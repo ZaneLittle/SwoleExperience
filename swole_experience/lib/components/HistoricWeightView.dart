@@ -13,7 +13,6 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
   bool _historicWeightViewExpanded = false;
 
   // TODO: TMP: Mocked data
-  // TODO: Try edit icon
   List<Widget> buildList() {
     return <Widget>[
       buildRow('17/03/2022', '162'),
