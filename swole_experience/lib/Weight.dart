@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 class Weight {
   Weight({
     required this.id,

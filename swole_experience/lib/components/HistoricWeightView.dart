@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:swole_experience/components/WeightEditForm.dart';
 
 import '../Weight.dart';
 import '../service/WeightService.dart';
@@ -48,16 +49,29 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               child:
                   Text(DateFormat('yyyy-MM-dd HH:mm').format(weight.dateTime))),
           Text(weight.weight.toString()),
-          IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                editWeightModal(context, weight);
+              }),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    // TODO: Update list
                     WeightService.svc.removeWeight(weight.id!);
                   }))
         ]);
+  }
+
+  void editWeightModal(BuildContext context, Weight weight) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext ctx) {
+          return SizedBox(
+              height: MediaQuery.of(context).size.height * .75,
+              child: WeightEditForm(weight: weight));
+        });
   }
 
   @override

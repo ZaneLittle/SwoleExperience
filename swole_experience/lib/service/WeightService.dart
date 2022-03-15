@@ -58,4 +58,9 @@ class WeightService {
     Database db = await svc.db;
     return await db.delete(_dbName, where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<int> updateWeight(Weight weight) async {
+    Database db = await svc.db;
+    return await db.update(_dbName, weight.toMap(), where: 'id = ?', whereArgs: [weight.id]);
+  }
 }
