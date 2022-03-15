@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:swole_experience/constants/ChartDemoData.dart';
 
-class WeightTrackerChart extends StatefulWidget {
-  const WeightTrackerChart({Key? key}) : super(key: key);
+class WeightTrendChart extends StatefulWidget {
+  const WeightTrendChart({Key? key}) : super(key: key);
 
   @override
-  State<WeightTrackerChart> createState() => _WeightTrackerChartState();
+  State<WeightTrendChart> createState() => _WeightTrendChartState();
 }
 
-class _WeightTrackerChartState extends State<WeightTrackerChart> {
+class _WeightTrendChartState extends State<WeightTrendChart> {
+  final GlobalKey<_WeightTrendChartState> _weightTrackerChartKey = GlobalKey<_WeightTrendChartState>();
+  bool _weightTrendExpanded = true;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(

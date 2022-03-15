@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../Weight.dart';
+import '../service/WeightService.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView({Key? key}) : super(key: key);
@@ -8,35 +12,47 @@ class HistoricWeightView extends StatefulWidget {
 }
 
 class _HistoricWeightViewState extends State<HistoricWeightView> {
-  final GlobalKey<_HistoricWeightViewState> _historicWeightViewKey = GlobalKey<_HistoricWeightViewState>();
+  final GlobalKey<_HistoricWeightViewState> _historicWeightViewKey =
+      GlobalKey<_HistoricWeightViewState>();
   final ScrollController _scrollController = ScrollController();
   bool _historicWeightViewExpanded = false;
 
-  // TODO: TMP: Mocked data
-  List<Widget> buildList() {
-    return <Widget>[
-      buildRow('17/03/2022', '162'),
-      buildRow('10/03/2022', '161'),
-      buildRow('03/03/2022', '160'),
-      buildRow('20/02/2022', '163'),
-      buildRow('13/02/2022', '159'),
-      buildRow('04/02/2022', '162'),
-      buildRow('23/01/2022', '164'),
-      buildRow('14/01/2022', '163'),
-      buildRow('07/01/2022', '163'),
-    ];
+  FutureBuilder buildList() {
+    return FutureBuilder<List<Weight>>(
+        future: WeightService.svc.getWeights(),
+        builder: (BuildContext context, AsyncSnapshot<List<Weight>> snapshot) {
+          // TODO: Proper dead states
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: Text('Loading...'));
+          } else if (!snapshot.hasData ||
+              snapshot.data == null ||
+              snapshot.data!.isEmpty) {
+            return const Center(child: Text('No weights have been logged'));
+          } else {
+            return ListView(
+              controller: _scrollController,
+              children: snapshot.data!.map((weight) {
+                return buildRow(
+                    DateFormat('yyyy-MM-dd HH:mm').format(weight.dateTime),
+                    weight.weight.toString());
+              }).toList(),
+            );
+          }
+        });
   }
 
   Row buildRow(String date, String weight) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-      Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(date)),
-      Text(weight),
-      Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: IconButton(icon: const Icon(Icons.edit), onPressed: () {}))
-    ]);
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(date)),
+          Text(weight),
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: IconButton(icon: const Icon(Icons.edit), onPressed: () {}))
+        ]);
   }
 
   @override
@@ -46,7 +62,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       title: const Text('Historic Weight Data'),
       subtitle: const Text('See all of your past weight data and edit.'),
       children: <Widget>[
-        Container(height: 200, child: ListView(controller: _scrollController, children: buildList())),
+        SizedBox(height: 200, child: buildList()),
       ],
       onExpansionChanged: (bool expanded) {
         setState(() => _historicWeightViewExpanded = expanded);

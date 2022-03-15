@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:swole_experience/components/WeightTracker.dart';
 
-void main() => runApp(SwoleExperienceApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const SwoleExperienceApp());
+}
 
 class SwoleExperienceApp extends StatelessWidget {
   const SwoleExperienceApp({Key? key}) : super(key: key);
@@ -39,6 +42,7 @@ class _AppState extends State<StatefulApp> {
     });
   }
 
+  // TODO: Routing
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

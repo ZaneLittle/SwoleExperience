@@ -21,7 +21,7 @@ class _WeightTrackerState extends State<WeightTracker> {
     return ListView(controller: _scrollController, children: <Widget>[
       Column(children: const <Widget>[
         WeightEntryForm(),
-        WeightTrackerChart(),
+        WeightTrendChart(),
         HistoricWeightView(),
       ])
     ]);
