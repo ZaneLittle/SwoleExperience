@@ -27,11 +27,8 @@ class WeightService {
     );
   }
 
-  /**
-   * Creates new database
-   *
-   * Note: dateTime is stored as TEXT since DATETIME is not supported: https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
-   */
+  /// Creates new database
+  /// Note: dateTime is stored as TEXT since DATETIME is not supported: https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $_dbName(
@@ -55,5 +52,10 @@ class WeightService {
   Future<int> addWeight(Weight weight) async {
     Database db = await svc.db;
     return await db.insert(_dbName, weight.toMap());
+  }
+
+  Future<int> removeWeight(String id) async {
+    Database db = await svc.db;
+    return await db.delete(_dbName, where: 'id = ?', whereArgs: [id]);
   }
 }

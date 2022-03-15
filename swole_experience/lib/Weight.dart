@@ -7,7 +7,7 @@ class Weight {
     required this.weight,
   });
 
-  final String id;
+  final String? id;
   final DateTime dateTime;
   final double weight;
 

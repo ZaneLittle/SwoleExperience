@@ -32,26 +32,31 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
             return ListView(
               controller: _scrollController,
               children: snapshot.data!.map((weight) {
-                return buildRow(
-                    DateFormat('yyyy-MM-dd HH:mm').format(weight.dateTime),
-                    weight.weight.toString());
+                return buildRow(weight);
               }).toList(),
             );
           }
         });
   }
 
-  Row buildRow(String date, String weight) {
+  Row buildRow(Weight weight) {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(date)),
-          Text(weight),
+              child:
+                  Text(DateFormat('yyyy-MM-dd HH:mm').format(weight.dateTime))),
+          Text(weight.weight.toString()),
+          IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: IconButton(icon: const Icon(Icons.edit), onPressed: () {}))
+              child: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    // TODO: Update list
+                    WeightService.svc.removeWeight(weight.id!);
+                  }))
         ]);
   }
 
