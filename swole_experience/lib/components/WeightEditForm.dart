@@ -39,6 +39,7 @@ class _WeightEditFormState extends State<WeightEditForm> {
           weight: updatedWeightValue);
 
       WeightService.svc.updateWeight(updatedWeight);
+      // TODO Update chart and table
     }
   }
 

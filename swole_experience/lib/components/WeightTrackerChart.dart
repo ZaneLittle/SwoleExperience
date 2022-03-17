@@ -18,6 +18,10 @@ class WeightTrendChart extends StatefulWidget {
 class _WeightTrendChartState extends State<WeightTrendChart> {
   final GlobalKey<_WeightTrendChartState> _weightTrackerChartKey =
       GlobalKey<_WeightTrendChartState>();
+  final ScrollController _scrollController = ScrollController();
+  bool? _showMinMax = true;
+  bool? _showAverage = true;
+  bool _optionsInitiallyExpanded = false;
 
   ///                       Chart Area Data                                  ///
   static FlBorderData get borderData => FlBorderData(
@@ -33,7 +37,6 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   static FlTitlesData getTitlesData(Map<double, List<double>> weightSeries) {
     return FlTitlesData(
       bottomTitles: getBottomTitles(weightSeries),
-      //SideTitles(showTitles: false),
       rightTitles: SideTitles(showTitles: false),
       topTitles: SideTitles(showTitles: false),
       leftTitles: leftTitles(
@@ -49,8 +52,6 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     if (interval < 1) {
       interval = 1;
     }
-
-    int i = 0;
 
     return SideTitles(
         showTitles: true,
@@ -101,6 +102,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
       Map<double, List<double>> weightSeries) {
     return [
       LineChartBarData(
+          show: _showAverage,
           isCurved: true,
           colors: [const Color(0xff4af699)],
           barWidth: 4,
@@ -109,6 +111,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           belowBarData: BarAreaData(show: false),
           spots: getAverageSeries(weightSeries)),
       LineChartBarData(
+          show: _showMinMax,
           isCurved: true,
           colors: [const Color(0x69999999)],
           barWidth: 2,
@@ -117,6 +120,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           belowBarData: BarAreaData(show: false),
           spots: getMaxSeries(weightSeries)),
       LineChartBarData(
+          show: _showMinMax,
           isCurved: true,
           colors: [const Color(0x69999999)],
           barWidth: 2,
@@ -163,6 +167,28 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return data;
   }
 
+  ///                             Helpers                                   ///
+  Color getFillColor(Set<MaterialState> states, Color active) {
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+      MaterialState.pressed,
+      MaterialState.hovered,
+      MaterialState.focused,
+      MaterialState.selected,
+    };
+    if (states.any(interactiveStates.contains)) {
+      return active;
+    }
+    return const Color(0xff75729e);
+  }
+
+  Color getMinMaxFillColor(Set<MaterialState> states) {
+    return getFillColor(states, const Color(0x69999999));
+  }
+
+  Color getAverageFillColor(Set<MaterialState> states) {
+    return getFillColor(states, const Color(0xff4af699));
+  }
+
   ///                             Build                                     ///
   // TODO: Chart does not reload when adding weight - reload is required
   @override
@@ -172,38 +198,97 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
         builder: (BuildContext context, AsyncSnapshot<List<Weight>> snapshot) {
           // TODO: Proper dead states
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: Text('Loading...'));
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * .4,
+                child: const Center(child: Text('Loading...')));
           } else if (!snapshot.hasData ||
               snapshot.data == null ||
               snapshot.data!.isEmpty) {
-            return const Center(child: Text('No weights have been logged'));
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * .4,
+                child:
+                    const Center(child: Text('No weights have been logged')));
           } else {
             Map<double, List<double>> weightSeries =
                 getWeightGrouping(snapshot.requireData);
 
             double maxWeight =
                 weightSeries.values.map((l) => l.reduce(max)).reduce(max);
+            maxWeight = maxWeight % 2 == 0 ? maxWeight + 2 : maxWeight + 3;
+
             double minWeight =
                 weightSeries.values.map((l) => l.reduce(min)).reduce(min);
+            minWeight = minWeight % 2 == 0 ? minWeight - 2 : minWeight - 3;
 
-            return SizedBox(
-                height: MediaQuery.of(context).size.height * .45,
-                child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-                    child: LineChart(
-                      LineChartData(
-                        lineTouchData: lineTouchData,
-                        gridData: gridData,
-                        titlesData: getTitlesData(weightSeries),
-                        borderData: borderData,
-                        lineBarsData: buildWeightData(weightSeries),
-                        maxY: maxWeight + 2,
-                        minY: minWeight - 2,
-                      ),
-                      swapAnimationDuration: const Duration(milliseconds: 150),
-                      swapAnimationCurve: Curves.linear,
-                    )));
+            return Column(children: <Widget>[
+              SizedBox(
+                  height: MediaQuery.of(context).size.height * .4,
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 14, bottom: 18),
+                      child: LineChart(
+                        LineChartData(
+                          lineTouchData: lineTouchData,
+                          gridData: gridData,
+                          titlesData: getTitlesData(weightSeries),
+                          borderData: borderData,
+                          lineBarsData: buildWeightData(weightSeries),
+                          maxY: maxWeight,
+                          minY: minWeight,
+                        ),
+                        swapAnimationDuration:
+                            const Duration(milliseconds: 150),
+                        swapAnimationCurve: Curves.linear,
+                      ))),
+              ExpansionTile(
+                  title: const Text('Line Options'),
+                  initiallyExpanded: _optionsInitiallyExpanded,
+                  onExpansionChanged: (bool expanded) {
+                    setState(() => _optionsInitiallyExpanded = expanded);
+                  },
+                  children: <Widget>[
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height * .2,
+                        child: ListView(
+                            controller: _scrollController,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _showMinMax,
+                                    fillColor:
+                                        MaterialStateProperty.resolveWith(
+                                            getMinMaxFillColor),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _showMinMax = value;
+                                        build(context);
+                                      });
+                                    },
+                                  ),
+                                  const Text('Min/Max'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _showAverage,
+                                    fillColor:
+                                        MaterialStateProperty.resolveWith(
+                                            getAverageFillColor),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _showAverage = value;
+                                        build(context);
+                                      });
+                                    },
+                                  ),
+                                  const Text('Average'),
+                                ],
+                              ),
+                            ]))
+                  ])
+            ]);
           }
         });
   }

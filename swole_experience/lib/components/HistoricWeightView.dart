@@ -59,7 +59,9 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    WeightService.svc.removeWeight(weight.id!);
+                    WeightService.svc.removeWeight(weight.id!).then((res) =>
+                        build(context) // TODO: not actually building
+                    );
                   }))
         ]);
   }
@@ -83,6 +85,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
             height: MediaQuery.of(context).size.height * .225,
             child: buildList()),
       ],
+      initiallyExpanded: _historicWeightViewExpanded,
       onExpansionChanged: (bool expanded) {
         setState(() => _historicWeightViewExpanded = expanded);
       },
