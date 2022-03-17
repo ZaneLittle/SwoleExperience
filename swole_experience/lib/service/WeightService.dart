@@ -3,15 +3,14 @@ import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/Weight.dart';
+import 'package:swole_experience/model/Weight.dart';
 
 class WeightService {
   static const String _dbName = 'weight';
 
   WeightService._privateConstructor();
 
-  static final WeightService svc =
-      WeightService._privateConstructor();
+  static final WeightService svc = WeightService._privateConstructor();
 
   static Database? _db;
 
@@ -39,9 +38,14 @@ class WeightService {
     ''');
   }
 
+  /// Queries the last 60 days of weight records
   Future<List<Weight>> getWeights() async {
+    String dateBound =
+        DateTime.now().subtract(const Duration(days: 60)).toString();
+
     Database db = await svc.db;
-    var weights = await db.query(_dbName, orderBy: 'dateTime DESC');
+    var weights = await db.query(_dbName,
+        orderBy: 'dateTime DESC', where: '"dateTime" > ?', whereArgs: [dateBound]); // TODO: not getting any results
 
     List<Weight> weightList = weights.isNotEmpty
         ? weights.map((c) => Weight.fromMap(c)).toList()
@@ -61,6 +65,7 @@ class WeightService {
 
   Future<int> updateWeight(Weight weight) async {
     Database db = await svc.db;
-    return await db.update(_dbName, weight.toMap(), where: 'id = ?', whereArgs: [weight.id]);
+    return await db.update(_dbName, weight.toMap(),
+        where: 'id = ?', whereArgs: [weight.id]);
   }
 }

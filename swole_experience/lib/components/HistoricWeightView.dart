@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:swole_experience/components/WeightEditForm.dart';
 
-import '../Weight.dart';
+import '../model/Weight.dart';
 import '../service/WeightService.dart';
 
 class HistoricWeightView extends StatefulWidget {
@@ -69,7 +69,6 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
         context: context,
         builder: (BuildContext ctx) {
           return SizedBox(
-              height: MediaQuery.of(context).size.height * .75,
               child: WeightEditForm(weight: weight));
         });
   }
@@ -79,9 +78,10 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
     return ExpansionTile(
       key: _historicWeightViewKey,
       title: const Text('Historic Weight Data'),
-      subtitle: const Text('See all of your past weight data and edit.'),
       children: <Widget>[
-        SizedBox(height: 200, child: buildList()),
+        SizedBox(
+            height: MediaQuery.of(context).size.height * .225,
+            child: buildList()),
       ],
       onExpansionChanged: (bool expanded) {
         setState(() => _historicWeightViewExpanded = expanded);

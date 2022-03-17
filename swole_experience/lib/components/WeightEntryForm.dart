@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-import '../Weight.dart';
+import '../model/Weight.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
 
@@ -42,7 +42,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
-                Icon(Icons.thumb_up),
+                Icon(Icons.thumb_up, color: Color(0xff75729e),),
                 SizedBox(
                   width: 20,
                 ),
@@ -54,9 +54,9 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: MediaQuery.of(context).size.height * .2,
+        height: MediaQuery.of(context).size.height * .125,
         width: MediaQuery.of(context).size.width * .9,
-        padding: const EdgeInsets.only(top: 32),
+        padding: const EdgeInsets.only(top: 12),
         child: Form(
             key: _formKey,
             child: Column(

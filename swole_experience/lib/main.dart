@@ -51,7 +51,6 @@ class _AppState extends State<StatefulApp> {
         ),
         darkTheme: ThemeData(
           brightness: Brightness.dark,
-          // TODO: BUG: separation lines not showing
         ),
         themeMode: ThemeMode.system,
         home: Scaffold(
