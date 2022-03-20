@@ -9,6 +9,7 @@ import '../model/Average.dart';
 import '../util/Converter.dart';
 import '../model/Weight.dart';
 import '../service/WeightService.dart';
+import '../util/Util.dart';
 
 class WeightTrendChart extends StatefulWidget {
   const WeightTrendChart({Key? key}) : super(key: key);
@@ -239,7 +240,6 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   // TODO: ENHANCEMENT Look into scrolling chart to allow showing more than just the 60 day window
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<List<List<dynamic>>>(
         future: Future.wait(
             [WeightService.svc.getWeights(), AverageService.svc.getAverages()]),
@@ -274,7 +274,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
 
             return Column(children: <Widget>[
               SizedBox(
-                  height: MediaQuery.of(context).size.height * .4,
+                  height: MediaQuery.of(context).size.height * .45,
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 10, right: 14, bottom: 18),
@@ -294,11 +294,15 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                         swapAnimationCurve: Curves.linear,
                       ))),
               //TODO: BUG: Why is it reloading when this is opened
+              //TODO: Refactor out to separate component
               ExpansionTile(
                   title: const Text('Line Options'),
                   initiallyExpanded: _optionsInitiallyExpanded,
                   onExpansionChanged: (bool expanded) {
                     setState(() => _optionsInitiallyExpanded = expanded);
+                    if(expanded) {
+                      Util().scrollToSelectedContext(_weightTrackerChartKey);
+                    }
                   },
                   children: <Widget>[
                     SizedBox(

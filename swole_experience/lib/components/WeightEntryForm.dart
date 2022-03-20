@@ -8,6 +8,7 @@ import '../model/Weight.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
 import '../util/Converter.dart';
+import 'AlertSnackBar.dart';
 
 // TODO: ENHANCEMENT: allow user to select time and date
 class WeightEntryForm extends StatefulWidget {
@@ -41,26 +42,21 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         AverageService.svc
             .calculateAverages(Converter().truncateToDay(dateTime).toString());
       }
+    }).onError((error, stackTrace) {
+      // TODO: add proper logger
+      print("Error adding weight $error\n$stackTrace");
+      const AlertSnackBar(
+        message: 'Unable to add weight.',
+        state: SnackBarState.failure,
+      ).alert(context);
+    }).then((res) {
+      if (res != 0) {
+        const AlertSnackBar(
+          message: 'Weight Added!',
+          state: SnackBarState.success,
+        ).alert(context);
+      }
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                Icon(
-                  Icons.thumb_up,
-                  color: Color(0xff4af699),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Text('Added Weight!'),
-              ],
-            ))));
   }
 
   @override

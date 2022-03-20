@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../components/WeightEditForm.dart';
 import '../model/Weight.dart';
 import '../service/WeightService.dart';
+import '../util/Util.dart';
+import 'AlertSnackBar.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView({Key? key}) : super(key: key);
@@ -17,6 +19,28 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       GlobalKey<_HistoricWeightViewState>();
   final ScrollController _scrollController = ScrollController();
   bool _historicWeightViewExpanded = false;
+
+  void deleteWeight(String? id) {
+    if (id != null) {
+      WeightService.svc.removeWeight(id).onError((error, stackTrace) {
+        // TODO: add proper logger
+        print("Error deleting weight $error\n$stackTrace");
+        const AlertSnackBar(
+          message: 'Unable to delete weight.',
+          state: SnackBarState.failure,
+        ).alert(context);
+        return 0;
+      }).then((res) {
+        if (res != 0) {
+          const AlertSnackBar(
+            message: 'Deleted Added!',
+            state: SnackBarState.success,
+          ).alert(context);
+          setState(() {});
+        }
+      });
+    }
+  }
 
   FutureBuilder buildList() {
     return FutureBuilder<List<Weight>>(
@@ -59,9 +83,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    WeightService.svc.removeWeight(weight.id!).then(
-                        (res) => build(context) // TODO: not actually building
-                        );
+                    deleteWeight(weight.id);
                   }))
         ]);
   }
@@ -81,12 +103,15 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       title: const Text('Historic Weight Data'),
       children: <Widget>[
         SizedBox(
-            height: MediaQuery.of(context).size.height * .225,
+            height: MediaQuery.of(context).size.height * .25,
             child: buildList()),
       ],
       initiallyExpanded: _historicWeightViewExpanded,
       onExpansionChanged: (bool expanded) {
         setState(() => _historicWeightViewExpanded = expanded);
+        if (expanded) {
+          Util().scrollToSelectedContext(_historicWeightViewKey);
+        }
       },
     );
   }

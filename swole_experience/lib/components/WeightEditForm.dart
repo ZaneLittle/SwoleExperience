@@ -7,8 +7,8 @@ import '../model/Weight.dart';
 import '../service/AverageService.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
+import 'AlertSnackBar.dart';
 
-// TODO: ENHANCEMENT: allow user to select time and date
 class WeightEditForm extends StatefulWidget {
   const WeightEditForm({Key? key, required this.weight}) : super(key: key);
 
@@ -44,6 +44,20 @@ class _WeightEditFormState extends State<WeightEditForm> {
         if (r != 0) {
           DateTime roundedDate = Converter().truncateToDay(updatedDateTime);
           AverageService.svc.calculateAverages(roundedDate.toString());
+        }
+      }).onError((error, stackTrace) {
+        // TODO: add proper logger
+        print("Error updating weight $error\n$stackTrace");
+        const AlertSnackBar(
+          message: 'Unable to update weight.',
+          state: SnackBarState.failure,
+        ).alert(context);
+      }).then((res) {
+        if (res != 0) {
+          const AlertSnackBar(
+            message: 'Weight Updated!',
+            state: SnackBarState.success,
+          ).alert(context);
         }
       });
       // TODO Update chart and table
