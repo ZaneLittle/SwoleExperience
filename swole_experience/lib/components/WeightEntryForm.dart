@@ -1,11 +1,13 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:swole_experience/service/AverageService.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/Weight.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
+import '../util/Converter.dart';
 
 // TODO: ENHANCEMENT: allow user to select time and date
 class WeightEntryForm extends StatefulWidget {
@@ -31,8 +33,15 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
     _weightController.value = TextEditingValue.empty;
     _dateController.value = TextEditingValue.empty;
 
-    WeightService.svc.addWeight(Weight(
-        id: const Uuid().v1(), weight: weightVal, dateTime: dateTime));
+    WeightService.svc
+        .addWeight(Weight(
+            id: const Uuid().v1(), weight: weightVal, dateTime: dateTime))
+        .then((int r) {
+      if (r != 0) {
+        AverageService.svc
+            .calculateAverages(Converter().truncateToDay(dateTime).toString());
+      }
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: GestureDetector(
@@ -42,7 +51,10 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const <Widget>[
-                Icon(Icons.thumb_up, color: Color(0xff75729e),),
+                Icon(
+                  Icons.thumb_up,
+                  color: Color(0xff4af699),
+                ),
                 SizedBox(
                   width: 20,
                 ),

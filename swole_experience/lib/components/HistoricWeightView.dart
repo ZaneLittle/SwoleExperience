@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:swole_experience/components/WeightEditForm.dart';
 
+import '../components/WeightEditForm.dart';
 import '../model/Weight.dart';
 import '../service/WeightService.dart';
 
@@ -59,9 +59,9 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    WeightService.svc.removeWeight(weight.id!).then((res) =>
-                        build(context) // TODO: not actually building
-                    );
+                    WeightService.svc.removeWeight(weight.id!).then(
+                        (res) => build(context) // TODO: not actually building
+                        );
                   }))
         ]);
   }
@@ -70,8 +70,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext ctx) {
-          return SizedBox(
-              child: WeightEditForm(weight: weight));
+          return SizedBox(child: WeightEditForm(weight: weight));
         });
   }
 

@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:swole_experience/util/Converter.dart';
+import 'package:swole_experience/service/AverageService.dart';
 
+import '../model/Average.dart';
+import '../util/Converter.dart';
 import '../model/Weight.dart';
 import '../service/WeightService.dart';
 
@@ -21,6 +23,8 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   final ScrollController _scrollController = ScrollController();
   bool? _showMinMax = true;
   bool? _showAverage = true;
+  bool? _showThreeDayAverage = true;
+  bool? _showSevenDayAverage = true;
   bool _optionsInitiallyExpanded = false;
 
   ///                       Chart Area Data                                  ///
@@ -97,9 +101,8 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
       );
 
   ///                           Data Builder                                ///
-  // TODO: 3 day and 7 day average
   List<LineChartBarData> buildWeightData(
-      Map<double, List<double>> weightSeries) {
+      Map<double, List<double>> weightSeries, List<Average> averageSeries) {
     return [
       LineChartBarData(
           show: _showAverage,
@@ -127,7 +130,25 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
           belowBarData: BarAreaData(show: false),
-          spots: getMinSeries(weightSeries))
+          spots: getMinSeries(weightSeries)),
+      LineChartBarData(
+          show: _showThreeDayAverage,
+          isCurved: true,
+          colors: [const Color(0xff4a5bf6)],
+          barWidth: 2,
+          isStrokeCapRound: false,
+          dotData: FlDotData(show: false),
+          belowBarData: BarAreaData(show: false),
+          spots: getThreeDayAverageSeries(averageSeries)),
+      LineChartBarData(
+          show: _showSevenDayAverage,
+          isCurved: true,
+          colors: [const Color(0xffff3030)],
+          barWidth: 2,
+          isStrokeCapRound: false,
+          dotData: FlDotData(show: false),
+          belowBarData: BarAreaData(show: false),
+          spots: getSevenDayAverageSeries(averageSeries)),
     ];
   }
 
@@ -135,6 +156,22 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return weightSeries.entries
         .map<FlSpot>((entry) => FlSpot((entry.key).truncateToDouble(),
             entry.value.reduce((a, b) => a + b) / entry.value.length))
+        .toList();
+  }
+
+  List<FlSpot> getThreeDayAverageSeries(List<Average> averageSeries) {
+    return averageSeries
+        .map<FlSpot>((entry) => FlSpot(
+            Converter().toDayScale(entry.date).truncateToDouble(),
+            entry.threeDayAverage))
+        .toList();
+  }
+
+  List<FlSpot> getSevenDayAverageSeries(List<Average> averageSeries) {
+    return averageSeries
+        .map<FlSpot>((entry) => FlSpot(
+            Converter().toDayScale(entry.date).truncateToDouble(),
+            entry.sevenDayAverage))
         .toList();
   }
 
@@ -189,13 +226,25 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return getFillColor(states, const Color(0xff4af699));
   }
 
+  Color getThreeDayAverageFillColor(Set<MaterialState> states) {
+    return getFillColor(states, const Color(0xff4a5bf6));
+  }
+
+  Color getSevenDayAverageFillColor(Set<MaterialState> states) {
+    return getFillColor(states, const Color(0xffff3030));
+  }
+
   ///                             Build                                     ///
-  // TODO: Chart does not reload when adding weight - reload is required
+  // TODO: BUG: Chart does not reload when adding weight
+  // TODO: ENHANCEMENT Look into scrolling chart to allow showing more than just the 60 day window
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Weight>>(
-        future: WeightService.svc.getWeights(),
-        builder: (BuildContext context, AsyncSnapshot<List<Weight>> snapshot) {
+
+    return FutureBuilder<List<List<dynamic>>>(
+        future: Future.wait(
+            [WeightService.svc.getWeights(), AverageService.svc.getAverages()]),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<List<dynamic>>> snapshot) {
           // TODO: Proper dead states
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SizedBox(
@@ -210,7 +259,10 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                     const Center(child: Text('No weights have been logged')));
           } else {
             Map<double, List<double>> weightSeries =
-                getWeightGrouping(snapshot.requireData);
+                getWeightGrouping(snapshot.requireData[0] as List<Weight>);
+
+            List<Average> averageSeries =
+                snapshot.requireData[1] as List<Average>;
 
             double maxWeight =
                 weightSeries.values.map((l) => l.reduce(max)).reduce(max);
@@ -232,7 +284,8 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                           gridData: gridData,
                           titlesData: getTitlesData(weightSeries),
                           borderData: borderData,
-                          lineBarsData: buildWeightData(weightSeries),
+                          lineBarsData:
+                              buildWeightData(weightSeries, averageSeries),
                           maxY: maxWeight,
                           minY: minWeight,
                         ),
@@ -240,6 +293,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                             const Duration(milliseconds: 150),
                         swapAnimationCurve: Curves.linear,
                       ))),
+              //TODO: BUG: Why is it reloading when this is opened
               ExpansionTile(
                   title: const Text('Line Options'),
                   initiallyExpanded: _optionsInitiallyExpanded,
@@ -248,12 +302,17 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                   },
                   children: <Widget>[
                     SizedBox(
-                        height: MediaQuery.of(context).size.height * .2,
-                        child: ListView(
-                            controller: _scrollController,
-                            children: <Widget>[
+                        height: 100,
+                        child:
+                            ListView(controller: _scrollController, children: <
+                                Widget>[
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                            Expanded(
+                                child: Column(children: <Widget>[
                               Row(
-                                children: [
+                                children: <Widget>[
                                   Checkbox(
                                     value: _showMinMax,
                                     fillColor:
@@ -285,8 +344,47 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                                   ),
                                   const Text('Average'),
                                 ],
+                              )
+                            ])),
+                            Expanded(
+                                child: Column(children: <Widget>[
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _showThreeDayAverage,
+                                    fillColor:
+                                        MaterialStateProperty.resolveWith(
+                                            getThreeDayAverageFillColor),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _showThreeDayAverage = value;
+                                        build(context);
+                                      });
+                                    },
+                                  ),
+                                  const Text('Three Day Average'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _showSevenDayAverage,
+                                    fillColor:
+                                        MaterialStateProperty.resolveWith(
+                                            getSevenDayAverageFillColor),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _showSevenDayAverage = value;
+                                        build(context);
+                                      });
+                                    },
+                                  ),
+                                  const Text('Seven Day Average'),
+                                ],
                               ),
                             ]))
+                          ])
+                        ]))
                   ])
             ]);
           }

@@ -1,10 +1,20 @@
 import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/model/Weight.dart';
+import 'package:swole_experience/util/Converter.dart';
 
+import '../model/Weight.dart';
+
+/// WeightService provides an interface to the `weight` table.
+/// This table stores the raw weight data the user has entered
+/// Weight = {
+///   TEXT id       = uuid for weight record
+///   FLOAT weight  = weight value the user has entered
+///   TEXT dateTime = string representation of the date the record is for
+/// }
+/// Note: dateTime is stored as TEXT since DATETIME is not supported:
+/// https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
 class WeightService {
   static const String _dbName = 'weight';
 
@@ -27,7 +37,6 @@ class WeightService {
   }
 
   /// Creates new database
-  /// Note: dateTime is stored as TEXT since DATETIME is not supported: https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $_dbName(
@@ -38,19 +47,28 @@ class WeightService {
     ''');
   }
 
-  /// Queries the last 60 days of weight records
-  Future<List<Weight>> getWeights() async {
-    String dateBound =
-        DateTime.now().subtract(const Duration(days: 60)).toString();
-
+  /// Queries a 60 day window of weight records, beginning at the start date,
+  /// or now if null
+  Future<List<Weight>> getWeights({DateTime? startDate}) async {
     Database db = await svc.db;
-    var weights = await db.query(_dbName,
-        orderBy: 'dateTime DESC', where: '"dateTime" > ?', whereArgs: [dateBound]); // TODO: not getting any results
 
-    List<Weight> weightList = weights.isNotEmpty
-        ? weights.map((c) => Weight.fromMap(c)).toList()
+    String dateBound = startDate != null
+        ? startDate.subtract(const Duration(days: 60)).toString()
+        : DateTime.now().subtract(const Duration(days: 60)).toString();
+
+    String startDateStr = startDate != null
+      ? Converter().roundToNextDay(startDate).toString()
+      : Converter().roundToNextDay(DateTime.now()).toString();
+
+    var weights = await db.query(_dbName,
+        orderBy: 'dateTime DESC',
+        where: '"dateTime" >= ? AND "dateTime" <= ?',
+        whereArgs: [dateBound, startDateStr],
+    );
+
+    return weights.isNotEmpty
+        ? weights.map((w) => Weight.fromMap(w)).toList()
         : [];
-    return weightList;
   }
 
   Future<int> addWeight(Weight weight) async {

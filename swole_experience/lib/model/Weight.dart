@@ -24,6 +24,6 @@ class Weight {
 
   @override
   String toString() {
-    return 'Weight:\n\tID:$id\n\tDateTime:$dateTime\n\t$weight';
+    return 'Weight:\n\tID:$id\n\tDateTime:$dateTime\n\tWeight:$weight';
   }
 }

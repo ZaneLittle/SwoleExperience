@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:swole_experience/util/Converter.dart';
 
 import '../model/Weight.dart';
+import '../service/AverageService.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
 
@@ -38,7 +40,12 @@ class _WeightEditFormState extends State<WeightEditForm> {
           dateTime: updatedDateTime,
           weight: updatedWeightValue);
 
-      WeightService.svc.updateWeight(updatedWeight);
+      WeightService.svc.updateWeight(updatedWeight).then((int r) {
+        if (r != 0) {
+          DateTime roundedDate = Converter().truncateToDay(updatedDateTime);
+          AverageService.svc.calculateAverages(roundedDate.toString());
+        }
+      });
       // TODO Update chart and table
     }
   }
