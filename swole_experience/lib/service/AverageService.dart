@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/util/Converter.dart';
 
 import '../model/Average.dart';
 import '../model/Weight.dart';
+import '../util/Converter.dart';
 import 'WeightService.dart';
 
 /// AverageService provides an interface to the `average` table.
@@ -124,8 +124,8 @@ class AverageService {
           sevenDayAvgList.reduce((a, b) => a + b) / sevenDayAvgList.length,
     );
 
-    int res = await db
-        .update(_dbName, average.toMap(), where: 'dateTime = ?', whereArgs: [date]);
+    int res = await db.update(_dbName, average.toMap(),
+        where: 'dateTime = ?', whereArgs: [date]);
     if (res == 0) {
       return await db.insert(_dbName, average.toMap());
     }

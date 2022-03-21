@@ -3,16 +3,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:swole_experience/service/AverageService.dart';
 
 import '../model/Average.dart';
 import '../util/Converter.dart';
 import '../model/Weight.dart';
-import '../service/WeightService.dart';
 import '../util/Util.dart';
 
 class WeightTrendChart extends StatefulWidget {
-  const WeightTrendChart({Key? key}) : super(key: key);
+  const WeightTrendChart({Key? key, this.context, this.dataSnapshot})
+      : super(key: key);
+
+  final BuildContext? context;
+  final AsyncSnapshot<List<List<dynamic>>>? dataSnapshot;
 
   @override
   State<WeightTrendChart> createState() => _WeightTrendChartState();
@@ -22,6 +24,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   final GlobalKey<_WeightTrendChartState> _weightTrackerChartKey =
       GlobalKey<_WeightTrendChartState>();
   final ScrollController _scrollController = ScrollController();
+
   bool? _showMinMax = true;
   bool? _showAverage = true;
   bool? _showThreeDayAverage = true;
@@ -240,158 +243,147 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   // TODO: ENHANCEMENT Look into scrolling chart to allow showing more than just the 60 day window
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<List<dynamic>>>(
-        future: Future.wait(
-            [WeightService.svc.getWeights(), AverageService.svc.getAverages()]),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<List<dynamic>>> snapshot) {
-          // TODO: Proper dead states
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return SizedBox(
-                height: MediaQuery.of(context).size.height * .4,
-                child: const Center(child: Text('Loading...')));
-          } else if (!snapshot.hasData ||
-              snapshot.data == null ||
-              snapshot.data!.isEmpty) {
-            return SizedBox(
-                height: MediaQuery.of(context).size.height * .4,
-                child:
-                    const Center(child: Text('No weights have been logged')));
-          } else {
-            Map<double, List<double>> weightSeries =
-                getWeightGrouping(snapshot.requireData[0] as List<Weight>);
+    if (widget.dataSnapshot == null ||
+        widget.dataSnapshot!.connectionState == ConnectionState.waiting) {
+      return SizedBox(
+          height: MediaQuery.of(context).size.height * .4,
+          child: const Center(child: Text('Loading...')));
+    } else if (!widget.dataSnapshot!.hasData ||
+        widget.dataSnapshot!.data == null ||
+        widget.dataSnapshot!.data!.isEmpty) {
+      return SizedBox(
+          height: MediaQuery.of(context).size.height * .4,
+          child: const Center(child: Text('No weights have been logged')));
+    } else {
+      Map<double, List<double>> weightSeries = getWeightGrouping(
+          widget.dataSnapshot!.requireData[0] as List<Weight>);
 
-            List<Average> averageSeries =
-                snapshot.requireData[1] as List<Average>;
+      List<Average> averageSeries =
+          widget.dataSnapshot!.requireData[1] as List<Average>;
 
-            double maxWeight =
-                weightSeries.values.map((l) => l.reduce(max)).reduce(max);
-            maxWeight = maxWeight % 2 == 0 ? maxWeight + 2 : maxWeight + 3;
+      double maxWeight =
+          weightSeries.values.map((l) => l.reduce(max)).reduce(max);
+      maxWeight = maxWeight % 2 == 0 ? maxWeight + 2 : maxWeight + 3;
 
-            double minWeight =
-                weightSeries.values.map((l) => l.reduce(min)).reduce(min);
-            minWeight = minWeight % 2 == 0 ? minWeight - 2 : minWeight - 3;
+      double minWeight =
+          weightSeries.values.map((l) => l.reduce(min)).reduce(min);
+      minWeight = minWeight % 2 == 0 ? minWeight - 2 : minWeight - 3;
 
-            return Column(children: <Widget>[
+      return Column(children: <Widget>[
+        SizedBox(
+            height: MediaQuery.of(context).size.height * .45,
+            child: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 14, bottom: 18),
+                child: LineChart(
+                  LineChartData(
+                    lineTouchData: lineTouchData,
+                    gridData: gridData,
+                    titlesData: getTitlesData(weightSeries),
+                    borderData: borderData,
+                    lineBarsData: buildWeightData(weightSeries, averageSeries),
+                    maxY: maxWeight,
+                    minY: minWeight,
+                  ),
+                  swapAnimationDuration: const Duration(milliseconds: 150),
+                  swapAnimationCurve: Curves.linear,
+                ))),
+        //TODO: Refactor out to separate component
+        ExpansionTile(
+            title: const Text('Line Options'),
+            initiallyExpanded: _optionsInitiallyExpanded,
+            onExpansionChanged: (bool expanded) {
+              setState(() => _optionsInitiallyExpanded = expanded);
+              if (expanded) {
+                Util().scrollToSelectedContext(_weightTrackerChartKey);
+              }
+            },
+            children: <Widget>[
               SizedBox(
-                  height: MediaQuery.of(context).size.height * .45,
-                  child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 10, right: 14, bottom: 18),
-                      child: LineChart(
-                        LineChartData(
-                          lineTouchData: lineTouchData,
-                          gridData: gridData,
-                          titlesData: getTitlesData(weightSeries),
-                          borderData: borderData,
-                          lineBarsData:
-                              buildWeightData(weightSeries, averageSeries),
-                          maxY: maxWeight,
-                          minY: minWeight,
-                        ),
-                        swapAnimationDuration:
-                            const Duration(milliseconds: 150),
-                        swapAnimationCurve: Curves.linear,
-                      ))),
-              //TODO: BUG: Why is it reloading when this is opened
-              //TODO: Refactor out to separate component
-              ExpansionTile(
-                  title: const Text('Line Options'),
-                  initiallyExpanded: _optionsInitiallyExpanded,
-                  onExpansionChanged: (bool expanded) {
-                    setState(() => _optionsInitiallyExpanded = expanded);
-                    if(expanded) {
-                      Util().scrollToSelectedContext(_weightTrackerChartKey);
-                    }
-                  },
-                  children: <Widget>[
-                    SizedBox(
-                        height: 100,
-                        child:
-                            ListView(controller: _scrollController, children: <
-                                Widget>[
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                            Expanded(
-                                child: Column(children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Checkbox(
-                                    value: _showMinMax,
-                                    fillColor:
-                                        MaterialStateProperty.resolveWith(
-                                            getMinMaxFillColor),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _showMinMax = value;
-                                        build(context);
-                                      });
-                                    },
-                                  ),
-                                  const Text('Min/Max'),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _showAverage,
-                                    fillColor:
-                                        MaterialStateProperty.resolveWith(
-                                            getAverageFillColor),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _showAverage = value;
-                                        build(context);
-                                      });
-                                    },
-                                  ),
-                                  const Text('Average'),
-                                ],
-                              )
-                            ])),
-                            Expanded(
-                                child: Column(children: <Widget>[
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _showThreeDayAverage,
-                                    fillColor:
-                                        MaterialStateProperty.resolveWith(
-                                            getThreeDayAverageFillColor),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _showThreeDayAverage = value;
-                                        build(context);
-                                      });
-                                    },
-                                  ),
-                                  const Text('Three Day Average'),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _showSevenDayAverage,
-                                    fillColor:
-                                        MaterialStateProperty.resolveWith(
-                                            getSevenDayAverageFillColor),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _showSevenDayAverage = value;
-                                        build(context);
-                                      });
-                                    },
-                                  ),
-                                  const Text('Seven Day Average'),
-                                ],
-                              ),
-                            ]))
-                          ])
-                        ]))
-                  ])
-            ]);
-          }
-        });
+                  height: 100,
+                  child: ListView(
+                      controller: _scrollController,
+                      children: <Widget>[
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                  child: Column(children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Checkbox(
+                                      value: _showMinMax,
+                                      fillColor:
+                                          MaterialStateProperty.resolveWith(
+                                              getMinMaxFillColor),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _showMinMax = value;
+                                          build(context);
+                                        });
+                                      },
+                                    ),
+                                    const Text('Min/Max'),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _showAverage,
+                                      fillColor:
+                                          MaterialStateProperty.resolveWith(
+                                              getAverageFillColor),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _showAverage = value;
+                                          build(context);
+                                        });
+                                      },
+                                    ),
+                                    const Text('Average'),
+                                  ],
+                                )
+                              ])),
+                              Expanded(
+                                  child: Column(children: <Widget>[
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _showThreeDayAverage,
+                                      fillColor:
+                                          MaterialStateProperty.resolveWith(
+                                              getThreeDayAverageFillColor),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _showThreeDayAverage = value;
+                                          build(context);
+                                        });
+                                      },
+                                    ),
+                                    const Text('Three Day Average'),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _showSevenDayAverage,
+                                      fillColor:
+                                          MaterialStateProperty.resolveWith(
+                                              getSevenDayAverageFillColor),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _showSevenDayAverage = value;
+                                          build(context);
+                                        });
+                                      },
+                                    ),
+                                    const Text('Seven Day Average'),
+                                  ],
+                                ),
+                              ]))
+                            ])
+                      ]))
+            ])
+      ]);
+    }
   }
 }

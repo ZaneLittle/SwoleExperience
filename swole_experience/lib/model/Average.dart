@@ -1,4 +1,4 @@
-import 'package:swole_experience/util/Converter.dart';
+import '../util/Converter.dart';
 
 class Average {
   Average({

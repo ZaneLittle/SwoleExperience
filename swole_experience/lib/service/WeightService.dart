@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/util/Converter.dart';
 
+import '../util/Converter.dart';
 import '../model/Weight.dart';
 
 /// WeightService provides an interface to the `weight` table.
@@ -57,13 +57,14 @@ class WeightService {
         : DateTime.now().subtract(const Duration(days: 60)).toString();
 
     String startDateStr = startDate != null
-      ? Converter().roundToNextDay(startDate).toString()
-      : Converter().roundToNextDay(DateTime.now()).toString();
+        ? Converter().roundToNextDay(startDate).toString()
+        : Converter().roundToNextDay(DateTime.now()).toString();
 
-    var weights = await db.query(_dbName,
-        orderBy: 'dateTime DESC',
-        where: '"dateTime" >= ? AND "dateTime" <= ?',
-        whereArgs: [dateBound, startDateStr],
+    var weights = await db.query(
+      _dbName,
+      orderBy: 'dateTime DESC',
+      where: '"dateTime" >= ? AND "dateTime" <= ?',
+      whereArgs: [dateBound, startDateStr],
     );
 
     return weights.isNotEmpty

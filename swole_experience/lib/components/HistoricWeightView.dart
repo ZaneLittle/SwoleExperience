@@ -8,7 +8,11 @@ import '../util/Util.dart';
 import 'AlertSnackBar.dart';
 
 class HistoricWeightView extends StatefulWidget {
-  const HistoricWeightView({Key? key}) : super(key: key);
+  const HistoricWeightView({Key? key, this.context, this.dataSnapshot})
+      : super(key: key);
+
+  final BuildContext? context;
+  final AsyncSnapshot<List<List<dynamic>>>? dataSnapshot;
 
   @override
   State<HistoricWeightView> createState() => _HistoricWeightViewState();
@@ -42,26 +46,22 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
     }
   }
 
-  FutureBuilder buildList() {
-    return FutureBuilder<List<Weight>>(
-        future: WeightService.svc.getWeights(),
-        builder: (BuildContext context, AsyncSnapshot<List<Weight>> snapshot) {
+  Widget buildList() {
           // TODO: Proper dead states
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (widget.dataSnapshot == null || widget.dataSnapshot!.connectionState == ConnectionState.waiting) {
             return const Center(child: Text('Loading...'));
-          } else if (!snapshot.hasData ||
-              snapshot.data == null ||
-              snapshot.data!.isEmpty) {
+          } else if (!widget.dataSnapshot!.hasData ||
+              widget.dataSnapshot!.data == null ||
+              widget.dataSnapshot!.data!.isEmpty) {
             return const Center(child: Text('No weights have been logged'));
           } else {
             return ListView(
               controller: _scrollController,
-              children: snapshot.data!.map((weight) {
+              children: widget.dataSnapshot!.requireData[0].map((weight) {
                 return buildRow(weight);
               }).toList(),
             );
           }
-        });
   }
 
   Row buildRow(Weight weight) {

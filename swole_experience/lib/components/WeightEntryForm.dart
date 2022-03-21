@@ -1,16 +1,15 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:swole_experience/service/AverageService.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/Weight.dart';
+import '../service/AverageService.dart';
 import '../service/WeightService.dart';
 import '../util/Validator.dart';
 import '../util/Converter.dart';
 import 'AlertSnackBar.dart';
 
-// TODO: ENHANCEMENT: allow user to select time and date
 class WeightEntryForm extends StatefulWidget {
   const WeightEntryForm({Key? key}) : super(key: key);
 
@@ -71,7 +70,6 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Row(
-                      // TODO: Elements need better styling and input needs to be hooked up to create
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Flexible(
