@@ -75,7 +75,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
         getTitles: (value) {
           DateTime now = DateTime.now();
           DateTime longDate =
-              DateTime(now.year, now.month, (now.day - value).toInt());
+              DateTime(now.year, now.month, (now.day - 60 + value).toInt());
           return DateFormat('MM/dd').format(longDate);
         });
   }

@@ -110,9 +110,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                             child: Padding(
                                 padding: const EdgeInsets.only(right: 4),
                                 child: TextFormField(
-                                  // focusNode: _weightEntryFieldFocusListener,
                                   controller: _weightController,
-                                  //MediaQuery.of(context).viewInsets.bottom
                                   decoration: InputDecoration(
                                     hintText: 'Enter your weight',
                                     suffixIcon: IconButton(
