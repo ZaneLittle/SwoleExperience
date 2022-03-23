@@ -22,6 +22,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
   final GlobalKey<_HistoricWeightViewState> _historicWeightViewKey =
       GlobalKey<_HistoricWeightViewState>();
   final ScrollController _scrollController = ScrollController();
+
   bool _historicWeightViewExpanded = false;
 
   void deleteWeight(String? id) {

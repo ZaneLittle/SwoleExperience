@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../components/HistoricWeightView.dart';
-import '../components/WeightEntryForm.dart';
-import '../components/WeightTrackerChart.dart';
+import 'HistoricWeightView.dart';
+import 'WeightEntryForm.dart';
+import 'WeightBreakdown.dart';
+import 'WeightTrackerChart.dart';
 import '../service/AverageService.dart';
 import '../service/WeightService.dart';
+
 
 class WeightTracker extends StatefulWidget {
   const WeightTracker({Key? key}) : super(key: key);
@@ -25,6 +27,7 @@ class _WeightTrackerState extends State<WeightTracker> {
         return ListView(controller: _scrollController, children: <Widget>[
           Column(children: <Widget>[
             const WeightEntryForm(),
+            WeightBreakdown(context: context, dataSnapshot: snapshot),
             WeightTrendChart(context: context, dataSnapshot: snapshot),
             HistoricWeightView(context: context, dataSnapshot: snapshot),
           ])
