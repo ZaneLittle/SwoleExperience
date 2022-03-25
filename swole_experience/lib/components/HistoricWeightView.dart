@@ -8,10 +8,15 @@ import '../util/Util.dart';
 import 'AlertSnackBar.dart';
 
 class HistoricWeightView extends StatefulWidget {
-  const HistoricWeightView({Key? key, this.context, this.dataSnapshot})
+  const HistoricWeightView(
+      {Key? key,
+      required this.context,
+      required this.rebuildCallback,
+      this.dataSnapshot})
       : super(key: key);
 
-  final BuildContext? context;
+  final BuildContext context;
+  final Function rebuildCallback;
   final AsyncSnapshot<List<List<dynamic>>>? dataSnapshot;
 
   @override
@@ -38,31 +43,32 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       }).then((res) {
         if (res != 0) {
           const AlertSnackBar(
-            message: 'Deleted Added!',
+            message: 'Deleted Weight!',
             state: SnackBarState.success,
           ).alert(context);
           setState(() {});
         }
-      });
+      }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
     }
   }
 
   Widget buildList() {
-          // TODO: Proper dead states
-          if (widget.dataSnapshot == null || widget.dataSnapshot!.connectionState == ConnectionState.waiting) {
-            return const Center(child: Text('Loading...'));
-          } else if (!widget.dataSnapshot!.hasData ||
-              widget.dataSnapshot!.data == null ||
-              widget.dataSnapshot!.data!.isEmpty) {
-            return const Center(child: Text('No weights have been logged'));
-          } else {
-            return ListView(
-              controller: _scrollController,
-              children: widget.dataSnapshot!.requireData[0].map((weight) {
-                return buildRow(weight);
-              }).toList(),
-            );
-          }
+    // TODO: Proper dead states
+    if (widget.dataSnapshot == null ||
+        widget.dataSnapshot!.connectionState == ConnectionState.waiting) {
+      return const Center(child: Text('Loading...'));
+    } else if (!widget.dataSnapshot!.hasData ||
+        widget.dataSnapshot!.data == null ||
+        widget.dataSnapshot!.data!.isEmpty) {
+      return const Center(child: Text('No weights have been logged'));
+    } else {
+      return ListView(
+        controller: _scrollController,
+        children: widget.dataSnapshot!.requireData[0].map((weight) {
+          return buildRow(weight);
+        }).toList(),
+      );
+    }
   }
 
   Row buildRow(Weight weight) {

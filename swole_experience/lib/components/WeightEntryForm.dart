@@ -11,7 +11,12 @@ import '../util/Converter.dart';
 import 'AlertSnackBar.dart';
 
 class WeightEntryForm extends StatefulWidget {
-  const WeightEntryForm({Key? key}) : super(key: key);
+  const WeightEntryForm(
+      {Key? key, required this.context, required this.rebuildCallback})
+      : super(key: key);
+
+  final BuildContext context;
+  final Function rebuildCallback;
 
   @override
   State<WeightEntryForm> createState() => _WeightEntryFormState();
@@ -39,7 +44,22 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         .then((int r) {
       if (r != 0) {
         AverageService.svc
-            .calculateAverages(Converter().truncateToDay(dateTime).toString());
+            .calculateAverages(Converter().truncateToDay(dateTime).toString())
+            .then((res) {
+          if (res != 0) {
+            const AlertSnackBar(
+              message: 'Weight Added!',
+              state: SnackBarState.success,
+            ).alert(context);
+          }
+        }).onError((error, stackTrace) {
+          // TODO: add proper logger
+          print("Error calculating averages $error\n$stackTrace");
+          const AlertSnackBar(
+            message: 'Unable to calculate averages.',
+            state: SnackBarState.failure,
+          ).alert(context);
+        }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
       }
     }).onError((error, stackTrace) {
       // TODO: add proper logger
@@ -48,13 +68,6 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         message: 'Unable to add weight.',
         state: SnackBarState.failure,
       ).alert(context);
-    }).then((res) {
-      if (res != 0) {
-        const AlertSnackBar(
-          message: 'Weight Added!',
-          state: SnackBarState.success,
-        ).alert(context);
-      }
     });
   }
 
