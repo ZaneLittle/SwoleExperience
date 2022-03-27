@@ -42,7 +42,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId 'com.zoop.swole_experience'
         versionName '0.1'
         minSdkVersion flutter.minSdkVersion

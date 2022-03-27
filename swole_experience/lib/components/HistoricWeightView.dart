@@ -102,7 +102,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext ctx) {
-          return SizedBox(child: WeightEditForm(weight: weight));
+          return SizedBox(child: WeightEditForm(weight: weight, rebuildCallback: widget.rebuildCallback));
         });
   }
 

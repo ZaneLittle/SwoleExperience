@@ -133,11 +133,6 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
           (averages[averages.length - sevenDayMax].sevenDayAverage -
               averages.last.sevenDayAverage);
 
-      // TODO: icons for change direction & Styling
-      // Up: arrow_drop_up
-      // Down: arrow_drop_down
-      // Same: arrow_right
-
       return ListView(controller: _scrollController, children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.start,

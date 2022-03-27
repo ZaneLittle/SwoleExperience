@@ -19,7 +19,6 @@ class _WeightTrackerState extends State<WeightTracker> {
 
   void rebuild(BuildContext context) {
     setState(() {});
-    build(context);
   }
 
   @override

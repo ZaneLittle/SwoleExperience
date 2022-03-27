@@ -118,18 +118,20 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           belowBarData: BarAreaData(show: false),
           spots: getAverageSeries(weightSeries)),
       LineChartBarData(
+          dashArray: [1],
           show: _showMinMax,
           isCurved: true,
-          colors: [const Color(0x69999999)],
+          colors: [const Color(0x69adadad)],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
           belowBarData: BarAreaData(show: false),
           spots: getMaxSeries(weightSeries)),
       LineChartBarData(
+          dashArray: [1],
           show: _showMinMax,
           isCurved: true,
-          colors: [const Color(0x69999999)],
+          colors: [const Color(0x69adadad)],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -223,7 +225,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   }
 
   Color getMinMaxFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0x69999999));
+    return getFillColor(states, const Color(0x69696969));
   }
 
   Color getAverageFillColor(Set<MaterialState> states) {
@@ -239,8 +241,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   }
 
   ///                             Build                                     ///
-  // TODO: BUG: Chart does not reload when adding weight
-  // TODO: ENHANCEMENT Look into scrolling chart to allow showing more than just the 60 day window
+  // TODO: ENHANCEMENT scrolling chart to allow showing more than just the 60 day window
   @override
   Widget build(BuildContext context) {
     if (widget.dataSnapshot == null ||

@@ -10,9 +10,14 @@ import 'package:swole_experience/util/Validator.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
 
 class WeightEditForm extends StatefulWidget {
-  const WeightEditForm({Key? key, required this.weight}) : super(key: key);
+  const WeightEditForm({
+    Key? key,
+    required this.weight,
+    required this.rebuildCallback,
+  }) : super(key: key);
 
   final Weight weight;
+  final Function rebuildCallback;
 
   @override
   State<WeightEditForm> createState() => _WeightEditFormState();
@@ -59,8 +64,7 @@ class _WeightEditFormState extends State<WeightEditForm> {
             state: SnackBarState.success,
           ).alert(context);
         }
-      });
-      // TODO Update chart and table
+      }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
     }
   }
 

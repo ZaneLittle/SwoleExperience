@@ -43,23 +43,22 @@ class _AppState extends State<StatefulApp> {
     });
   }
 
-  // TODO: Routing
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-        ),
-        themeMode: ThemeMode.system,
-        home: Scaffold(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system,
+      home: Scaffold(
           body: Center(
             child: _pages.elementAt(_selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            // TODO: BUG: accent colour when selected is ugly
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.restaurant),
@@ -75,9 +74,9 @@ class _AppState extends State<StatefulApp> {
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: Colors.amber[800],
+            selectedItemColor: const Color(0xffb24dff),
             onTap: _onItemTapped,
-          ),
-        ));
+          )),
+    );
   }
 }
