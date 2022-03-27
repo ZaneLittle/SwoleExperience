@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../model/Average.dart';
-import '../util/Util.dart';
+import 'package:swole_experience/model/Average.dart';
+import 'package:swole_experience/util/Util.dart';
 
 class WeightBreakdown extends StatefulWidget {
   const WeightBreakdown({Key? key, this.context, this.dataSnapshot})
@@ -112,7 +112,10 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
       return const Center(child: Text('Loading...'));
     } else if (!widget.dataSnapshot!.hasData ||
         widget.dataSnapshot!.data == null ||
-        widget.dataSnapshot!.data!.isEmpty) {
+        widget.dataSnapshot!.data!.isEmpty ||
+        widget.dataSnapshot!.data![0].isEmpty ||
+        widget.dataSnapshot!.data![0].isEmpty
+    ) {
       return const Center(child: Text('No weights have been logged'));
     } else {
       List<Average> averages =

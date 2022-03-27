@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'HistoricWeightView.dart';
-import 'WeightEntryForm.dart';
-import 'WeightBreakdown.dart';
-import 'WeightTrackerChart.dart';
-import '../service/AverageService.dart';
-import '../service/WeightService.dart';
+import 'package:swole_experience/components/HistoricWeightView.dart';
+import 'package:swole_experience/components/WeightEntryForm.dart';
+import 'package:swole_experience/components/WeightBreakdown.dart';
+import 'package:swole_experience/components/WeightTrackerChart.dart';
+import 'package:swole_experience/service/AverageService.dart';
+import 'package:swole_experience/service/WeightService.dart';
 
 class WeightTracker extends StatefulWidget {
   const WeightTracker({Key? key}) : super(key: key);

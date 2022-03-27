@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
-import '../model/Average.dart';
-import '../util/Converter.dart';
-import '../model/Weight.dart';
-import '../util/Util.dart';
+import 'package:swole_experience/model/Average.dart';
+import 'package:swole_experience/util/Converter.dart';
+import 'package:swole_experience/model/Weight.dart';
+import 'package:swole_experience/util/Util.dart';
 
 class WeightTrendChart extends StatefulWidget {
   const WeightTrendChart({Key? key, this.context, this.dataSnapshot})
@@ -250,7 +250,9 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           child: const Center(child: Text('Loading...')));
     } else if (!widget.dataSnapshot!.hasData ||
         widget.dataSnapshot!.data == null ||
-        widget.dataSnapshot!.data!.isEmpty) {
+        widget.dataSnapshot!.data!.isEmpty ||
+        widget.dataSnapshot!.data![0].isEmpty ||
+        widget.dataSnapshot!.data![0].isEmpty) {
       return SizedBox(
           height: MediaQuery.of(context).size.height * .4,
           child: const Center(child: Text('No weights have been logged')));

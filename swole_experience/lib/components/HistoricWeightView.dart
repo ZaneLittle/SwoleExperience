@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../components/WeightEditForm.dart';
-import '../model/Weight.dart';
-import '../service/WeightService.dart';
-import '../util/Util.dart';
-import 'AlertSnackBar.dart';
+import 'package:swole_experience/components/WeightEditForm.dart';
+import 'package:swole_experience/model/Weight.dart';
+import 'package:swole_experience/service/WeightService.dart';
+import 'package:swole_experience/util/Util.dart';
+import 'package:swole_experience/components/AlertSnackBar.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView(
@@ -59,7 +59,10 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       return const Center(child: Text('Loading...'));
     } else if (!widget.dataSnapshot!.hasData ||
         widget.dataSnapshot!.data == null ||
-        widget.dataSnapshot!.data!.isEmpty) {
+        widget.dataSnapshot!.data!.isEmpty ||
+        widget.dataSnapshot!.data![0].isEmpty ||
+        widget.dataSnapshot!.data![1].isEmpty
+    ) {
       return const Center(child: Text('No weights have been logged'));
     } else {
       return ListView(

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-import '../model/Weight.dart';
-import '../service/AverageService.dart';
-import '../service/WeightService.dart';
-import '../util/Converter.dart';
-import '../util/Validator.dart';
-import 'AlertSnackBar.dart';
+import 'package:swole_experience/model/Weight.dart';
+import 'package:swole_experience/service/AverageService.dart';
+import 'package:swole_experience/service/WeightService.dart';
+import 'package:swole_experience/util/Converter.dart';
+import 'package:swole_experience/util/Validator.dart';
+import 'package:swole_experience/components/AlertSnackBar.dart';
 
 class WeightEditForm extends StatefulWidget {
   const WeightEditForm({Key? key, required this.weight}) : super(key: key);
