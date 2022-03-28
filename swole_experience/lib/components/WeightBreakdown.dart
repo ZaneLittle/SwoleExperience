@@ -56,15 +56,14 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
             Widget>[
           SizedBox(
               width: 70,
-              child: Row(
-                  children: <Widget>[
-                    const Padding(
-                        padding: EdgeInsets.only(right: 12),
-                        child: Icon(Icons.arrow_drop_down)),
-                    Text(change.toStringAsFixed(1),
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                  ])),
+              child: Row(children: <Widget>[
+                const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: Icon(Icons.arrow_drop_down)),
+                Text(change.toStringAsFixed(1),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+              ])),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             Text('$period Day Change',
                 style:
@@ -72,12 +71,6 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
           ])
         ]),
       )));
-      return Expanded(
-          child: ListTile(
-        leading: const Icon(Icons.arrow_drop_down),
-        title: Text(change.toStringAsFixed(1)),
-        subtitle: Text('$period Day Change'),
-      ));
     } else {
       return Expanded(
           child: Card(
@@ -87,15 +80,14 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
             Widget>[
           SizedBox(
               width: 70,
-              child: Row(
-                  children: <Widget>[
-                    const Padding(
-                        padding: EdgeInsets.only(right: 12),
-                        child: Icon(Icons.arrow_right)),
-                    Text(change.toStringAsFixed(1),
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                  ])),
+              child: Row(children: <Widget>[
+                const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: Icon(Icons.arrow_right)),
+                Text(change.toStringAsFixed(1),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+              ])),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             Text('$period Day Change',
                 style:
@@ -114,8 +106,7 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
         widget.dataSnapshot!.data == null ||
         widget.dataSnapshot!.data!.isEmpty ||
         widget.dataSnapshot!.data![0].isEmpty ||
-        widget.dataSnapshot!.data![0].isEmpty
-    ) {
+        widget.dataSnapshot!.data![0].isEmpty) {
       return const Center(child: Text('No weights have been logged'));
     } else {
       List<Average> averages =
@@ -126,12 +117,10 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
           6;
       int threeDayMax = averages.length < 3 ? averages.length : 3;
       int sevenDayMax = averages.length < 7 ? averages.length : 7;
-      double threeDayChange =
-          (averages[averages.length - threeDayMax].threeDayAverage -
-              averages.last.threeDayAverage);
-      double sevenDayChange =
-          (averages[averages.length - sevenDayMax].sevenDayAverage -
-              averages.last.sevenDayAverage);
+      double threeDayChange = averages.first.threeDayAverage -
+          averages[threeDayMax - 1].threeDayAverage;
+      double sevenDayChange = averages.first.sevenDayAverage -
+          averages[sevenDayMax - 1].sevenDayAverage;
 
       return ListView(controller: _scrollController, children: <Widget>[
         Row(

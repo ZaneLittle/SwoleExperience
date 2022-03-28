@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import 'package:swole_experience/components/WeightEditForm.dart';
 import 'package:swole_experience/model/Weight.dart';
@@ -27,14 +28,14 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
   final GlobalKey<_HistoricWeightViewState> _historicWeightViewKey =
       GlobalKey<_HistoricWeightViewState>();
   final ScrollController _scrollController = ScrollController();
+  final Logger logger = Logger();
 
   bool _historicWeightViewExpanded = false;
 
   void deleteWeight(String? id) {
     if (id != null) {
       WeightService.svc.removeWeight(id).onError((error, stackTrace) {
-        // TODO: add proper logger
-        print("Error deleting weight $error\n$stackTrace");
+        logger.e("Error deleting weight $error", stackTrace);
         const AlertSnackBar(
           message: 'Unable to delete weight.',
           state: SnackBarState.failure,

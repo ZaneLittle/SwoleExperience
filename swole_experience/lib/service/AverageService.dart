@@ -116,12 +116,14 @@ class AverageService {
 
     Average average = Average(
       date: safeDate,
-      average: weightMap[safeDate]!.reduce((a, b) => a + b) /
-          weightMap[safeDate]!.length,
-      threeDayAverage:
-          threeDayAvgList.reduce((a, b) => a + b) / threeDayAvgList.length,
-      sevenDayAverage:
-          sevenDayAvgList.reduce((a, b) => a + b) / sevenDayAvgList.length,
+      average: double.parse((weightMap[safeDate]!.reduce((a, b) => a + b) /
+          weightMap[safeDate]!.length).toStringAsFixed(2)),
+      threeDayAverage: double.parse(
+          (threeDayAvgList.reduce((a, b) => a + b) / threeDayAvgList.length)
+              .toStringAsFixed(2)),
+      sevenDayAverage: double.parse(
+          (sevenDayAvgList.reduce((a, b) => a + b) / sevenDayAvgList.length)
+              .toStringAsFixed(2)),
     );
 
     int res = await db.update(_dbName, average.toMap(),

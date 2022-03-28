@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:logger/logger.dart';
 
 import 'package:swole_experience/model/Weight.dart';
 import 'package:swole_experience/service/AverageService.dart';
@@ -25,7 +26,7 @@ class WeightEditForm extends StatefulWidget {
 
 class _WeightEditFormState extends State<WeightEditForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  final Logger logger = Logger();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -51,8 +52,7 @@ class _WeightEditFormState extends State<WeightEditForm> {
           AverageService.svc.calculateAverages(roundedDate.toString());
         }
       }).onError((error, stackTrace) {
-        // TODO: add proper logger
-        print("Error updating weight $error\n$stackTrace");
+        logger.e("Error updating weight $error", stackTrace);
         const AlertSnackBar(
           message: 'Unable to update weight.',
           state: SnackBarState.failure,

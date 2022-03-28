@@ -99,9 +99,23 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
 
   static LineTouchData get lineTouchData => LineTouchData(
         handleBuiltInTouches: true,
+        touchSpotThreshold: 50,
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-        ),
+            tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+            getTooltipItems: (items) {
+              return items.map<LineTooltipItem>((item) {
+                DateTime now = DateTime.now();
+                DateTime longDate = DateTime(
+                    now.year, now.month, (now.day - 60 + item.x).toInt());
+                String date = DateFormat('MM/dd').format(longDate);
+                Color color = item.bar.colors.first == const Color(0x69adadad)
+                    ? const Color(0xffd0d0d0) // Cast to lighter grey
+                    : item.bar.colors.first;
+
+                return LineTooltipItem(date + ": " + item.y.toStringAsFixed(2),
+                    TextStyle(color: color));
+              }).toList();
+            }),
       );
 
   ///                           Data Builder                                ///
@@ -116,7 +130,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
           belowBarData: BarAreaData(show: false),
-          spots: getAverageSeries(weightSeries)),
+          spots: getAverageSeries(averageSeries)),
       LineChartBarData(
           dashArray: [1],
           show: _showMinMax,
@@ -158,10 +172,11 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     ];
   }
 
-  List<FlSpot> getAverageSeries(Map<double, List<double>> weightSeries) {
-    return weightSeries.entries
-        .map<FlSpot>((entry) => FlSpot((entry.key).truncateToDouble(),
-            entry.value.reduce((a, b) => a + b) / entry.value.length))
+  List<FlSpot> getAverageSeries(List<Average> averageSeries) {
+    return averageSeries
+        .map<FlSpot>((entry) => FlSpot(
+            Converter().toDayScale(entry.date).truncateToDouble(),
+            double.parse((entry.average).toStringAsFixed(2))))
         .toList();
   }
 
@@ -169,7 +184,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return averageSeries
         .map<FlSpot>((entry) => FlSpot(
             Converter().toDayScale(entry.date).truncateToDouble(),
-            entry.threeDayAverage))
+            double.parse((entry.threeDayAverage).toStringAsFixed(2))))
         .toList();
   }
 
@@ -177,7 +192,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return averageSeries
         .map<FlSpot>((entry) => FlSpot(
             Converter().toDayScale(entry.date).truncateToDouble(),
-            entry.sevenDayAverage))
+            double.parse((entry.sevenDayAverage).toStringAsFixed(2))))
         .toList();
   }
 
@@ -225,7 +240,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   }
 
   Color getMinMaxFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0x69696969));
+    return getFillColor(states, const Color(0x69adadad));
   }
 
   Color getAverageFillColor(Set<MaterialState> states) {

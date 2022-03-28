@@ -1,6 +1,7 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:swole_experience/model/Weight.dart';
@@ -24,6 +25,7 @@ class WeightEntryForm extends StatefulWidget {
 
 class _WeightEntryFormState extends State<WeightEntryForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Logger logger = Logger();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
@@ -53,8 +55,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
             ).alert(context);
           }
         }).onError((error, stackTrace) {
-          // TODO: add proper logger
-          print("Error calculating averages $error\n$stackTrace");
+          logger.e("Error calculating averages $error", stackTrace);
           const AlertSnackBar(
             message: 'Unable to calculate averages.',
             state: SnackBarState.failure,
@@ -62,8 +63,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
       }
     }).onError((error, stackTrace) {
-      // TODO: add proper logger
-      print("Error adding weight $error\n$stackTrace");
+      logger.e("Error adding weight $error", stackTrace);
       const AlertSnackBar(
         message: 'Unable to add weight.',
         state: SnackBarState.failure,
