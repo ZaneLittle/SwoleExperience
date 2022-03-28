@@ -109,7 +109,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                     now.year, now.month, (now.day - 60 + item.x).toInt());
                 String date = DateFormat('MM/dd').format(longDate);
                 Color color = item.bar.colors.first == const Color(0x69adadad)
-                    ? const Color(0xffd0d0d0) // Cast to lighter grey
+                    ? const Color(0xffd0d0d0) // Cast to lighter grey for visibility
                     : item.bar.colors.first;
 
                 return LineTooltipItem(date + ": " + item.y.toStringAsFixed(2),

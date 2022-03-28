@@ -89,9 +89,8 @@ class AverageService {
         await WeightService.svc.getWeights(startDate: safeDate);
     Map<DateTime, List<double>> weightMap = {};
     for (Weight weight in weights) {
-      DateTime currentDate = DateTime(
-          weight.dateTime.year, weight.dateTime.month, weight.dateTime.day);
-      weightMap[date] == null
+      DateTime currentDate = Converter().truncateToDay(weight.dateTime);
+      weightMap[currentDate] == null
           ? weightMap[currentDate] = [weight.weight]
           : weightMap[currentDate]!.add(weight.weight);
     }

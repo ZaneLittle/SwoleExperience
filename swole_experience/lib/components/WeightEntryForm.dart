@@ -87,7 +87,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                       children: <Widget>[
                         Flexible(
                             child: SizedBox(
-                                width: 130,
+                                width: 95,
                                 child: Padding(
                                     padding: const EdgeInsets.only(left: 4),
                                     child: DateTimeField(
@@ -95,7 +95,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                                         controller: _dateController,
                                         decoration: InputDecoration(
                                             hintText:
-                                                DateFormat('yyyy-MM-dd HH:mm')
+                                                DateFormat('MM/dd HH:mm')
                                                     .format(DateTime.now())),
                                         onShowPicker:
                                             (context, currentValue) async {
@@ -119,13 +119,15 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                                             return currentValue;
                                           }
                                         })))),
-                        Flexible(
-                            child: Padding(
+                        Center(
+                            child: SizedBox(
+                                width: 200,
+                                child: Padding(
                                 padding: const EdgeInsets.only(right: 4),
                                 child: TextFormField(
                                   controller: _weightController,
                                   decoration: InputDecoration(
-                                    hintText: 'Enter your weight',
+                                    hintText: 'Enter weight',
                                     suffixIcon: IconButton(
                                       iconSize: 32,
                                       icon:
@@ -148,7 +150,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                                       logWeight();
                                     }
                                   },
-                                ))),
+                                )))),
                       ])
                 ])));
   }
