@@ -111,9 +111,9 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
     } else {
       List<Average> averages =
           widget.dataSnapshot!.requireData[1] as List<Average>;
-      double currentWeight = ((averages.last.sevenDayAverage * 3) +
-              (averages.last.threeDayAverage * 2) +
-              (averages.last.average)) /
+      double currentWeight = ((averages.first.sevenDayAverage * 3) +
+              (averages.first.threeDayAverage * 2) +
+              (averages.first.average)) /
           6;
       int threeDayMax = averages.length < 3 ? averages.length : 3;
       int sevenDayMax = averages.length < 7 ? averages.length : 7;
