@@ -5,8 +5,10 @@ import 'package:logger/logger.dart';
 import 'package:swole_experience/components/WeightEditForm.dart';
 import 'package:swole_experience/model/Weight.dart';
 import 'package:swole_experience/service/WeightService.dart';
+import 'package:swole_experience/util/Converter.dart';
 import 'package:swole_experience/util/Util.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/service/AverageService.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView(
@@ -32,7 +34,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
 
   bool _historicWeightViewExpanded = false;
 
-  void deleteWeight(String? id) {
+  void deleteWeight(String? id, DateTime date) {
     if (id != null) {
       WeightService.svc.removeWeight(id).onError((error, stackTrace) {
         logger.e("Error deleting weight $error", stackTrace);
@@ -41,6 +43,11 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
           state: SnackBarState.failure,
         ).alert(context);
         return 0;
+      }).then((res) {
+        if (res != 0) {
+          AverageService.svc.calculateAverages(
+              Converter().truncateToDay(date).toString());
+        }
       }).then((res) {
         if (res != 0) {
           const AlertSnackBar(
@@ -94,7 +101,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               child: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    deleteWeight(weight.id);
+                    deleteWeight(weight.id, weight.dateTime);
                   }))
         ]);
   }

@@ -113,23 +113,32 @@ class AverageService {
       i++;
     }
 
-    Average average = Average(
-      date: safeDate,
-      average: double.parse((weightMap[safeDate]!.reduce((a, b) => a + b) /
-          weightMap[safeDate]!.length).toStringAsFixed(2)),
-      threeDayAverage: double.parse(
-          (threeDayAvgList.reduce((a, b) => a + b) / threeDayAvgList.length)
-              .toStringAsFixed(2)),
-      sevenDayAverage: double.parse(
-          (sevenDayAvgList.reduce((a, b) => a + b) / sevenDayAvgList.length)
-              .toStringAsFixed(2)),
-    );
+    // Check if we have records for this day or we're recalculating an empty day
+    if (weightMap[safeDate] != null) {
+      Average average = Average(
+        date: safeDate,
+        average: double.parse((weightMap[safeDate]!.reduce((a, b) => a + b) /
+                weightMap[safeDate]!.length)
+            .toStringAsFixed(2)),
+        threeDayAverage: double.parse(
+            (threeDayAvgList.reduce((a, b) => a + b) / threeDayAvgList.length)
+                .toStringAsFixed(2)),
+        sevenDayAverage: double.parse(
+            (sevenDayAvgList.reduce((a, b) => a + b) / sevenDayAvgList.length)
+                .toStringAsFixed(2)),
+      );
 
-    int res = await db.update(_dbName, average.toMap(),
-        where: 'dateTime = ?', whereArgs: [date]);
-    if (res == 0) {
-      return await db.insert(_dbName, average.toMap());
+      int res = await db.update(_dbName, average.toMap(),
+          where: 'dateTime = ?', whereArgs: [safeDate.toString()]);
+      if (res == 0) {
+        return await db.insert(_dbName, average.toMap());
+      }
+      return res;
+    } else {
+      // No records for the day, we should delete
+      // Note that this is a safe delete, if the record doesn't exist, we wont fall over
+      return await db.delete(_dbName,
+          where: 'dateTime = ?', whereArgs: [safeDate.toString()]);
     }
-    return res;
   }
 }
