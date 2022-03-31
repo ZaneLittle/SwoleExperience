@@ -109,7 +109,8 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                     now.year, now.month, (now.day - 60 + item.x).toInt());
                 String date = DateFormat('MM/dd').format(longDate);
                 Color color = item.bar.colors.first == const Color(0x69adadad)
-                    ? const Color(0xffd0d0d0) // Cast to lighter grey for visibility
+                    ? const Color(
+                        0xffd0d0d0) // Cast to lighter grey for visibility
                     : item.bar.colors.first;
 
                 return LineTooltipItem(date + ": " + item.y.toStringAsFixed(2),
@@ -268,10 +269,16 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
         widget.dataSnapshot!.data == null ||
         widget.dataSnapshot!.data!.isEmpty ||
         widget.dataSnapshot!.data![0].isEmpty ||
-        widget.dataSnapshot!.data![0].isEmpty) {
+        widget.dataSnapshot!.data![1].isEmpty) {
       return SizedBox(
           height: MediaQuery.of(context).size.height * .4,
           child: const Center(child: Text('No weights have been logged')));
+    } else if (widget.dataSnapshot!.data![0].length < 2 ||
+        widget.dataSnapshot!.data![1].length < 2) {
+      return SizedBox(
+          height: MediaQuery.of(context).size.height * .4,
+          child: const Center(
+              child: Text('Keep adding weights to see a visualization!')));
     } else {
       Map<double, List<double>> weightSeries = getWeightGrouping(
           widget.dataSnapshot!.requireData[0] as List<Weight>);
