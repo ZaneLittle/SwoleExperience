@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -55,18 +56,29 @@ class AverageService {
   }
 
   /// Get a list of the averages for the past 60 days
-  Future<List<Average>> getAverages() async {
+  Future<List<Average>> getAverages({DateTime? startDate}) async {
     Database db = await svc.db;
 
     String dateBound =
         DateTime.now().subtract(const Duration(days: 60)).toString();
 
-    var averages = await db.query(
-      _dbName,
-      orderBy: 'dateTime DESC',
-      where: '"dateTime" >= ?',
-      whereArgs: [dateBound],
-    );
+    String? startDateStr = startDate != null
+        ? Converter().roundToNextDay(startDate).toString()
+        : null;
+
+    var averages = startDate != null
+        ? await db.query(
+            _dbName,
+            orderBy: 'dateTime DESC',
+            where: '"dateTime" >= ? AND "dateTime" <= ?',
+            whereArgs: [dateBound, startDateStr],
+          )
+        : await db.query(
+            _dbName,
+            orderBy: 'dateTime DESC',
+            where: '"dateTime" >= ?',
+            whereArgs: [dateBound],
+          );
 
     return averages.isNotEmpty
         ? averages.map((a) => Average.fromMap(a)).toList()

@@ -56,16 +56,23 @@ class WeightService {
         ? startDate.subtract(const Duration(days: 60)).toString()
         : DateTime.now().subtract(const Duration(days: 60)).toString();
 
-    String startDateStr = startDate != null
+    String? startDateStr = startDate != null
         ? Converter().roundToNextDay(startDate).toString()
-        : Converter().roundToNextDay(DateTime.now()).toString();
+        : null;
 
-    var weights = await db.query(
-      _dbName,
-      orderBy: 'dateTime DESC',
-      where: '"dateTime" >= ? AND "dateTime" <= ?',
-      whereArgs: [dateBound, startDateStr],
-    );
+    var weights = startDate != null
+        ? await db.query(
+            _dbName,
+            orderBy: 'dateTime DESC',
+            where: '"dateTime" >= ? AND "dateTime" <= ?',
+            whereArgs: [dateBound, startDateStr],
+          )
+        : await db.query(
+            _dbName,
+            orderBy: 'dateTime DESC',
+            where: '"dateTime" >= ?',
+            whereArgs: [dateBound],
+          );
 
     return weights.isNotEmpty
         ? weights.map((w) => Weight.fromMap(w)).toList()

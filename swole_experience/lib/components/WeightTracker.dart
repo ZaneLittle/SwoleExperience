@@ -24,8 +24,10 @@ class _WeightTrackerState extends State<WeightTracker> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<List<dynamic>>>(
-        future: Future.wait(
-            [WeightService.svc.getWeights(), AverageService.svc.getAverages()]),
+        future: Future.wait([
+          WeightService.svc.getWeights(startDate: DateTime.now()),
+          AverageService.svc.getAverages(startDate: DateTime.now())
+        ]),
         builder: (BuildContext context,
             AsyncSnapshot<List<List<dynamic>>> snapshot) {
           return ListView(controller: _scrollController, children: <Widget>[
