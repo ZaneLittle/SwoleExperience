@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import './components/WeightTracker.dart';
+import 'components/weight_tracker/weight_tracker.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

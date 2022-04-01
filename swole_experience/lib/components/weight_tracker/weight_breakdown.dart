@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:swole_experience/model/Average.dart';
-import 'package:swole_experience/util/Util.dart';
+import 'package:swole_experience/model/average.dart';
+import 'package:swole_experience/util/util.dart';
 
 class WeightBreakdown extends StatefulWidget {
   const WeightBreakdown({Key? key, this.context, this.dataSnapshot})

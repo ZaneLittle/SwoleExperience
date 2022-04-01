@@ -4,10 +4,10 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../model/Average.dart';
-import '../model/Weight.dart';
-import '../util/Converter.dart';
-import 'WeightService.dart';
+import '../model/average.dart';
+import '../model/weight.dart';
+import '../util/converter.dart';
+import 'weight_service.dart';
 
 /// AverageService provides an interface to the `average` table.
 /// This table stores rolling averages for unique days

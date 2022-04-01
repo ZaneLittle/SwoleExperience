@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
-import 'package:swole_experience/components/WeightEditForm.dart';
-import 'package:swole_experience/model/Weight.dart';
-import 'package:swole_experience/service/WeightService.dart';
-import 'package:swole_experience/util/Converter.dart';
-import 'package:swole_experience/util/Util.dart';
+import 'package:swole_experience/components/weight_tracker/weight_edit_form.dart';
+import 'package:swole_experience/model/weight.dart';
+import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/util/converter.dart';
+import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
-import 'package:swole_experience/service/AverageService.dart';
+import 'package:swole_experience/service/average_service.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView(

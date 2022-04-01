@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:swole_experience/components/weight_tracker/line_options.dart';
 
-import 'package:swole_experience/model/Average.dart';
-import 'package:swole_experience/util/Converter.dart';
-import 'package:swole_experience/model/Weight.dart';
-import 'package:swole_experience/util/Util.dart';
+import 'package:swole_experience/model/average.dart';
+import 'package:swole_experience/util/converter.dart';
+import 'package:swole_experience/model/weight.dart';
+import 'package:swole_experience/constants/weight_chart_line_colors.dart';
 
 class WeightTrendChart extends StatefulWidget {
   const WeightTrendChart({Key? key, this.context, this.dataSnapshot})
@@ -23,13 +24,48 @@ class WeightTrendChart extends StatefulWidget {
 class _WeightTrendChartState extends State<WeightTrendChart> {
   final GlobalKey<_WeightTrendChartState> _weightTrackerChartKey =
       GlobalKey<_WeightTrendChartState>();
-  final ScrollController _scrollController = ScrollController();
 
   bool? _showMinMax = true;
   bool? _showAverage = true;
   bool? _showThreeDayAverage = true;
   bool? _showSevenDayAverage = true;
-  bool _optionsInitiallyExpanded = false;
+  final bool _optionsInitiallyExpanded = false;
+
+  void setShowMinMax(bool? value) {
+    _showMinMax = value;
+    setState(() {});
+  }
+
+  bool? getShowMinMax() {
+    return _showMinMax;
+  }
+
+  void setShowAverage(bool? value) {
+    _showAverage = value;
+    setState(() {});
+  }
+
+  bool? getShowAverage() {
+    return _showAverage;
+  }
+
+  void setShowThreeDayAverage(bool? value) {
+    _showThreeDayAverage = value;
+    setState(() {});
+  }
+
+  bool? getShowThreeDayAverage() {
+    return _showThreeDayAverage;
+  }
+
+  void setShowSevenDayAverage(bool? value) {
+    _showSevenDayAverage = value;
+    setState(() {});
+  }
+
+  bool? getShowSevenDayAverage() {
+    return _showSevenDayAverage;
+  }
 
   ///                       Chart Area Data                                  ///
   static FlBorderData get borderData => FlBorderData(
@@ -108,10 +144,11 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                 DateTime longDate = DateTime(
                     now.year, now.month, (now.day - 60 + item.x).toInt());
                 String date = DateFormat('MM/dd').format(longDate);
-                Color color = item.bar.colors.first == const Color(0x69adadad)
-                    ? const Color(
-                        0xffd0d0d0) // Cast to lighter grey for visibility
-                    : item.bar.colors.first;
+                Color color =
+                    item.bar.colors.first == WeightChartLineColors.minMaxColor
+                        ? const Color(
+                            0xffd0d0d0) // Cast to lighter grey for visibility
+                        : item.bar.colors.first;
 
                 return LineTooltipItem(date + ": " + item.y.toStringAsFixed(2),
                     TextStyle(color: color));
@@ -126,7 +163,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
       LineChartBarData(
           show: _showAverage,
           isCurved: true,
-          colors: [const Color(0xff4af699)],
+          colors: [WeightChartLineColors.averageColor],
           barWidth: 4,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -136,7 +173,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           dashArray: [1],
           show: _showMinMax,
           isCurved: true,
-          colors: [const Color(0x69adadad)],
+          colors: [WeightChartLineColors.minMaxColor],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -146,7 +183,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           dashArray: [1],
           show: _showMinMax,
           isCurved: true,
-          colors: [const Color(0x69adadad)],
+          colors: [WeightChartLineColors.minMaxColor],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -155,7 +192,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
       LineChartBarData(
           show: _showThreeDayAverage,
           isCurved: true,
-          colors: [const Color(0xff4a5bf6)],
+          colors: [WeightChartLineColors.threeDayAverageColor],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -164,7 +201,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
       LineChartBarData(
           show: _showSevenDayAverage,
           isCurved: true,
-          colors: [const Color(0xffff3030)],
+          colors: [WeightChartLineColors.sevenDayAverageColor],
           barWidth: 2,
           isStrokeCapRound: false,
           dotData: FlDotData(show: false),
@@ -226,36 +263,6 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     return data;
   }
 
-  ///                             Helpers                                   ///
-  Color getFillColor(Set<MaterialState> states, Color active) {
-    const Set<MaterialState> interactiveStates = <MaterialState>{
-      MaterialState.pressed,
-      MaterialState.hovered,
-      MaterialState.focused,
-      MaterialState.selected,
-    };
-    if (states.any(interactiveStates.contains)) {
-      return active;
-    }
-    return const Color(0xff75729e);
-  }
-
-  Color getMinMaxFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0x69adadad));
-  }
-
-  Color getAverageFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0xff4af699));
-  }
-
-  Color getThreeDayAverageFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0xff4a5bf6));
-  }
-
-  Color getSevenDayAverageFillColor(Set<MaterialState> states) {
-    return getFillColor(states, const Color(0xffff3030));
-  }
-
   ///                             Build                                     ///
   // TODO: ENHANCEMENT scrolling chart to allow showing more than just the 60 day window
   @override
@@ -296,9 +303,11 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
 
       return Column(children: <Widget>[
         SizedBox(
+            key: _weightTrackerChartKey,
             height: MediaQuery.of(context).size.height * .45,
             child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 14, bottom: 18),
+                padding: const EdgeInsets.only(
+                    left: 8, right: 14, top: 12, bottom: 12),
                 child: LineChart(
                   LineChartData(
                     lineTouchData: lineTouchData,
@@ -312,102 +321,16 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
                   swapAnimationDuration: const Duration(milliseconds: 150),
                   swapAnimationCurve: Curves.linear,
                 ))),
-        //TODO: Refactor out to separate component
-        ExpansionTile(
-            title: const Text('Line Options'),
-            initiallyExpanded: _optionsInitiallyExpanded,
-            onExpansionChanged: (bool expanded) {
-              setState(() => _optionsInitiallyExpanded = expanded);
-              if (expanded) {
-                Util().scrollToSelectedContext(_weightTrackerChartKey);
-              }
-            },
-            children: <Widget>[
-              SizedBox(
-                  height: 100,
-                  child: ListView(
-                      controller: _scrollController,
-                      children: <Widget>[
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Expanded(
-                                  child: Column(children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Checkbox(
-                                      value: _showMinMax,
-                                      fillColor:
-                                          MaterialStateProperty.resolveWith(
-                                              getMinMaxFillColor),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showMinMax = value;
-                                          build(context);
-                                        });
-                                      },
-                                    ),
-                                    const Text('Min/Max'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _showAverage,
-                                      fillColor:
-                                          MaterialStateProperty.resolveWith(
-                                              getAverageFillColor),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showAverage = value;
-                                          build(context);
-                                        });
-                                      },
-                                    ),
-                                    const Text('Average'),
-                                  ],
-                                )
-                              ])),
-                              Expanded(
-                                  child: Column(children: <Widget>[
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _showThreeDayAverage,
-                                      fillColor:
-                                          MaterialStateProperty.resolveWith(
-                                              getThreeDayAverageFillColor),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showThreeDayAverage = value;
-                                          build(context);
-                                        });
-                                      },
-                                    ),
-                                    const Text('Three Day Average'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _showSevenDayAverage,
-                                      fillColor:
-                                          MaterialStateProperty.resolveWith(
-                                              getSevenDayAverageFillColor),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showSevenDayAverage = value;
-                                          build(context);
-                                        });
-                                      },
-                                    ),
-                                    const Text('Seven Day Average'),
-                                  ],
-                                ),
-                              ]))
-                            ])
-                      ]))
-            ])
+        LineOptions(
+            getShowMinMax: getShowMinMax,
+            setShowMinMax: setShowMinMax,
+            getShowAverage: getShowAverage,
+            setShowAverage: setShowAverage,
+            getShowSevenDayAverage: getShowSevenDayAverage,
+            setShowSevenDayAverage: setShowSevenDayAverage,
+            getShowThreeDayAverage: getShowThreeDayAverage,
+            setShowThreeDayAverage: setShowThreeDayAverage,
+            optionsInitiallyExpanded: _optionsInitiallyExpanded)
       ]);
     }
   }

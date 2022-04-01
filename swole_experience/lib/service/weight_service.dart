@@ -3,8 +3,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../util/Converter.dart';
-import '../model/Weight.dart';
+import '../util/converter.dart';
+import '../model/weight.dart';
 
 /// WeightService provides an interface to the `weight` table.
 /// This table stores the raw weight data the user has entered

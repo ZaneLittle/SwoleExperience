@@ -4,11 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:swole_experience/model/Weight.dart';
-import 'package:swole_experience/service/AverageService.dart';
-import 'package:swole_experience/service/WeightService.dart';
-import 'package:swole_experience/util/Validator.dart';
-import 'package:swole_experience/util/Converter.dart';
+import 'package:swole_experience/model/weight.dart';
+import 'package:swole_experience/service/average_service.dart';
+import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/util/validator.dart';
+import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
 
 class WeightEntryForm extends StatefulWidget {
@@ -74,7 +74,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: MediaQuery.of(context).size.height * .125,
+        height: MediaQuery.of(context).size.height * .1,
         width: MediaQuery.of(context).size.width * .9,
         padding: const EdgeInsets.only(top: 12),
         child: Form(

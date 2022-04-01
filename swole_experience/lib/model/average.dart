@@ -1,4 +1,4 @@
-import '../util/Converter.dart';
+import '../util/converter.dart';
 
 class Average {
   Average({
