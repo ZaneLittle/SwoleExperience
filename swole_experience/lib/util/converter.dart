@@ -11,7 +11,7 @@ class Converter {
     DateTime now = DateTime.now();
     DateTime initDate = truncateToDay(date);
     DateTime startDate = DateTime(now.year, now.month, now.day - starting);
-    double dif = initDate.difference(startDate).inDays.toDouble();
+    double dif = initDate.difference(startDate).inDays.toDouble() + 1;
 
     return dif;
   }
