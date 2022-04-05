@@ -2,9 +2,12 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swole_experience/service/preference_service.dart';
 
-import '../util/converter.dart';
-import '../model/weight.dart';
+import 'package:swole_experience/constants/weight_units.dart';
+import 'package:swole_experience/model/weight.dart';
+import 'package:swole_experience/model/preference.dart';
+import 'package:swole_experience/util/converter.dart';
 
 /// WeightService provides an interface to the `weight` table.
 /// This table stores the raw weight data the user has entered
@@ -74,14 +77,20 @@ class WeightService {
             whereArgs: [dateBound],
           );
 
-    return weights.isNotEmpty
-        ? weights.map((w) => Weight.fromMap(w)).toList()
-        : [];
+    List<Weight> res = [];
+    for(Map<String, dynamic> w in weights) {
+      res.add(await _convertWeightToPreferredUnit(Weight.fromMap(w)));
+    }
+
+    return res;
   }
 
   Future<int> addWeight(Weight weight) async {
     Database db = await svc.db;
-    return await db.insert(_dbName, weight.toMap());
+
+    Weight weightInPounds = await _convertWeightToPounds(weight);
+
+    return await db.insert(_dbName, weightInPounds.toMap());
   }
 
   Future<int> removeWeight(String id) async {
@@ -91,7 +100,41 @@ class WeightService {
 
   Future<int> updateWeight(Weight weight) async {
     Database db = await svc.db;
-    return await db.update(_dbName, weight.toMap(),
+
+    Weight weightInPounds = await _convertWeightToPounds(weight);
+
+    return await db.update(_dbName, weightInPounds.toMap(),
         where: 'id = ?', whereArgs: [weight.id]);
+  }
+
+  ///                               Helpers                                 ///
+
+  /// Returns the appropriate multiplier to pounds based on the user's preferred weight
+  Future<double> _getMultiplier() async {
+    Preference weightPref =
+    await PreferenceService.svc.getPreference(WeightConstant.weightUnitKey);
+    return weightPref.value == WeightConstant.kilograms
+        ? 2.205
+        : weightPref.value == WeightConstant.stone
+        ? 14
+        : 1;
+  }
+
+  /// Converts a weight record to pounds based on the user's preference
+  Future<Weight> _convertWeightToPounds(Weight weight) async {
+    double multiplier = await _getMultiplier();
+    return Weight(
+        id: weight.id,
+        dateTime: weight.dateTime,
+        weight: weight.weight * multiplier);
+  }
+
+  /// Converts a weight in pounds to the user's preferred unit
+  Future<Weight> _convertWeightToPreferredUnit(Weight weight) async {
+    double multiplier = await _getMultiplier();
+    return Weight(
+        id: weight.id,
+        dateTime: weight.dateTime,
+        weight: weight.weight / multiplier);
   }
 }

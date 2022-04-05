@@ -1,13 +1,15 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swole_experience/constants/weight_units.dart';
 
-import '../model/average.dart';
-import '../model/weight.dart';
-import '../util/converter.dart';
-import 'weight_service.dart';
+import 'package:swole_experience/model/average.dart';
+import 'package:swole_experience/model/preference.dart';
+import 'package:swole_experience/model/weight.dart';
+import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/util/converter.dart';
 
 /// AverageService provides an interface to the `average` table.
 /// This table stores rolling averages for unique days
@@ -80,9 +82,12 @@ class AverageService {
             whereArgs: [dateBound],
           );
 
-    return averages.isNotEmpty
-        ? averages.map((a) => Average.fromMap(a)).toList()
-        : [];
+    List<Average> res = [];
+    for(Map<String, dynamic> a in averages) {
+      res.add(await _convertAverageToPreferredUnit(Average.fromMap(a)));
+    }
+
+    return res;
   }
 
   /// Updates the averages at the given string represented date
@@ -152,5 +157,40 @@ class AverageService {
       return await db.delete(_dbName,
           where: 'dateTime = ?', whereArgs: [safeDate.toString()]);
     }
+  }
+
+  ///                               Helpers                                 ///
+
+  /// Returns the appropriate multiplier to pounds based on the user's preferred weight
+  Future<double> _getMultiplier() async {
+    Preference weightPref =
+        await PreferenceService.svc.getPreference(WeightConstant.weightUnitKey);
+    return weightPref.value == WeightConstant.kilograms
+        ? 2.205
+        : weightPref.value == WeightConstant.stone
+            ? 14
+            : 1;
+  }
+
+  /// Converts an average record to pounds based on the user's preference
+  Future<Average> _convertAverageToPounds(Average average) async {
+    double multiplier = await _getMultiplier();
+
+    return Average(
+        date: average.date,
+        average: average.average * multiplier,
+        threeDayAverage: average.threeDayAverage * multiplier,
+        sevenDayAverage: average.sevenDayAverage * multiplier);
+  }
+
+  /// Converts an average record to pounds based on the user's preference
+  Future<Average> _convertAverageToPreferredUnit(Average average) async {
+    double multiplier = await _getMultiplier();
+
+    return Average(
+        date: average.date,
+        average: average.average / multiplier,
+        threeDayAverage: average.threeDayAverage / multiplier,
+        sevenDayAverage: average.sevenDayAverage / multiplier);
   }
 }
