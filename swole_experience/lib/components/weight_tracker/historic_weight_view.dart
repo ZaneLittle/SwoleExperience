@@ -90,7 +90,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child:
                   Text(DateFormat('yyyy-MM-dd HH:mm').format(weight.dateTime))),
-          Text(weight.weight.toString()),
+          Text(weight.weight.toStringAsFixed(2)),
           IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {

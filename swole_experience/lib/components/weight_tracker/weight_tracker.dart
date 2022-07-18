@@ -4,8 +4,10 @@ import 'package:swole_experience/components/weight_tracker/historic_weight_view.
 import 'package:swole_experience/components/weight_tracker/weight_entry_form.dart';
 import 'package:swole_experience/components/weight_tracker/weight_breakdown.dart';
 import 'package:swole_experience/components/weight_tracker/weight_tracker_chart.dart';
+import 'package:swole_experience/components/preferences/settings.dart';
 import 'package:swole_experience/service/average_service.dart';
 import 'package:swole_experience/service/weight_service.dart';
+
 
 class WeightTracker extends StatefulWidget {
   const WeightTracker({Key? key}) : super(key: key);
@@ -32,7 +34,20 @@ class _WeightTrackerState extends State<WeightTracker> {
             AsyncSnapshot<List<List<dynamic>>> snapshot) {
           return ListView(controller: _scrollController, children: <Widget>[
             Column(children: <Widget>[
-              WeightEntryForm(context: context, rebuildCallback: rebuild),
+              Row(children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: IconButton(
+                        icon: const Icon(Icons.settings),
+                        iconSize: 32,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Settings()));
+                        })),
+                WeightEntryForm(context: context, rebuildCallback: rebuild)
+              ]),
               WeightBreakdown(context: context, dataSnapshot: snapshot),
               WeightTrendChart(context: context, dataSnapshot: snapshot),
               HistoricWeightView(

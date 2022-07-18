@@ -52,7 +52,7 @@ class _AppState extends State<StatefulApp> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       home: Scaffold(
           body: Center(
             child: _pages.elementAt(_selectedIndex),
