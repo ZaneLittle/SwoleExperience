@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'components/weight_tracker/weight_tracker.dart';
+import 'package:swole_experience/components/workouts/workouts.dart';
+import 'package:swole_experience/components/weight_tracker/weight_tracker.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +33,7 @@ class _AppState extends State<StatefulApp> {
       'Macros Coming soon',
     ),
     const WeightTracker(),
-    const Text(
-      'Workouts Coming soon',
-    ),
+    const Workouts(),
   ];
 
   void _onItemTapped(int index) {
@@ -53,7 +52,8 @@ class _AppState extends State<StatefulApp> {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
+      // themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       home: Scaffold(
           body: Center(
             child: _pages.elementAt(_selectedIndex),
