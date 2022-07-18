@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/weight_tracker/historic_weight_view.dart';
@@ -19,7 +21,7 @@ class WeightTracker extends StatefulWidget {
 class _WeightTrackerState extends State<WeightTracker> {
   final ScrollController _scrollController = ScrollController();
 
-  void rebuild(BuildContext context) {
+  FutureOr rebuild(dynamic val) {
     setState(() {});
   }
 
@@ -44,7 +46,7 @@ class _WeightTrackerState extends State<WeightTracker> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const Settings()));
+                                  builder: (context) => const Settings())).then(rebuild);
                         })),
                 WeightEntryForm(context: context, rebuildCallback: rebuild)
               ]),

@@ -55,6 +55,7 @@ class _SettingsState extends State<Settings> {
             iconSize: 32,
             onPressed: () {
               Navigator.pop(context);
+              setState(() { });
             },
           ),
           title: const Text('Settings'),
