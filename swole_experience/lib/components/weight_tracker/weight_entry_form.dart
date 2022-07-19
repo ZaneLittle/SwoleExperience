@@ -75,12 +75,12 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
   Widget build(BuildContext context) {
     return Container(
         height: MediaQuery.of(context).size.height * .1,
-        width: MediaQuery.of(context).size.width * .9,
+        width: 300,
         padding: const EdgeInsets.only(top: 12),
         child: Form(
             key: _formKey,
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,7 +121,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
                                         })))),
                         Center(
                             child: SizedBox(
-                                width: 200,
+                                width: 180,
                                 child: Padding(
                                 padding: const EdgeInsets.only(right: 4),
                                 child: TextFormField(
