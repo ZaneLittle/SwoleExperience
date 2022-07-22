@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/constants/weight_units.dart';
@@ -15,6 +18,10 @@ class _SettingsState extends State<Settings> {
   final ScrollController _scrollController = ScrollController();
   String? _weightUnitValue;
 
+  FutureOr rebuild(dynamic value) {
+    setState(() {});
+  }
+
   Preference? findPreference(List<Preference> preferences, String pref) {
     for (var it in preferences) {
       if (it.preference == pref) {
@@ -24,16 +31,17 @@ class _SettingsState extends State<Settings> {
     return null;
   }
 
-  DropdownButton buildWeightUnitPreference(List<Preference> preferences) {
-    Preference? pref = findPreference(preferences, WeightConstant.weightUnitKey);
+  DropdownButton buildWeightUnitPreferenceSelect(List<Preference> preferences) {
+    Preference? pref =
+        findPreference(preferences, WeightConstant.weightUnitKey);
     _weightUnitValue = pref == null ? WeightConstant.pounds : pref.value;
 
     return DropdownButton(
         // Default is pounds
         value: _weightUnitValue,
         items: WeightConstant.weightUnits.keys
-            .map((unit) =>
-                DropdownMenuItem(child: Text(WeightConstant.weightUnits[unit]!), value: unit))
+            .map((unit) => DropdownMenuItem(
+                child: Text(WeightConstant.weightUnits[unit]!), value: unit))
             .toList(),
         onChanged: (value) {
           PreferenceService.svc.addOrUpdatePreference(Preference(
@@ -46,6 +54,46 @@ class _SettingsState extends State<Settings> {
         });
   }
 
+  ///                           Lines                                        ///
+
+  Widget buildWeightUnitLine(AsyncSnapshot<List<Preference>> snapshot) {
+    return Card(
+      child: SizedBox(height: 48, child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          const Padding(
+              padding: EdgeInsets.only(left: 12), child: Text('Weight Unit')),
+          Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: buildWeightUnitPreferenceSelect(snapshot.data!)),
+        ],
+      ),
+    ));
+  }
+
+  Widget buildWorkoutConfigureLine() {
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WorkoutsConfigure()))
+              .then(rebuild);
+        },
+        child: Card(
+            child: SizedBox(height: 48, child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+              Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Text('Configure Workouts')),
+              Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: Icon(Icons.arrow_forward_ios)),
+            ]))));
+  }
+
+  ///                           Build                                        ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +103,7 @@ class _SettingsState extends State<Settings> {
             iconSize: 32,
             onPressed: () {
               Navigator.pop(context);
-              setState(() { });
+              setState(() {});
             },
           ),
           title: const Text('Settings'),
@@ -74,21 +122,8 @@ class _SettingsState extends State<Settings> {
                       child: ListView(
                           controller: _scrollController,
                           children: <Widget>[
-                            Card(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  const Padding(
-                                      padding: EdgeInsets.only(left: 12),
-                                      child: Text('Weight Unit')),
-                                  Padding(
-                                      padding: const EdgeInsets.only(right: 12),
-                                      child: buildWeightUnitPreference(
-                                          snapshot.data!)),
-                                ],
-                              ),
-                            ),
+                            buildWeightUnitLine(snapshot),
+                            buildWorkoutConfigureLine(),
                           ]));
                 }
               })

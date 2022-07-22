@@ -74,7 +74,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: MediaQuery.of(context).size.height * .1,
+        height: 80,
         width: 300,
         padding: const EdgeInsets.only(top: 12),
         child: Form(
