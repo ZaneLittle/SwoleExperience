@@ -27,7 +27,7 @@ class Workout {
         weight = map['weight'] as double,
         sets = map['sets'] as int,
         reps = map['reps'] as int,
-        notes = map['notes'] as String;
+        notes = map['notes'] as String?;
 
   Map<String, dynamic> toMap() {
     return {

@@ -59,9 +59,9 @@ class _WorkoutListState extends State<WorkoutList> {
     } else {
       return ListView(
         controller: _scrollController,
-        children: dataSnapshot.requireData.map((w) {
-          return WorkoutCard(workout: w);
-        }).toList(),
+        children: dataSnapshot.requireData.map((w) =>
+          WorkoutCard(workout: w)
+        ).toList(),
       );
     }
   }

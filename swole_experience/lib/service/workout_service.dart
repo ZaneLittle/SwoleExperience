@@ -12,7 +12,7 @@ import 'package:swole_experience/model/workout.dart';
 ///   INTEGER day      = Day the exercise is to be performed on
 ///                     *Note*: Index starts at 1
 ///   INTEGER dayOrder = Order the exercises is intended to be performed in for the day
-///                     *Note* Index starts at 0
+///                     *Note* Index starts at 1
 ///   TEXT name        = Name of the exercise
 ///   FLOAT weight     = Weight for the exercise
 ///   INTEGER sets     = number of sets to perform

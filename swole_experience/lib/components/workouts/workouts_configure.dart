@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/workouts/workout_card.dart';
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/service/workout_service.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
   const WorkoutsConfigure({Key? key, this.context}) : super(key: key);
@@ -23,10 +23,14 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   final ScrollController _scrollController = ScrollController();
 
   Map<int, List<Workout>> workoutMap = {
-    1: [],
+    0: [],
   };
 
   void initWorkoutMap(List<Workout> workouts) {
+    for (int key in workoutMap.keys) {
+      workoutMap[key] = [];
+    }
+
     for (var workout in workouts) {
       workoutMap[workout.day] != null
           ? workoutMap[workout.day]!.add(workout)
@@ -39,13 +43,21 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     setState(() {});
   }
 
-  void addExercise() {
-    // TODO: weight update/create page
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => WorkoutCreateUpdateForm(
-                rebuildCallback: () => setState(() => {}))));
+  void addExercise(int day, int defaultOrder) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext ctx) {
+          return SizedBox(
+              child: WorkoutCreateUpdateForm(
+                  day: day,
+                  defaultOrder: defaultOrder,
+                  rebuildCallback: () {
+                    setState(() => {});
+                    build(context);
+                  }
+              )
+          );
+        });
   }
 
   Widget buildAddDay() {
@@ -69,10 +81,10 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             )));
   }
 
-  Widget buildAddExercise() {
+  Widget buildAddExercise(int day, int defaultOrder) {
     return TextButton(
         onPressed: () {
-          addExercise();
+          addExercise(day, defaultOrder);
         },
         child: Padding(
             padding: const EdgeInsets.all(8),
@@ -90,12 +102,19 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             )));
   }
 
+  /// Workouts list is intended to be constrained for the day
   Widget buildDay(List<Workout> workouts, int day) {
+    List<Widget> workoutList = workouts.map((w) => WorkoutCard(workout: w) as Widget).toList();
+    workoutList.add(buildAddExercise(day, workouts.length + 1));
+
     return ExpansionTile(
         title: Text('Day ' + day.toString()),
         initiallyExpanded: true,
         children: [
-          buildAddExercise(),
+          SizedBox(height: 240, child: ListView(
+              controller: _scrollController,
+              children: workoutList,
+          )),
         ]);
   }
 
@@ -128,7 +147,6 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
         body: FutureBuilder<List<List<dynamic>>>(
             future: Future.wait([
               WorkoutService.svc.getWorkouts(),
-              // PreferenceService.svc.getPreference()
             ]),
             builder: (BuildContext context,
                 AsyncSnapshot<List<List<dynamic>>> snapshot) {
