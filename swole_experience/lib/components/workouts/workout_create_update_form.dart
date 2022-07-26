@@ -33,9 +33,9 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
 class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _notesFieldKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _nameFieldKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final Logger logger = Logger();
 
   final ScrollController _scrollController = ScrollController();
@@ -49,22 +49,50 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
   void createWorkout() {
     Workout workout = Workout(
-        day: int.tryParse(_dayController.value.text) ?? widget.day,
-        id: Random().nextInt(9999).toString(),
-        dayOrder: int.tryParse(_orderController.value.text) ?? widget.defaultOrder,
-        name: _nameController.value.text,
-        sets: int.parse(_setsController.value.text),
-        reps: int.parse(_repsController.value.text),
-        weight: double.parse(_weightController.value.text),
-        notes: _notesController.value.text,
+      day: int.tryParse(_dayController.value.text) ?? widget.day,
+      id: Random().nextInt(9999).toString(),
+      dayOrder:
+          int.tryParse(_orderController.value.text) ?? widget.defaultOrder,
+      name: _nameController.value.text,
+      sets: int.parse(_setsController.value.text),
+      reps: int.parse(_repsController.value.text),
+      weight: double.parse(_weightController.value.text),
+      notes: _notesController.value.text,
     );
 
     WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
       return handleSaveError('create', error, stackTrace);
-    }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
+    }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
   }
 
-  void updateWorkout() {}
+  void updateWorkout() {
+    if (widget.workout != null) {
+      Workout workout = Workout(
+        day: int.tryParse(_dayController.value.text) ?? widget.day,
+        id: widget.workout!.id,
+        dayOrder:
+            int.tryParse(_orderController.value.text) ?? widget.defaultOrder,
+        name: _nameController.value.text.isNotEmpty
+            ? _nameController.value.text
+            : widget.workout!.name,
+        sets: int.tryParse(_setsController.value.text) ?? widget.workout!.sets,
+        reps: int.tryParse(_repsController.value.text) ?? widget.workout!.reps,
+        weight: double.tryParse(_weightController.value.text) ??
+            widget.workout!.weight,
+        notes: _notesController.value.text.isNotEmpty
+            ? _notesController.value.text
+            : widget.workout?.notes,
+      );
+
+      WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
+        return handleSaveError('update', error, stackTrace);
+      }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
+    } else {
+      logger.e(
+          'Error: updating but no workout on stack - should not be possible');
+      handleSaveError('update', null, null);
+    }
+  }
 
   bool isAnyChanged() {
     return _nameController.value.text.isNotEmpty ||
@@ -75,7 +103,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         _notesController.value.text.isNotEmpty;
   }
 
-  int handleSaveError(String operation, Object? error, StackTrace stackTrace) {
+  int handleSaveError(String operation, Object? error, StackTrace? stackTrace) {
     logger.e("Error ${operation}ing workout $error", stackTrace);
     const AlertSnackBar(
       message: "Unable to update or create the workout.",
@@ -85,9 +113,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   void save() {
-    if (isAnyChanged()) {
-      widget.workout != null ? updateWorkout() : createWorkout();
-    }
+    widget.workout != null ? updateWorkout() : createWorkout();
   }
 
   ///                               ELEMENTS                                 ///
@@ -102,8 +128,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                   top: 24, bottom: 24, left: 32, right: 12),
               child: TextFormField(
                   controller: _nameController,
-                  validator: (String? value) =>
-                      Validator.stringValidator(value),
+                  validator: (String? value) => Validator.stringValidator(value,
+                      defaultValue: widget.workout?.name),
                   decoration: InputDecoration(
                       hintText: widget.workout?.name ?? 'Name')),
             )));
@@ -115,13 +141,13 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         width: 96,
         child: Padding(
           padding:
-          const EdgeInsets.only(top: 24, bottom: 24, left: 12, right: 32),
+              const EdgeInsets.only(top: 24, bottom: 24, left: 12, right: 32),
           child: TextFormField(
               controller: _orderController,
               validator: (String? value) =>
                   Validator.intValidatorNullAllowed(value),
               keyboardType:
-              const TextInputType.numberWithOptions(decimal: false),
+                  const TextInputType.numberWithOptions(decimal: false),
               decoration: InputDecoration(
                   hintText: widget.workout?.dayOrder.toString() ?? 'Order')),
         ));
@@ -136,10 +162,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                   top: 24, bottom: 24, left: 32, right: 12),
               child: TextFormField(
                   controller: _weightController,
-                  validator: (String? value) =>
-                      Validator.doubleValidator(value),
+                  validator: (String? value) => Validator.doubleValidator(value,
+                      defaultValue: widget.workout?.weight),
                   keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                       hintText: widget.workout?.weight.toString() ?? 'Weight')),
             )));
@@ -154,9 +180,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                   top: 24, bottom: 24, left: 12, right: 12),
               child: TextFormField(
                   controller: _setsController,
-                  validator: (String? value) => Validator.intValidator(value),
+                  validator: (String? value) => Validator.intValidator(value,
+                      defaultValue: widget.workout?.sets),
                   keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
+                      const TextInputType.numberWithOptions(decimal: false),
                   decoration: InputDecoration(
                       hintText: widget.workout?.sets.toString() ?? 'Sets')),
             )));
@@ -171,9 +198,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                   top: 24, bottom: 24, left: 12, right: 32),
               child: TextFormField(
                   controller: _repsController,
-                  validator: (String? value) => Validator.intValidator(value),
+                  validator: (String? value) => Validator.intValidator(value,
+                      defaultValue: widget.workout?.reps),
                   keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
+                      const TextInputType.numberWithOptions(decimal: false),
                   decoration: InputDecoration(
                       hintText: widget.workout?.reps.toString() ?? 'Reps')),
             )));
@@ -185,14 +213,14 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         height: 240,
         child: Padding(
           padding:
-          const EdgeInsets.only(top: 24, bottom: 24, left: 32, right: 32),
+              const EdgeInsets.only(top: 24, bottom: 24, left: 32, right: 32),
           child: TextFormField(
             controller: _notesController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
             decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                hintText: widget.workout?.name ?? 'Notes'),
+                hintText: widget.workout?.notes ?? 'Notes'),
             onTap: () => Util().scrollToSelectedContext(_notesFieldKey),
           ),
         ));
@@ -205,6 +233,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         icon: const Icon(Icons.cancel),
         onPressed: () {
           Navigator.of(context).pop();
+          widget.rebuildCallback(widget.workout);
         },
       ),
       IconButton(
@@ -220,12 +249,6 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         },
       ),
     ]);
-  }
-
-  @override
-  void dispose() {
-    Util().scrollToSelectedContext(_nameFieldKey);
-    super.dispose();
   }
 
   @override
@@ -246,10 +269,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
             ]),
             buildNotesField(),
             buildConfirmCancel(),
-            SizedBox(height: MediaQuery
-                .of(context)
-                .size
-                .height * .34)
+            SizedBox(height: MediaQuery.of(context).size.height * .34)
           ],
         ));
   }

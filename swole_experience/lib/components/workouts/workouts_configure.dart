@@ -23,7 +23,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   final ScrollController _scrollController = ScrollController();
 
   Map<int, List<Workout>> workoutMap = {
-    0: [],
+    1: [],
   };
 
   void initWorkoutMap(List<Workout> workouts) {
@@ -51,12 +51,11 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
               child: WorkoutCreateUpdateForm(
                   day: day,
                   defaultOrder: defaultOrder,
-                  rebuildCallback: () {
+                  rebuildCallback: (Workout workout) {
+                    workoutMap[workout.day]!.add(workout);
                     setState(() => {});
                     build(context);
-                  }
-              )
-          );
+                  }));
         });
   }
 
@@ -82,6 +81,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   }
 
   Widget buildAddExercise(int day, int defaultOrder) {
+    // TODO: Add another option to pick from existing workouts
     return TextButton(
         onPressed: () {
           addExercise(day, defaultOrder);
@@ -104,17 +104,27 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
   /// Workouts list is intended to be constrained for the day
   Widget buildDay(List<Workout> workouts, int day) {
-    List<Widget> workoutList = workouts.map((w) => WorkoutCard(workout: w) as Widget).toList();
+    // Cast is necessary, otherwise it auto assigns List<Widget> to
+    // List<WorkoutCard> and falls over when adding the button
+    List<Widget> workoutList = workouts
+        .map((w) => WorkoutCard(
+              allowDelete: true,
+              workout: w,
+              rebuildCallback: () => setState(() {}),
+            ) as Widget)
+        .toList();
     workoutList.add(buildAddExercise(day, workouts.length + 1));
 
     return ExpansionTile(
         title: Text('Day ' + day.toString()),
         initiallyExpanded: true,
         children: [
-          SizedBox(height: 240, child: ListView(
-              controller: _scrollController,
-              children: workoutList,
-          )),
+          SizedBox(
+              height: 240,
+              child: ListView(
+                controller: _scrollController,
+                children: workoutList,
+              )),
         ]);
   }
 

@@ -11,6 +11,8 @@ import 'package:swole_experience/model/workout.dart';
 ///   TEXT id          = uuid for the record
 ///   INTEGER day      = Day the exercise is to be performed on
 ///                     *Note*: Index starts at 1
+///                     *Note* Index of 0 means not in use.
+///                     TODO: Surface those not in use somehow,
 ///   INTEGER dayOrder = Order the exercises is intended to be performed in for the day
 ///                     *Note* Index starts at 1
 ///   TEXT name        = Name of the exercise

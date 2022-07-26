@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:swole_experience/components/preferences/settings_button.dart';
 import 'package:swole_experience/components/workouts/timer.dart';
 import 'package:swole_experience/components/workouts/workout_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-
-import '../preferences/settings.dart';
 
 class Workouts extends StatefulWidget {
   const Workouts({Key? key, this.context}) : super(key: key);
