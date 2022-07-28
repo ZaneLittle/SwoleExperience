@@ -66,7 +66,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                           }));
                 });
           } else {
-            // TODO: We're not allowing delete but user has swiped right - do we want to perform a different action or should this also be an update operation?
+            widget.rebuildCallback();
+            //TODO: Mark as done instead?
           }
         },
         key: ValueKey("_workoutCard${widget.workout.id}"),

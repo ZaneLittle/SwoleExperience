@@ -8,7 +8,7 @@ class Preference {
   Preference.fromMap(Map<String, dynamic> map)
       : preference = map['preference'] as String,
         value = map['value'] as String,
-        lastUpdated = DateTime.parse(map['lastUpdated'] as String);
+        lastUpdated = DateTime.tryParse(map['lastUpdated'] as String);
 
   Map<String, dynamic> toMap() {
     return {

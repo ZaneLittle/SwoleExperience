@@ -1,7 +1,5 @@
 class WeightConstant {
 
-  static const String weightUnitKey = 'WEIGHT_UNIT';
-
   static const String pounds = 'POUNDS';
 
   static const String kilograms = 'KILOGRAMS';

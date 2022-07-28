@@ -106,7 +106,7 @@ class _WeightBreakdownState extends State<WeightBreakdown> {
         widget.dataSnapshot!.data == null ||
         widget.dataSnapshot!.data!.isEmpty ||
         widget.dataSnapshot!.data![0].isEmpty ||
-        widget.dataSnapshot!.data![0].isEmpty) {
+        widget.dataSnapshot!.data![1].isEmpty) {
       return const Center(child: Text('No weights have been logged'));
     } else {
       List<Average> averages =

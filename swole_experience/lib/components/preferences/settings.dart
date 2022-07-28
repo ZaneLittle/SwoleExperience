@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
-import 'package:swole_experience/constants/weight_units.dart';
+import 'package:swole_experience/constants/weight_constant.dart';
+import 'package:swole_experience/constants/preference_constants.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -33,7 +34,7 @@ class _SettingsState extends State<Settings> {
 
   DropdownButton buildWeightUnitPreferenceSelect(List<Preference> preferences) {
     Preference? pref =
-        findPreference(preferences, WeightConstant.weightUnitKey);
+        findPreference(preferences, Constants.weightUnitKey);
     _weightUnitValue = pref == null ? WeightConstant.pounds : pref.value;
 
     return DropdownButton(
@@ -45,7 +46,7 @@ class _SettingsState extends State<Settings> {
             .toList(),
         onChanged: (value) {
           PreferenceService.svc.addOrUpdatePreference(Preference(
-              preference: WeightConstant.weightUnitKey,
+              preference: Constants.weightUnitKey,
               value: value,
               lastUpdated: DateTime.now()));
           setState(() {

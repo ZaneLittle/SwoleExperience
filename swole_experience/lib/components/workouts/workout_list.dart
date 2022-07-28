@@ -4,16 +4,19 @@ import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-import 'package:swole_experience/service/workout_service.dart';
-import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
 
 class WorkoutList extends StatefulWidget {
-  const WorkoutList({Key? key, this.context, required this.day})
+  const WorkoutList(
+      {Key? key,
+      this.context,
+      required this.dataSnapshot,
+      required this.rebuildCallback})
       : super(key: key);
 
   final BuildContext? context;
-  final int day;
+  final AsyncSnapshot<List<List<dynamic>>> dataSnapshot;
+  final Function rebuildCallback;
 
   @override
   State<WorkoutList> createState() => _WorkoutListState();
@@ -26,14 +29,16 @@ class _WorkoutListState extends State<WorkoutList> {
 
   FutureOr rebuild(dynamic value) {
     setState(() {});
+    widget.rebuildCallback(value);
   }
 
-  Widget buildList(AsyncSnapshot<List<Workout>> dataSnapshot) {
-    if (dataSnapshot.connectionState == ConnectionState.waiting) {
+  Widget buildList() {
+    if (widget.dataSnapshot.connectionState == ConnectionState.waiting) {
       return const Center(child: Text('Loading...'));
-    } else if (!dataSnapshot.hasData ||
-        dataSnapshot.data == null ||
-        dataSnapshot.data!.isEmpty) {
+    } else if (!widget.dataSnapshot.hasData ||
+        widget.dataSnapshot.data == null ||
+        widget.dataSnapshot.data!.isEmpty ||
+        widget.dataSnapshot.data![0].isEmpty) {
       return TextButton(
           onPressed: () {
             Navigator.push(
@@ -59,23 +64,22 @@ class _WorkoutListState extends State<WorkoutList> {
     } else {
       return ListView(
         controller: _scrollController,
-        children: dataSnapshot.requireData.map((w) =>
-          WorkoutCard(workout: w, rebuildCallback: () => setState(() {}),)
-        ).toList(),
+        children: widget.dataSnapshot.requireData[0]
+            .map((w) => WorkoutCard(
+                  workout: w,
+                  rebuildCallback: () => setState(() {}),
+                ))
+            .toList(),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Workout>>(
-        future: WorkoutService.svc.getWorkouts(day: widget.day),
-        builder: (BuildContext context, AsyncSnapshot<List<Workout>> snapshot) {
-          return SizedBox(
-            key: _workoutListKey,
-            height: MediaQuery.of(context).size.height - 240,
-            child: buildList(snapshot),
-          );
-        });
+    return SizedBox(
+      key: _workoutListKey,
+      height: MediaQuery.of(context).size.height - 240,
+      child: buildList(),
+    );
   }
 }

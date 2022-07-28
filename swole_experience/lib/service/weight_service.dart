@@ -1,13 +1,15 @@
 import 'dart:io';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/service/preference_service.dart';
 
-import 'package:swole_experience/constants/weight_units.dart';
+import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/constants/weight_constant.dart';
 import 'package:swole_experience/model/weight.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/util/converter.dart';
+import 'package:swole_experience/constants/preference_constants.dart';
 
 /// WeightService provides an interface to the `weight` table.
 /// This table stores the raw weight data the user has entered
@@ -111,11 +113,11 @@ class WeightService {
 
   /// Returns the appropriate multiplier to pounds based on the user's preferred weight
   Future<double> _getMultiplier() async {
-    Preference weightPref =
-    await PreferenceService.svc.getPreference(WeightConstant.weightUnitKey);
-    return weightPref.value == WeightConstant.kilograms
+    List<Preference> weightPref =
+    await PreferenceService.svc.getPreference(Constants.weightUnitKey);
+    return weightPref.first.value == WeightConstant.kilograms
         ? 2.205
-        : weightPref.value == WeightConstant.stone
+        : weightPref.first.value == WeightConstant.stone
         ? 14
         : 1;
   }

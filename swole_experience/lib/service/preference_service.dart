@@ -46,7 +46,8 @@ class PreferenceService {
     ''');
   }
 
-  Future<Preference> getPreference(String preference) async {
+  /// Return list of preferences matching key ordered by last updated descending
+  Future<List<Preference>> getPreference(String preference) async {
     Database db = await svc.db;
 
     var preferences = await db.query(_dbName,
@@ -55,12 +56,12 @@ class PreferenceService {
         whereArgs: [preference]);
 
     if (preferences.isEmpty) {
-      logger.w('Did not find preference $preference, returning empty');
-      return Preference(preference: preference);
+      logger.i('Did not find preference $preference, returning empty');
+      return [];
     } else if (preferences.length > 1) {
-      logger.w('Found multiple preferences for $preference, returning latest');
+      logger.w('Found multiple preferences for $preference');
     }
-    return Preference.fromMap(preferences.first);
+    return preferences.map((pref) => Preference.fromMap(pref)).toList();
   }
 
   Future<List<Preference>> getAllPreferences() async {

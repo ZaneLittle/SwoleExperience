@@ -7,6 +7,7 @@ import 'package:swole_experience/components/workouts/workout_create_update_form.
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/util/util.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
   const WorkoutsConfigure({Key? key, this.context}) : super(key: key);
@@ -31,11 +32,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       workoutMap[key] = [];
     }
 
-    for (var workout in workouts) {
-      workoutMap[workout.day] != null
-          ? workoutMap[workout.day]!.add(workout)
-          : workoutMap[workout.day] = [workout];
-    }
+    workoutMap.addAll(Util().getWorkoutDays(workouts));
   }
 
   void addDay() {
@@ -148,6 +145,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             icon: const Icon(Icons.arrow_back),
             iconSize: 32,
             onPressed: () {
+              // TODO: if any days have no workouts, compress and alert user
               Navigator.pop(context);
               setState(() {});
             },
