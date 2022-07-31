@@ -86,13 +86,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
         return handleSaveError('update', error, stackTrace);
-      // }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
+        // }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
       }).then((res) {
-        res != 0
-            ? widget.rebuildCallback(workout)
-            : null;
+        res != 0 ? widget.rebuildCallback(workout) : null;
       });
-
     } else {
       logger.e(
           'Error: updating but no workout on stack - should not be possible');
@@ -125,10 +122,9 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   ///                               ELEMENTS                                 ///
 
   Widget buildNameField() {
-    if (widget.workout?.name.isNotEmpty ?? false)  {
-      _nameController = TextEditingController(text: widget.workout?.name);
-    }
-        return Expanded(
+    _nameController = TextEditingController(text: widget.workout?.name);
+
+    return Expanded(
         child: SizedBox(
             key: _nameFieldKey,
             height: 84,
@@ -139,30 +135,34 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                   controller: _nameController,
                   validator: (String? value) => Validator.stringValidator(value,
                       defaultValue: widget.workout?.name),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.name ?? 'Name')),
+                  decoration: const InputDecoration(hintText: 'Name')),
             )));
   }
 
   Widget buildOrderField() {
+    _orderController =
+        TextEditingController(text: widget.workout?.dayOrder.toString());
+
     return SizedBox(
         height: 84,
         width: 96,
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 24, bottom: 24, left: 12, right: 32),
-          child: TextFormField(
+            padding:
+                const EdgeInsets.only(top: 24, bottom: 24, left: 12, right: 32),
+            child: TextFormField(
               controller: _orderController,
               validator: (String? value) =>
                   Validator.intValidatorNullAllowed(value),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: false),
-              decoration: InputDecoration(
-                  hintText: widget.workout?.dayOrder.toString() ?? 'Order')),
-        ));
+              decoration: const InputDecoration(hintText: 'Order'),
+            )));
   }
 
   Widget buildWeightField() {
+    _weightController =
+        TextEditingController(text: widget.workout?.weight.toString());
+
     return Expanded(
         child: SizedBox(
             height: 84,
@@ -175,12 +175,14 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                       defaultValue: widget.workout?.weight),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.weight.toString() ?? 'Weight')),
+                  decoration: const InputDecoration(hintText: 'Weight', helperText: 'Weight')),
             )));
   }
 
   Widget buildSetsField() {
+    _setsController =
+        TextEditingController(text: widget.workout?.sets.toString());
+
     return Expanded(
         child: SizedBox(
             height: 84,
@@ -193,12 +195,15 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                       defaultValue: widget.workout?.sets),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: false),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.sets.toString() ?? 'Sets')),
+                  decoration: const InputDecoration(
+                      hintText: 'Sets', helperText: 'Sets')),
             )));
   }
 
   Widget buildRepsField() {
+    _repsController =
+        TextEditingController(text: widget.workout?.reps.toString());
+
     return Expanded(
         child: SizedBox(
             height: 84,
@@ -211,12 +216,14 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                       defaultValue: widget.workout?.reps),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: false),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.reps.toString() ?? 'Reps')),
+                  decoration: const InputDecoration(
+                      hintText: 'Reps', helperText: 'Reps')),
             )));
   }
 
   Widget buildNotesField() {
+    _notesController = TextEditingController(text: widget.workout?.notes);
+
     return SizedBox(
         key: _notesFieldKey,
         height: 240,
@@ -227,9 +234,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
             controller: _notesController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
-            decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText: widget.workout?.notes ?? 'Notes'),
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(), hintText: 'Notes'),
             onTap: () => Util().scrollToSelectedContext(_notesFieldKey),
           ),
         ));
