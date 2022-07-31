@@ -86,7 +86,13 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
         return handleSaveError('update', error, stackTrace);
-      }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
+      // }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
+      }).then((res) {
+        res != 0
+            ? widget.rebuildCallback(workout)
+            : null;
+      });
+
     } else {
       logger.e(
           'Error: updating but no workout on stack - should not be possible');

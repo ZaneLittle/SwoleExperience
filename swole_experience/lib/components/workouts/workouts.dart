@@ -41,7 +41,7 @@ class _WorkoutsState extends State<Workouts> {
       if (workingOffset + day < 1) {
         workingOffset = daysLength - day;
       } else if (workingOffset + day > daysLength) {
-        workingOffset =  1 - day;
+        workingOffset = 1 - day;
       }
 
       setState(() {
@@ -147,25 +147,35 @@ class _WorkoutsState extends State<Workouts> {
   Widget buildList(int? dayOffset) {
     return FutureBuilder<List<List<dynamic>>>(
         future: Future.wait([
-          WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0)),
+          // WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0)),
           PreferenceService.svc.getPreference(Constants.workoutDayPreference),
         ]),
         builder: (BuildContext context,
-            AsyncSnapshot<List<List<dynamic>>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+            AsyncSnapshot<List<List<dynamic>>> initSnapshot) {
+          if (initSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: Text('Loading...'));
           } else {
             setupDay(
-                dayPref: snapshot.data?[1] as List<Preference>?,
+                dayPref: initSnapshot.data?[0] as List<Preference>?,
                 offset: dayOffset ?? 0);
+            return FutureBuilder<List<List<dynamic>>>(
+              future: Future.wait([
+                WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0)),
+              ]),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<List<dynamic>>> finalSnapshot) {
 
-            return Column(
-              children: [
-                buildDaySelect(snapshot),
-                WorkoutList(dataSnapshot: snapshot, rebuildCallback: rebuild),
-                buildCompleteDayButton(snapshot),
-                const WorkoutTimer(),
-              ],
+                finalSnapshot.data?.add(initSnapshot.data ?? []);
+
+                return Column(
+                  children: [
+                    buildDaySelect(finalSnapshot),
+                    WorkoutList(dataSnapshot: finalSnapshot, rebuildCallback: rebuild),
+                    buildCompleteDayButton(finalSnapshot),
+                    const WorkoutTimer(),
+                  ],
+                );
+              }
             );
           }
         });

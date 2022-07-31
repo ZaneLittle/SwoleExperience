@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:swole_experience/constants/common_styles.dart';
 
 enum SnackBarState {
   success,
   failure,
   warning,
+  info,
 }
 
 class AlertSnackBar {
@@ -22,10 +24,13 @@ class AlertSnackBar {
         {
           return const Icon(Icons.error_outline, color: Color(0xffff0000));
         }
-        break;
       case SnackBarState.warning:
         {
           return const Icon(Icons.warning_amber, color: Color(0xffeed202));
+        }
+      case SnackBarState.info:
+        {
+          return const Icon(Icons.info, color: CommonStyles.primaryColour);
         }
       default:
         {

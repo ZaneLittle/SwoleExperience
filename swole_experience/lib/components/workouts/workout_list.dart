@@ -67,7 +67,7 @@ class _WorkoutListState extends State<WorkoutList> {
         children: widget.dataSnapshot.requireData[0]
             .map((w) => WorkoutCard(
                   workout: w,
-                  rebuildCallback: () => setState(() {}),
+                  rebuildCallback: (dynamic value) => rebuild(value),
                 ))
             .toList(),
       );

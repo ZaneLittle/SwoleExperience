@@ -44,47 +44,50 @@ class _WorkoutCardState extends State<WorkoutCard> {
     return (notes.length > 60 || notes.contains('\n')) ? 62 : 38;
   }
 
+  void onDismissed(DismissDirection direction, Workout w) {
+    if (direction == DismissDirection.startToEnd && widget.allowDelete) {
+      // TODO: do we just set to day 0 instead of deleting?
+      WorkoutService.svc.removeWorkout(widget.workout.id);
+      widget.rebuildCallback();
+    } else if (direction == DismissDirection.endToStart) {
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext ctx) {
+            return SizedBox(
+                child: WorkoutCreateUpdateForm(
+                    day: w.day,
+                    defaultOrder: w.dayOrder,
+                    workout: w,
+                    rebuildCallback: (Workout workout) {
+                      widget.rebuildCallback(workout);
+                    }));
+          });
+    } else {
+      widget.rebuildCallback(w);
+      //TODO: Mark as done instead?
+    }
+  }
+
   Widget buildList(Workout? workout) {
     Workout w = workout ?? widget.workout;
     return Dismissible(
-        onDismissed: (DismissDirection direction) {
-          if (direction.name == 'startToEnd' && widget.allowDelete) {
-            // TODO: do we just set to day 0 instead of deleting?
-            WorkoutService.svc.removeWorkout(widget.workout.id);
-            widget.rebuildCallback();
-          } else if (direction.name == 'endToStart') {
-            showModalBottomSheet(
-                context: context,
-                builder: (BuildContext ctx) {
-                  return SizedBox(
-                      child: WorkoutCreateUpdateForm(
-                          day: w.day,
-                          defaultOrder: w.dayOrder,
-                          workout: w,
-                          rebuildCallback: (Workout workout) {
-                            widget.rebuildCallback();
-                          }));
-                });
-          } else {
-            widget.rebuildCallback();
-            //TODO: Mark as done instead?
-          }
-        },
+        onDismissed: (DismissDirection direction) => onDismissed(direction, w),
         key: ValueKey("_workoutCard${widget.workout.id}"),
-        background: Row(children: [
-          widget.allowDelete ? Expanded(
-              child: Container(
-                  color: Colors.red,
-                  child: Align(alignment:Alignment.centerLeft,
-                      child: Padding(
+        resizeDuration: const Duration(milliseconds: 50),
+        direction: widget.allowDelete ? DismissDirection.horizontal : DismissDirection.endToStart,
+        background: widget.allowDelete ? Expanded(
+            child: Container(
+                color: Colors.red,
+                child: Align(alignment:Alignment.centerLeft,
+                    child: Padding(
                         padding: const EdgeInsets.only(left: 18),
-                          child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.close),
-                        Text('Delete'),
-                  ]))))) : Container(),
-          Expanded(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.close),
+                              Text('Delete'),
+                            ]))))) : Container(),
+        secondaryBackground: Expanded(
               child: Container(
                   color: CommonStyles.primaryColour,
                   child: Align(alignment:Alignment.centerRight,
@@ -96,7 +99,6 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 Icon(Icons.mode_edit),
                                 Text('Update'),
                               ]))))),
-        ]),
         child: SizedBox(
                 height: getHeight(),
                 width: MediaQuery.of(context).size.width,
