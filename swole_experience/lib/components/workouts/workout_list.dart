@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
-import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
+import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/model/workout.dart';
 
 class WorkoutList extends StatefulWidget {
   const WorkoutList(
@@ -67,7 +68,7 @@ class _WorkoutListState extends State<WorkoutList> {
         children: widget.dataSnapshot.requireData[0]
             .map((w) => WorkoutCard(
                   workout: w,
-                  rebuildCallback: (dynamic value) => rebuild(value),
+                  rebuildCallback: rebuild,
                 ))
             .toList(),
       );

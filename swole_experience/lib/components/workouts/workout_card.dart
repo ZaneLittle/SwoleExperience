@@ -58,7 +58,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     day: w.day,
                     defaultOrder: w.dayOrder,
                     workout: w,
-                    rebuildCallback: (Workout workout) {
+                    rebuildCallback: (Workout? workout) {
                       widget.rebuildCallback(workout);
                     }));
           });

@@ -7,9 +7,11 @@ import 'package:swole_experience/components/workouts/timer.dart';
 import 'package:swole_experience/components/workouts/workout_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
+import 'package:swole_experience/model/preference.dart';
+import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/service/workout_service.dart';
-import 'package:swole_experience/model/preference.dart';
+
 
 class Workouts extends StatefulWidget {
   const Workouts({Key? key, this.context}) : super(key: key);
@@ -28,7 +30,7 @@ class _WorkoutsState extends State<Workouts> {
   int day = 1;
   String dayText = 'Today';
 
-  FutureOr rebuild(dynamic value) {
+  FutureOr rebuild(Workout? value) {
     setState(() {});
     build(context);
   }

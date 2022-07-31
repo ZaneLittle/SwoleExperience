@@ -39,12 +39,12 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   final Logger logger = Logger();
 
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _orderController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _setsController = TextEditingController();
-  final TextEditingController _repsController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _orderController = TextEditingController();
+  TextEditingController _weightController = TextEditingController();
+  TextEditingController _setsController = TextEditingController();
+  TextEditingController _repsController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
   final TextEditingController _dayController = TextEditingController();
 
   void createWorkout() {
@@ -125,7 +125,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   ///                               ELEMENTS                                 ///
 
   Widget buildNameField() {
-    return Expanded(
+    if (widget.workout?.name.isNotEmpty ?? false)  {
+      _nameController = TextEditingController(text: widget.workout?.name);
+    }
+        return Expanded(
         child: SizedBox(
             key: _nameFieldKey,
             height: 84,

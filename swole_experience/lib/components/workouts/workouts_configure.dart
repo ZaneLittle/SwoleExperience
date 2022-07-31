@@ -38,8 +38,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     workoutMap.addAll(Util().getWorkoutDays(workouts));
   }
 
-  void rebuild(Workout w) {
-    // workoutMap[w.day]!.add(w);
+  void rebuild(Workout? w) {
     setState(() => {});
     build(context);
   }
@@ -57,7 +56,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
               child: WorkoutCreateUpdateForm(
                   day: day,
                   defaultOrder: defaultOrder,
-                  rebuildCallback: (Workout workout) => rebuild(workout)));
+                  rebuildCallback: (Workout? workout) => rebuild(workout)));
         });
   }
 
@@ -160,7 +159,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     WorkoutCard(
       allowDelete: true,
       workout: w,
-      rebuildCallback: (Workout w) => rebuild(w),
+      rebuildCallback: rebuild,
     ) as Widget)
         .toList();
     workoutList.add(buildAddExercise(day, workouts.length + 1));
