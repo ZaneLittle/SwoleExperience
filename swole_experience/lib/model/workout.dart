@@ -46,4 +46,26 @@ class Workout {
   String toString() {
     return 'Workout:\n\tID:$id\n\tDay:$day\n\tOrder:$dayOrder\n\tName:$name\n\tWeight:$weight\n\tSets:$sets\n\tReps:$reps\n\tNotes:$notes';
   }
+
+  Workout copy({
+    String? id,
+    int? day,
+    int? dayOrder,
+    String? name,
+    double? weight,
+    int? sets,
+    int? reps,
+    String? notes,
+  }) {
+    return Workout(
+      id: id ?? this.id,
+      day: day ?? this.day,
+      dayOrder: dayOrder ?? this.dayOrder,
+      name: name ?? this.name,
+      weight: weight ?? this.weight,
+      sets: sets ?? this.sets,
+      reps: reps ?? this.reps,
+      notes: notes ?? this.notes,
+    );
+  }
 }

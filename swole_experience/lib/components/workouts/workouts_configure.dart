@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
@@ -21,12 +20,16 @@ class WorkoutsConfigure extends StatefulWidget {
 
 class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   final GlobalKey<_WorkoutsConfigureState> _workoutsConfigureKey =
-  GlobalKey<_WorkoutsConfigureState>();
+      GlobalKey<_WorkoutsConfigureState>();
   final ScrollController _scrollController = ScrollController();
+
+  final Logger logger = Logger();
 
   Map<int, List<Workout>> workoutMap = {
     1: [],
   };
+
+  bool shouldRebuild = true;
 
   ///                         Processing                                    ///
 
@@ -105,6 +108,24 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     }
   }
 
+  void reorderAllDays() {
+    for (int day in workoutMap.keys) {
+      reorderDay(day);
+    }
+  }
+
+  /// Update the order of each workout in the workout map of a given day based on the order it appears in the list
+  void reorderDay(int day) {
+    for (int i = 0; i < workoutMap[day]!.length; i++) {
+      Workout w = workoutMap[day]![i];
+      if (w.dayOrder != i) {
+        Workout newW = w.copy(dayOrder: i);
+        workoutMap[day]![i] = newW;
+        WorkoutService.svc.updateWorkout(workoutMap[day]![i].copy(dayOrder: i));
+      }
+    }
+  }
+
   ///                                 ELEMENTS                              ///
 
   Widget buildAddDay() {
@@ -131,6 +152,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   Widget buildAddExercise(int day, int defaultOrder) {
     // TODO: Add another option to pick from existing workouts
     return TextButton(
+        key: Key('addButton$day'),
         onPressed: () {
           addExercise(day, defaultOrder);
         },
@@ -155,79 +177,114 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     // Cast is necessary, otherwise it auto assigns List<Widget> to
     // List<WorkoutCard> and falls over when adding the button
     List<Widget> workoutList = workouts
-        .map((w) =>
-    WorkoutCard(
-      allowDelete: true,
-      workout: w,
-      rebuildCallback: rebuild,
-    ) as Widget)
+        .map((w) => WorkoutCard(
+              key: Key(w.toString()),
+              allowDelete: true,
+              workout: w,
+              rebuildCallback: rebuild,
+            ) as Widget)
         .toList();
-    workoutList.add(buildAddExercise(day, workouts.length + 1));
-
+    workoutList.add(buildAddExercise(day, workouts.length));
     return ExpansionTile(
         title: Text('Day ' + day.toString()),
         initiallyExpanded: true,
         children: [
           SizedBox(
               height: 240,
-              child: ListView(
-                controller: _scrollController,
-                children: workoutList,
-              )),
+              child: ReorderableListView(
+                  children: workoutList,
+                  onReorder: (int oldIndex, int newIndex) {
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+
+                      if (newIndex >= workoutMap[day]!.length) {
+                        newIndex = workoutMap[day]!.length - 1;
+                      }
+
+                      Workout w = workoutMap[day]!.removeAt(oldIndex);
+                      workoutMap[day]!.insert(newIndex, w);
+
+                      reorderDay(day);
+
+                      shouldRebuild = false;
+                    });
+                  })),
         ]);
   }
 
   Widget buildDays() {
     List<int> dayList = workoutMap.keys.toList();
     List<Widget> dayWidgetList =
-    dayList.map((day) => buildDay(workoutMap[day]!, day)).toList();
+        dayList.map((day) => buildDay(workoutMap[day]!, day)).toList();
     dayWidgetList.add(buildAddDay());
 
     return SizedBox(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height - 80,
+        height: MediaQuery.of(context).size.height - 80,
         child:
-        ListView(controller: _scrollController, children: dayWidgetList));
+            ListView(controller: _scrollController, children: dayWidgetList));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            iconSize: 32,
-            onPressed: () {
-              removeEmptyDays();
-              Navigator.pop(context);
-              setState(() {});
-            },
+    if (shouldRebuild) {
+      return Scaffold(
+          appBar: AppBar(
+            backgroundColor: CommonStyles.primaryDark,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              iconSize: 32,
+              onPressed: () {
+                removeEmptyDays();
+                reorderAllDays();
+                Navigator.pop(context);
+                setState(() {});
+              },
+            ),
+            title: const Text('Configure workouts'),
           ),
-          title: const Text('Configure workouts'),
-        ),
-        body: FutureBuilder<List<List<dynamic>>>(
-            future: Future.wait([
-              WorkoutService.svc.getWorkouts(),
-            ]),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<List<dynamic>>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: Text('Loading...'));
-              } else {
-                List<Workout> workouts =
-                snapshot.requireData[0] as List<Workout>;
-                initWorkoutMap(workouts);
+          body: FutureBuilder<List<List<dynamic>>>(
+              future: Future.wait([
+                WorkoutService.svc.getWorkouts(),
+              ]),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: Text('Loading...'));
+                } else {
+                  List<Workout> workouts =
+                      snapshot.requireData[0] as List<Workout>;
+                  initWorkoutMap(workouts);
 
-                return SizedBox(
-                  // height: MediaQuery.of(context).size.height,
-                    child: ListView(
-                        controller: _scrollController,
-                        children: <Widget>[
-                          buildDays(),
-                        ]));
-              }
-            }));
+                  return SizedBox(
+                      child: ListView(
+                          controller: _scrollController,
+                          children: <Widget>[
+                        buildDays(),
+                      ]));
+                }
+              }));
+    } else {
+      shouldRebuild = true;
+      return Scaffold(
+          appBar: AppBar(
+            backgroundColor: CommonStyles.primaryDark,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              iconSize: 32,
+              onPressed: () {
+                removeEmptyDays();
+                Navigator.pop(context);
+                setState(() {});
+              },
+            ),
+            title: const Text('Configure workouts'),
+          ),
+          body: SizedBox(
+              child: ListView(controller: _scrollController, children: <Widget>[
+            buildDays(),
+          ])));
+    }
   }
 }

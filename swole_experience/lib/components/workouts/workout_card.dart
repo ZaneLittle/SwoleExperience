@@ -48,7 +48,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     if (direction == DismissDirection.startToEnd && widget.allowDelete) {
       // TODO: do we just set to day 0 instead of deleting?
       WorkoutService.svc.removeWorkout(widget.workout.id);
-      widget.rebuildCallback();
+      widget.rebuildCallback(w);
     } else if (direction == DismissDirection.endToStart) {
       showModalBottomSheet(
           context: context,
@@ -70,13 +70,13 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   Widget buildList(Workout? workout) {
     Workout w = workout ?? widget.workout;
+
     return Dismissible(
         onDismissed: (DismissDirection direction) => onDismissed(direction, w),
         key: ValueKey("_workoutCard${widget.workout.id}"),
         resizeDuration: const Duration(milliseconds: 50),
         direction: widget.allowDelete ? DismissDirection.horizontal : DismissDirection.endToStart,
-        background: widget.allowDelete ? Expanded(
-            child: Container(
+        background: widget.allowDelete ? Container(
                 color: Colors.red,
                 child: Align(alignment:Alignment.centerLeft,
                     child: Padding(
@@ -86,9 +86,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                             children: const [
                               Icon(Icons.close),
                               Text('Delete'),
-                            ]))))) : Container(),
-        secondaryBackground: Expanded(
-              child: Container(
+                            ])))) : Container(),
+        secondaryBackground: Container(
                   color: CommonStyles.primaryColour,
                   child: Align(alignment:Alignment.centerRight,
                       child: Padding(
@@ -98,7 +97,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                               children: const [
                                 Icon(Icons.mode_edit),
                                 Text('Update'),
-                              ]))))),
+                              ])))),
         child: SizedBox(
                 height: getHeight(),
                 width: MediaQuery.of(context).size.width,

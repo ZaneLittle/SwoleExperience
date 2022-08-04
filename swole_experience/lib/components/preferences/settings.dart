@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
+import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/constants/weight_constant.dart';
@@ -99,6 +100,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: CommonStyles.primaryDark,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             iconSize: 32,

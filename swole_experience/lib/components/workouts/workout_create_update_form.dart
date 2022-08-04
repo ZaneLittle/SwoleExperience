@@ -40,7 +40,6 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
   final ScrollController _scrollController = ScrollController();
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _orderController = TextEditingController();
   TextEditingController _weightController = TextEditingController();
   TextEditingController _setsController = TextEditingController();
   TextEditingController _repsController = TextEditingController();
@@ -51,8 +50,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     Workout workout = Workout(
       day: int.tryParse(_dayController.value.text) ?? widget.day,
       id: Random().nextInt(9999).toString(),
-      dayOrder:
-          int.tryParse(_orderController.value.text) ?? widget.defaultOrder,
+      dayOrder: widget.defaultOrder,
       name: _nameController.value.text,
       sets: int.parse(_setsController.value.text),
       reps: int.parse(_repsController.value.text),
@@ -70,8 +68,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       Workout workout = Workout(
         day: int.tryParse(_dayController.value.text) ?? widget.day,
         id: widget.workout!.id,
-        dayOrder:
-            int.tryParse(_orderController.value.text) ?? widget.defaultOrder,
+        dayOrder: widget.defaultOrder,
         name: _nameController.value.text.isNotEmpty
             ? _nameController.value.text
             : widget.workout!.name,
@@ -99,7 +96,6 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
   bool isAnyChanged() {
     return _nameController.value.text.isNotEmpty ||
-        _orderController.value.text.isNotEmpty ||
         _weightController.value.text.isNotEmpty ||
         _setsController.value.text.isNotEmpty ||
         _repsController.value.text.isNotEmpty ||
@@ -122,7 +118,9 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   ///                               ELEMENTS                                 ///
 
   Widget buildNameField() {
-    _nameController = TextEditingController(text: widget.workout?.name);
+    if (_nameController.value.text.isEmpty) {
+      _nameController = TextEditingController(text: widget.workout?.name);
+    }
 
     return Expanded(
         child: SizedBox(
@@ -139,29 +137,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
             )));
   }
 
-  Widget buildOrderField() {
-    _orderController =
-        TextEditingController(text: widget.workout?.dayOrder.toString());
-
-    return SizedBox(
-        height: 84,
-        width: 96,
-        child: Padding(
-            padding:
-                const EdgeInsets.only(top: 24, bottom: 24, left: 12, right: 32),
-            child: TextFormField(
-              controller: _orderController,
-              validator: (String? value) =>
-                  Validator.intValidatorNullAllowed(value),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: false),
-              decoration: const InputDecoration(hintText: 'Order'),
-            )));
-  }
-
   Widget buildWeightField() {
-    _weightController =
-        TextEditingController(text: widget.workout?.weight.toString());
+    if (_weightController.value.text.isEmpty) {
+      _weightController =
+          TextEditingController(text: widget.workout?.weight.toString());
+    }
 
     return Expanded(
         child: SizedBox(
@@ -175,13 +155,16 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
                       defaultValue: widget.workout?.weight),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(hintText: 'Weight', helperText: 'Weight')),
+                  decoration: const InputDecoration(
+                      hintText: 'Weight', helperText: 'Weight')),
             )));
   }
 
   Widget buildSetsField() {
-    _setsController =
-        TextEditingController(text: widget.workout?.sets.toString());
+    if (_setsController.value.text.isEmpty) {
+      _setsController =
+          TextEditingController(text: widget.workout?.sets.toString());
+    }
 
     return Expanded(
         child: SizedBox(
@@ -201,8 +184,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   Widget buildRepsField() {
-    _repsController =
-        TextEditingController(text: widget.workout?.reps.toString());
+    if (_repsController.value.text.isEmpty) {
+      _repsController =
+          TextEditingController(text: widget.workout?.reps.toString());
+    }
 
     return Expanded(
         child: SizedBox(
@@ -222,7 +207,9 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   Widget buildNotesField() {
-    _notesController = TextEditingController(text: widget.workout?.notes);
+    if (_notesController.value.text.isEmpty) {
+      _notesController = TextEditingController(text: widget.workout?.notes);
+    }
 
     return SizedBox(
         key: _notesFieldKey,
@@ -275,7 +262,6 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
           children: <Widget>[
             Row(children: [
               buildNameField(),
-              buildOrderField(),
             ]),
             Row(children: [
               buildWeightField(),
