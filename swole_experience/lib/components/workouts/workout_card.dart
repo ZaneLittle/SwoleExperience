@@ -5,6 +5,8 @@ import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/service/workout_service.dart';
 
+
+
 class WorkoutCard extends StatefulWidget {
   const WorkoutCard({
     Key? key,
@@ -48,7 +50,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     if (direction == DismissDirection.startToEnd && widget.allowDelete) {
       // TODO: do we just set to day 0 instead of deleting?
       WorkoutService.svc.removeWorkout(widget.workout.id);
-      widget.rebuildCallback(w);
+      widget.rebuildCallback(w, delete: true);
     } else if (direction == DismissDirection.endToStart) {
       showModalBottomSheet(
           context: context,
@@ -64,7 +66,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
           });
     } else {
       widget.rebuildCallback(w);
-      //TODO: Mark as done instead?
+      //TODO: Mark as done
     }
   }
 

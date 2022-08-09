@@ -41,14 +41,25 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     workoutMap.addAll(Util().getWorkoutDays(workouts));
   }
 
-  void rebuild(Workout? w) {
-    setState(() => {});
-    build(context);
+  void rebuild(Workout? w, {bool delete = false}) {
+    setState(() {
+      if (w != null && !delete) {
+        (workoutMap[w.day] != null)
+            ? workoutMap[w.day]!.add(w)
+            : workoutMap[w.day] = [w];
+      } else if(w != null && delete) {
+        workoutMap[w.day]?.remove(w);
+      }
+
+      shouldRebuild = false;
+    });
   }
 
   void addDay() {
-    workoutMap[workoutMap.keys.last + 1] = [];
-    setState(() {});
+    setState(() {
+      workoutMap[workoutMap.keys.last + 1] = [];
+      shouldRebuild = false;
+    });
   }
 
   void addExercise(int day, int defaultOrder) {
@@ -69,7 +80,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       if (workoutMap[day] == null || workoutMap[day]!.isEmpty) {
         // Find next non-empty day, if none, exit
         bool found = false;
-        for (int nextDay = day; nextDay <= workoutMap.keys.length; nextDay++) {
+        for (int nextDay = day + 1; nextDay <= workoutMap.keys.length; nextDay++) {
           if (workoutMap[nextDay] != null && workoutMap[nextDay]!.isNotEmpty) {
             if (!popupHasBeenDisplayed) {
               const AlertSnackBar(
@@ -275,6 +286,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
               iconSize: 32,
               onPressed: () {
                 removeEmptyDays();
+                reorderAllDays();
                 Navigator.pop(context);
                 setState(() {});
               },

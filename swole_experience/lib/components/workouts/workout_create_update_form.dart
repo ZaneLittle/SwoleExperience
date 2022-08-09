@@ -37,14 +37,13 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   final GlobalKey<_WorkoutCreateUpdateFormState> _nameFieldKey =
       GlobalKey<_WorkoutCreateUpdateFormState>();
   final Logger logger = Logger();
-
   final ScrollController _scrollController = ScrollController();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _weightController = TextEditingController();
-  TextEditingController _setsController = TextEditingController();
-  TextEditingController _repsController = TextEditingController();
-  TextEditingController _notesController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _setsController = TextEditingController();
+  final TextEditingController _repsController = TextEditingController();
   final TextEditingController _dayController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
 
   void createWorkout() {
     Workout workout = Workout(
@@ -123,87 +122,67 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     }
 
     return Expanded(
-        child: SizedBox(
             key: _nameFieldKey,
-            height: 84,
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 24, bottom: 24, left: 32, right: 12),
+                  top: 12, bottom: 18, left: 32, right: 32),
               child: TextFormField(
                   controller: _nameController,
                   validator: (String? value) => Validator.stringValidator(value,
                       defaultValue: widget.workout?.name),
                   decoration: const InputDecoration(hintText: 'Name')),
-            )));
+            ));
   }
 
   Widget buildWeightField() {
-    if (_weightController.value.text.isEmpty) {
-      _weightController =
-          TextEditingController(text: widget.workout?.weight.toString());
-    }
-
     return Expanded(
-        child: SizedBox(
-            height: 84,
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 24, bottom: 24, left: 32, right: 12),
+                  top: 0, bottom: 12, left: 32, right: 12),
               child: TextFormField(
                   controller: _weightController,
                   validator: (String? value) => Validator.doubleValidator(value,
                       defaultValue: widget.workout?.weight),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      hintText: 'Weight', helperText: 'Weight')),
-            )));
+                  decoration: InputDecoration(
+                      hintText: widget.workout?.weight.toString() ?? 'Weight',
+                      helperText: 'Weight')),
+            ));
   }
 
   Widget buildSetsField() {
-    if (_setsController.value.text.isEmpty) {
-      _setsController =
-          TextEditingController(text: widget.workout?.sets.toString());
-    }
-
     return Expanded(
-        child: SizedBox(
-            height: 84,
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 24, bottom: 24, left: 12, right: 12),
+                  top: 0, bottom: 12, left: 12, right: 12),
               child: TextFormField(
                   controller: _setsController,
                   validator: (String? value) => Validator.intValidator(value,
                       defaultValue: widget.workout?.sets),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: false),
-                  decoration: const InputDecoration(
-                      hintText: 'Sets', helperText: 'Sets')),
-            )));
+                  decoration: InputDecoration(
+                      hintText: widget.workout?.sets.toString() ?? 'Sets',
+                      helperText: 'Sets')),
+            ));
   }
 
   Widget buildRepsField() {
-    if (_repsController.value.text.isEmpty) {
-      _repsController =
-          TextEditingController(text: widget.workout?.reps.toString());
-    }
-
     return Expanded(
-        child: SizedBox(
-            height: 84,
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 24, bottom: 24, left: 12, right: 32),
+                  top: 0, bottom: 12, left: 12, right: 32),
               child: TextFormField(
                   controller: _repsController,
                   validator: (String? value) => Validator.intValidator(value,
                       defaultValue: widget.workout?.reps),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: false),
-                  decoration: const InputDecoration(
-                      hintText: 'Reps', helperText: 'Reps')),
-            )));
+                  decoration: InputDecoration(
+                      hintText: widget.workout?.reps.toString() ?? 'Reps',
+                      helperText: 'Reps')),
+            ));
   }
 
   Widget buildNotesField() {
@@ -213,7 +192,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
     return SizedBox(
         key: _notesFieldKey,
-        height: 240,
+        // height: 240,
         child: Padding(
           padding:
               const EdgeInsets.only(top: 24, bottom: 24, left: 32, right: 32),
