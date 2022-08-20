@@ -75,9 +75,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         reps: int.tryParse(_repsController.value.text) ?? widget.workout!.reps,
         weight: double.tryParse(_weightController.value.text) ??
             widget.workout!.weight,
-        notes: _notesController.value.text.isNotEmpty
-            ? _notesController.value.text
-            : widget.workout?.notes,
+        notes: _notesController.value.text,
       );
 
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
