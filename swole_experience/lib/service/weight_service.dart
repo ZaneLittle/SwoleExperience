@@ -80,7 +80,7 @@ class WeightService {
           );
 
     List<Weight> res = [];
-    for(Map<String, dynamic> w in weights) {
+    for (Map<String, dynamic> w in weights) {
       res.add(await _convertWeightToPreferredUnit(Weight.fromMap(w)));
     }
 
@@ -114,12 +114,14 @@ class WeightService {
   /// Returns the appropriate multiplier to pounds based on the user's preferred weight
   Future<double> _getMultiplier() async {
     List<Preference> weightPref =
-    await PreferenceService.svc.getPreference(Constants.weightUnitKey);
-    return weightPref.first.value == WeightConstant.kilograms
+        await PreferenceService.svc.getPreference(Constants.weightUnitKey);
+    return (weightPref.isNotEmpty) &&
+            weightPref.first.value == WeightConstant.kilograms
         ? 2.205
-        : weightPref.first.value == WeightConstant.stone
-        ? 14
-        : 1;
+        : (weightPref.isNotEmpty) &&
+                weightPref.first.value == WeightConstant.stone
+            ? 14
+            : 1;
   }
 
   /// Converts a weight record to pounds based on the user's preference

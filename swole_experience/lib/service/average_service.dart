@@ -84,7 +84,7 @@ class AverageService {
           );
 
     List<Average> res = [];
-    for(Map<String, dynamic> a in averages) {
+    for (Map<String, dynamic> a in averages) {
       res.add(await _convertAverageToPreferredUnit(Average.fromMap(a)));
     }
 
@@ -166,9 +166,11 @@ class AverageService {
   Future<double> _getMultiplier() async {
     List<Preference> weightPref =
         await PreferenceService.svc.getPreference(Constants.weightUnitKey);
-    return weightPref.first.value == WeightConstant.kilograms
+    return (weightPref.isNotEmpty) &&
+            weightPref.first.value == WeightConstant.kilograms
         ? 2.205
-        : weightPref.first.value == WeightConstant.stone
+        : (weightPref.isNotEmpty) &&
+                weightPref.first.value == WeightConstant.stone
             ? 14
             : 1;
   }
