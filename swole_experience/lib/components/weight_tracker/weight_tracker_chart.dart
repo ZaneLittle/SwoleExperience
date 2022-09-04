@@ -282,10 +282,11 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
           child: const Center(child: Text('No weights have been logged')));
     } else if (widget.dataSnapshot!.data![0].length < 2 ||
         widget.dataSnapshot!.data![1].length < 2) {
+      // Need two days of data to visualize in the chart
       return SizedBox(
           height: MediaQuery.of(context).size.height * .4,
           child: const Center(
-              child: Text('Keep adding weights to see a visualization!')));
+              child: Text('Keep adding weights to see your trends!')));
     } else {
       Map<double, List<double>> weightSeries = getWeightGrouping(
           widget.dataSnapshot!.requireData[0] as List<Weight>);

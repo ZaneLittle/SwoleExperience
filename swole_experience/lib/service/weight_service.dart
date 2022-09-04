@@ -80,6 +80,7 @@ class WeightService {
           );
 
     List<Weight> res = [];
+    // TODO: Refector to only get preference once - rn its done each iteration which is big dumb
     for (Map<String, dynamic> w in weights) {
       res.add(await _convertWeightToPreferredUnit(Weight.fromMap(w)));
     }
@@ -112,6 +113,7 @@ class WeightService {
   ///                               Helpers                                 ///
 
   /// Returns the appropriate multiplier to pounds based on the user's preferred weight
+  /// /// TODO: refactor this and the duplicate in avg svc into utils file
   Future<double> _getMultiplier() async {
     List<Preference> weightPref =
         await PreferenceService.svc.getPreference(Constants.weightUnitKey);

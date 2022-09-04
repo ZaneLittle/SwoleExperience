@@ -163,6 +163,7 @@ class AverageService {
   ///                               Helpers                                 ///
 
   /// Returns the appropriate multiplier to pounds based on the user's preferred weight
+  /// TODO: refactor this and the duplicate in weight svc into utils file
   Future<double> _getMultiplier() async {
     List<Preference> weightPref =
         await PreferenceService.svc.getPreference(Constants.weightUnitKey);
