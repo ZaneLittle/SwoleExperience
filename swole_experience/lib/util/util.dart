@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/model/workout.dart';
 
 /// General utility functions
 class Util {
+  static final Logger logger = Logger();
+
   void scrollToSelectedContext(GlobalKey key) {
     final keyContext = key.currentContext;
     if (keyContext != null) {
@@ -28,4 +33,17 @@ class Util {
 
     return workoutMap;
   }
+
+
+  /// Navigates to a provided external URL
+  static Future launchExternalUrl(Uri url, BuildContext context) async {
+    if (!await launchUrl(url)) {
+      logger.e("Failed to launch $url");
+      AlertSnackBar(
+        message: 'Unable to launch $url.',
+        state: SnackBarState.failure,
+      ).alert(context);
+    }
+  }
 }
+

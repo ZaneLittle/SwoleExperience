@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:swole_experience/components/preferences/NavigationLine.dart';
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/constants/weight_constant.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
+import 'package:swole_experience/util/util.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -18,11 +20,14 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final ScrollController _scrollController = ScrollController();
+  final Uri _feedbackUri = Uri.parse('https://github.com/ZaneLittle/SwoleExperience/issues/new');
   String? _weightUnitValue;
 
   FutureOr rebuild(dynamic value) {
     setState(() {});
   }
+
+  ///                          Helpers                                       ///
 
   Preference? findPreference(List<Preference> preferences, String pref) {
     for (var it in preferences) {
@@ -33,9 +38,10 @@ class _SettingsState extends State<Settings> {
     return null;
   }
 
+  ///                         Sub Components                                 ///
+
   DropdownButton buildWeightUnitPreferenceSelect(List<Preference> preferences) {
-    Preference? pref =
-        findPreference(preferences, Constants.weightUnitKey);
+    Preference? pref = findPreference(preferences, Constants.weightUnitKey);
     _weightUnitValue = pref == null ? WeightConstant.pounds : pref.value;
 
     return DropdownButton(
@@ -60,7 +66,9 @@ class _SettingsState extends State<Settings> {
 
   Widget buildWeightUnitLine(AsyncSnapshot<List<Preference>> snapshot) {
     return Card(
-      child: SizedBox(height: 48, child: Row(
+        child: SizedBox(
+      height: 48,
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           const Padding(
@@ -74,25 +82,26 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget buildWorkoutConfigureLine() {
-    return GestureDetector(
+    return NavigationLine(
+        navType: NavigationType.internal,
+        lineText: 'Configure Workouts',
         onTap: () {
           Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const WorkoutsConfigure()))
               .then(rebuild);
-        },
-        child: Card(
-            child: SizedBox(height: 48, child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-              Padding(
-                  padding: EdgeInsets.only(left: 12),
-                  child: Text('Configure Workouts')),
-              Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(Icons.arrow_forward_ios)),
-            ]))));
+        });
+  }
+
+  Widget buildFeedbackLine() {
+    return NavigationLine(
+      navType: NavigationType.external,
+      lineText: 'Provide feedback on the app',
+      onTap: () {
+        Util.launchExternalUrl(_feedbackUri, context);
+      }
+    );
   }
 
   ///                           Build                                        ///
@@ -127,6 +136,7 @@ class _SettingsState extends State<Settings> {
                           children: <Widget>[
                             buildWeightUnitLine(snapshot),
                             buildWorkoutConfigureLine(),
+                            buildFeedbackLine(),
                           ]));
                 }
               })
