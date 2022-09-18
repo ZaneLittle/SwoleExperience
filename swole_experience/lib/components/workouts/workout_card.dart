@@ -100,9 +100,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                 Icon(Icons.mode_edit),
                                 Text('Update'),
                               ])))),
-        child: SizedBox(
-                height: getHeight(),
-                width: MediaQuery.of(context).size.width,
+        child: Flex(
+          direction: Axis.vertical,
+          children: [Expanded(
+                // height: getHeight(),
+                // width: MediaQuery.of(context).size.width,
                 child: Card(
                     child: Padding(
                   padding:
@@ -159,7 +161,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                                         ]))))
                         : Container()
                   ]),
-                ))));
+                )))]));
   }
 
   @override
