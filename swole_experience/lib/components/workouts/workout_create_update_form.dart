@@ -59,7 +59,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
     WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
       return handleSaveError('create', error, stackTrace);
-    }).then((res) => res != 0 ? widget.rebuildCallback(workout) : null);
+    }).then((res) => res != 0 ? widget.rebuildCallback(workout: workout) : null);
   }
 
   void updateWorkout() {
@@ -81,7 +81,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
         return handleSaveError('update', error, stackTrace);
       }).then((res) {
-        res != 0 ? widget.rebuildCallback(workout) : null;
+        res != 0 ? widget.rebuildCallback(workout: workout, update: true) : null;
       });
     } else {
       logger.e(
@@ -211,7 +211,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         icon: const Icon(Icons.cancel),
         onPressed: () {
           Navigator.of(context).pop();
-          widget.rebuildCallback(widget.workout);
+          widget.rebuildCallback(workout: widget.workout, update: widget.workout != null);
         },
       ),
       IconButton(

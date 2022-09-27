@@ -1,11 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/service/workout_service.dart';
-
-
 
 class WorkoutCard extends StatefulWidget {
   const WorkoutCard({
@@ -36,9 +36,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   double getHeight() {
-    return hasNote()
-        ? getNoteHeight(widget.workout.notes!) + 80
-        : 80;
+    return hasNote() ? getNoteHeight(widget.workout.notes!) + 80 : 80;
   }
 
   /// Scale notes to a max of 3 lines
@@ -50,7 +48,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     if (direction == DismissDirection.startToEnd && widget.allowDelete) {
       // TODO: do we just set to day 0 instead of deleting?
       WorkoutService.svc.removeWorkout(widget.workout.id);
-      widget.rebuildCallback(w, delete: true);
+      widget.rebuildCallback(workout: w, delete: true);
     } else if (direction == DismissDirection.endToStart) {
       showModalBottomSheet(
           context: context,
@@ -60,12 +58,13 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     day: w.day,
                     defaultOrder: w.dayOrder,
                     workout: w,
-                    rebuildCallback: (Workout? workout) {
-                      widget.rebuildCallback(workout);
+                    rebuildCallback: (
+                        {Workout? workout, bool delete = false, bool update = false}) {
+                      widget.rebuildCallback(workout: workout, delete: delete, update: update);
                     }));
           });
     } else {
-      widget.rebuildCallback(w);
+      widget.rebuildCallback(workout: w);
       //TODO: Mark as done
     }
   }
@@ -75,12 +74,16 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
     return Dismissible(
         onDismissed: (DismissDirection direction) => onDismissed(direction, w),
-        key: ValueKey("_workoutCard${widget.workout.id}"),
+        key: ValueKey("_workoutCard${widget.workout.id}_${Random().nextInt(9999).toString()}"),
         resizeDuration: const Duration(milliseconds: 50),
-        direction: widget.allowDelete ? DismissDirection.horizontal : DismissDirection.endToStart,
-        background: widget.allowDelete ? Container(
+        direction: widget.allowDelete
+            ? DismissDirection.horizontal
+            : DismissDirection.endToStart,
+        background: widget.allowDelete
+            ? Container(
                 color: Colors.red,
-                child: Align(alignment:Alignment.centerLeft,
+                child: Align(
+                    alignment: Alignment.centerLeft,
                     child: Padding(
                         padding: const EdgeInsets.only(left: 18),
                         child: Column(
@@ -88,85 +91,80 @@ class _WorkoutCardState extends State<WorkoutCard> {
                             children: const [
                               Icon(Icons.close),
                               Text('Delete'),
-                            ])))) : Container(),
+                            ]))))
+            : Container(),
         secondaryBackground: Container(
-                  color: CommonStyles.primaryColour,
-                  child: Align(alignment:Alignment.centerRight,
-                      child: Padding(
-                          padding: const EdgeInsets.only(right: 18),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.mode_edit),
-                                Text('Update'),
-                              ])))),
-        child: Flex(
-          direction: Axis.vertical,
-          children: [Expanded(
-                // height: getHeight(),
-                // width: MediaQuery.of(context).size.width,
-                child: Card(
-                    child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  child: Column(children: [
-                    Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(w.name,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold))),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Text('Weight: '),
-                              Text(w.weight.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold))
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text('Sets: '),
-                              Text(w.sets.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold))
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text('Reps: '),
-                              Text(w.reps.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold))
-                            ],
-                          ),
-                        ]),
-                    hasNote()
-                        ? Card(
-                            color: const Color(0x33ffffff),
-                            child: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                height:
-                                    getNoteHeight(widget.workout.notes!) - 7,
-                                child: Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: ListView(
-                                        controller: _scrollController,
-                                        children: [
-                                          Text(widget.workout.notes!,
-                                              style: const TextStyle(
-                                                  fontStyle: FontStyle.italic))
-                                        ]))))
-                        : Container()
-                  ]),
-                )))]));
+            color: CommonStyles.primaryColour,
+            child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                    padding: const EdgeInsets.only(right: 18),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.mode_edit),
+                          Text('Update'),
+                        ])))),
+        child: Flex(direction: Axis.vertical, children: [
+          Expanded(
+              child: Card(
+                  child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            child: Column(children: [
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(w.name,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold))),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Row(
+                  children: [
+                    const Text('Weight: '),
+                    Text(w.weight.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Sets: '),
+                    Text(w.sets.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Reps: '),
+                    Text(w.reps.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+              ]),
+              hasNote()
+                  ? Card(
+                      color: const Color(0x33ffffff),
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: getNoteHeight(widget.workout.notes!) - 7,
+                          child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: ListView(
+                                  controller: _scrollController,
+                                  children: [
+                                    Text(widget.workout.notes!,
+                                        style: const TextStyle(
+                                            fontStyle: FontStyle.italic))
+                                  ]))))
+                  : Container()
+            ]),
+          )))
+        ]));
   }
 
   @override
   Widget build(BuildContext context, {Workout? rebuildWorkout}) {
     return SizedBox(
-        key: _workoutListKey, height: getHeight(), child: buildList(rebuildWorkout));
+        key: _workoutListKey,
+        height: getHeight(),
+        child: buildList(rebuildWorkout));
   }
 }

@@ -89,7 +89,7 @@ class _SettingsState extends State<Settings> {
           Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const WorkoutsConfigure()))
+                      builder: (context) => const WorkoutsConfigure(freshBuild: true)))
               .then(rebuild);
         });
   }
@@ -129,8 +129,7 @@ class _SettingsState extends State<Settings> {
                     snapshot.data == null) {
                   return const Center(child: Text('Loading...'));
                 } else {
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * .9,
+                  return Expanded(
                       child: ListView(
                           controller: _scrollController,
                           children: <Widget>[

@@ -28,10 +28,12 @@ class _WorkoutListState extends State<WorkoutList> {
       GlobalKey<_WorkoutListState>();
   final ScrollController _scrollController = ScrollController();
 
-  FutureOr rebuild(dynamic value) {
+  FutureOr rebuild({Workout? workout, bool delete = false, bool update = false}) {
     setState(() {});
-    widget.rebuildCallback(value);
+    widget.rebuildCallback(workout);
   }
+
+  FutureOr rebuildDynamic(dynamic value) => rebuild(workout: value);
 
   Widget buildList() {
     if (widget.dataSnapshot.connectionState == ConnectionState.waiting) {
@@ -46,7 +48,7 @@ class _WorkoutListState extends State<WorkoutList> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const WorkoutsConfigure()))
-                .then(rebuild);
+                .then(rebuildDynamic);
           },
           child: Align(
               alignment: Alignment.center,

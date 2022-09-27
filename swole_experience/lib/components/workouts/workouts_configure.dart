@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -10,12 +12,17 @@ import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
-  const WorkoutsConfigure({Key? key, this.context}) : super(key: key);
+  const WorkoutsConfigure(
+      {Key? key, this.context, this.freshBuild = false})
+      : super(key: key);
 
   final BuildContext? context;
+  final bool freshBuild;
 
   @override
-  State<WorkoutsConfigure> createState() => _WorkoutsConfigureState();
+  State<WorkoutsConfigure> createState() {
+    return _WorkoutsConfigureState();
+  }
 }
 
 class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
@@ -25,11 +32,17 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
   final Logger logger = Logger();
 
+  bool shouldFetch = false;
+
   Map<int, List<Workout>> workoutMap = {
     1: [],
   };
 
-  bool shouldRebuild = true;
+  @override
+  void initState() {
+    super.initState();
+    shouldFetch = widget.freshBuild;
+  }
 
   ///                         Processing                                    ///
 
@@ -41,24 +54,25 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     workoutMap.addAll(Util().getWorkoutDays(workouts));
   }
 
-  void rebuild(Workout? w, {bool delete = false}) {
+  void rebuild({Workout? workout, bool delete = false, bool update = false}) {
     setState(() {
-      if (w != null && !delete) {
-        (workoutMap[w.day] != null)
-            ? workoutMap[w.day]!.add(w)
-            : workoutMap[w.day] = [w];
-      } else if(w != null && delete) {
-        workoutMap[w.day]?.remove(w);
+      if (workout != null && (delete || update)) {
+        workoutMap[workout.day]?.removeAt(workout.dayOrder);
+      }
+      if (workout != null && !delete) {
+        (workoutMap[workout.day] != null)
+            ? workoutMap[workout.day]!.add(workout)
+            : workoutMap[workout.day] = [workout];
       }
 
-      shouldRebuild = false;
+      shouldFetch = false;
     });
   }
 
   void addDay() {
     setState(() {
       workoutMap[workoutMap.keys.last + 1] = [];
-      shouldRebuild = false;
+      shouldFetch = false;
     });
   }
 
@@ -70,7 +84,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
               child: WorkoutCreateUpdateForm(
                   day: day,
                   defaultOrder: defaultOrder,
-                  rebuildCallback: (Workout? workout) => rebuild(workout)));
+                  rebuildCallback: rebuild));
         });
   }
 
@@ -80,7 +94,9 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       if (workoutMap[day] == null || workoutMap[day]!.isEmpty) {
         // Find next non-empty day, if none, exit
         bool found = false;
-        for (int nextDay = day + 1; nextDay <= workoutMap.keys.length; nextDay++) {
+        for (int nextDay = day + 1;
+            nextDay <= workoutMap.keys.length;
+            nextDay++) {
           if (workoutMap[nextDay] != null && workoutMap[nextDay]!.isNotEmpty) {
             if (!popupHasBeenDisplayed) {
               const AlertSnackBar(
@@ -189,7 +205,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     // List<WorkoutCard> and falls over when adding the button
     List<Widget> workoutList = workouts
         .map((w) => WorkoutCard(
-              key: Key(w.toString()),
+              key: Key("_workoutCard${w.id}_${Random().nextInt(9999).toString()}"),
               allowDelete: true,
               workout: w,
               rebuildCallback: rebuild,
@@ -219,7 +235,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
                       reorderDay(day);
 
-                      shouldRebuild = false;
+                      shouldFetch = false;
                     });
                   })),
         ]);
@@ -239,7 +255,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
   @override
   Widget build(BuildContext context) {
-    if (shouldRebuild) {
+    if (shouldFetch) {
       return Scaffold(
           appBar: AppBar(
             backgroundColor: CommonStyles.primaryDark,
@@ -267,6 +283,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                   List<Workout> workouts =
                       snapshot.requireData[0] as List<Workout>;
                   initWorkoutMap(workouts);
+                  shouldFetch = false;
 
                   return SizedBox(
                       child: ListView(
@@ -277,7 +294,6 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                 }
               }));
     } else {
-      shouldRebuild = true;
       return Scaffold(
           appBar: AppBar(
             backgroundColor: CommonStyles.primaryDark,
