@@ -60,8 +60,9 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
         workoutMap[workout.day]?.removeAt(workout.dayOrder);
       }
       if (workout != null && !delete) {
+        // TODO: this adding logic is not right - not adding at the right spot
         (workoutMap[workout.day] != null)
-            ? workoutMap[workout.day]!.add(workout)
+            ? workoutMap[workout.day]!.insert(workout.dayOrder, workout)
             : workoutMap[workout.day] = [workout];
       }
 
