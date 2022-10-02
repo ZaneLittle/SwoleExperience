@@ -37,7 +37,7 @@ class Util {
 
   /// Navigates to a provided external URL
   static Future launchExternalUrl(Uri url, BuildContext context) async {
-    if (!await launchUrl(url)) {
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       logger.e("Failed to launch $url");
       AlertSnackBar(
         message: 'Unable to launch $url.',

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:swole_experience/components/preferences/NavigationLine.dart';
+import 'package:swole_experience/components/preferences/navigation_line.dart';
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/preference.dart';
@@ -20,7 +20,7 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final ScrollController _scrollController = ScrollController();
-  final Uri _feedbackUri = Uri.parse('https://github.com/ZaneLittle/SwoleExperience/issues/new');
+  final Uri _feedbackUri = Uri.parse('https://github.com/ZaneLittle/SwoleExperience/issues/new/choose');
   String? _weightUnitValue;
 
   FutureOr rebuild(dynamic value) {
