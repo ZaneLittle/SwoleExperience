@@ -22,6 +22,7 @@ class Util {
   /// Builds a map of workout days, builds a map of workout days
   ///   - key = day
   ///   - value = list of workouts for that day
+  /// Note: Returned map is unordered at the day level
   Map<int, List<Workout>> getWorkoutDays(List<Workout> workouts) {
     Map<int, List<Workout>> workoutMap = { };
 

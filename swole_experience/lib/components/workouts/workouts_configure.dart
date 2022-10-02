@@ -51,7 +51,10 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       workoutMap[key] = [];
     }
 
-    workoutMap.addAll(Util().getWorkoutDays(workouts));
+    Map<int, List<Workout>> _workoutMap = Util().getWorkoutDays(workouts);
+    for (int day = 1; day <= _workoutMap.keys.length; day++) {
+      workoutMap[day] = _workoutMap[day]!;
+    }
   }
 
   void rebuild({Workout? workout, bool delete = false, bool update = false}) {
