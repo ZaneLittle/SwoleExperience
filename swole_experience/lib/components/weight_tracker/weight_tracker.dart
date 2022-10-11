@@ -6,10 +6,13 @@ import 'package:swole_experience/components/weight_tracker/historic_weight_view.
 import 'package:swole_experience/components/weight_tracker/weight_entry_form.dart';
 import 'package:swole_experience/components/weight_tracker/weight_breakdown.dart';
 import 'package:swole_experience/components/weight_tracker/weight_tracker_chart.dart';
+import 'package:swole_experience/constants/pages.dart';
+import 'package:swole_experience/constants/preference_constants.dart';
+import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/average_service.dart';
+import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/service/weight_service.dart';
 import 'package:swole_experience/components/preferences/settings_button.dart';
-
 
 class WeightTracker extends StatefulWidget {
   const WeightTracker({Key? key}) : super(key: key);

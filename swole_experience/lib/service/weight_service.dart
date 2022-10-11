@@ -116,7 +116,7 @@ class WeightService {
   /// /// TODO: refactor this and the duplicate in avg svc into utils file
   Future<double> _getMultiplier() async {
     List<Preference> weightPref =
-        await PreferenceService.svc.getPreference(Constants.weightUnitKey);
+        await PreferenceService.svc.getPreference(PreferenceConstant.weightUnitKey);
     return (weightPref.isNotEmpty) &&
             weightPref.first.value == WeightConstant.kilograms
         ? 2.205

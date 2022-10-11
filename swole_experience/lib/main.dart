@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workouts.dart';
 import 'package:swole_experience/components/weight_tracker/weight_tracker.dart';
+import 'package:swole_experience/constants/pages.dart';
+import 'package:swole_experience/constants/preference_constants.dart';
+import 'package:swole_experience/model/preference.dart';
+import 'package:swole_experience/service/preference_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,55 +31,89 @@ class StatefulApp extends StatefulWidget {
 }
 
 class _AppState extends State<StatefulApp> {
-  int _selectedIndex = 1; // Default to weight tracker open
+  int _selectedIndex = 0; // Default to weight tracker open
   static final List<Widget> _pages = <Widget>[
-    const Text(
-      'Macros Coming soon',
-    ),
+    // const Text(
+    //   'Macros Coming soon',
+    // ),
     const WeightTracker(),
     const Workouts(),
   ];
 
+  void setPagePref(int index) {
+
+    PreferenceService.svc.setPreference(Preference(
+        preference: PreferenceConstant.defaultPageKey,
+        value: Pages.getPage(index),
+        lastUpdated: DateTime.now()));
+  }
+
   void _onItemTapped(int index) {
+    setPagePref(index);
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
+  MaterialApp buildApp(Widget home) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
-      home: Scaffold(
-          body: Center(
-            child: _pages.elementAt(_selectedIndex),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.restaurant),
-                label: 'Macros',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.timeline),
-                label: 'Weight',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.fitness_center),
-                label: 'Workout',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: const Color(0xffb24dff),
-            onTap: _onItemTapped,
-          )),
+      themeMode: ThemeMode.dark,
+      home: home,
     );
+  }
+
+  Scaffold buildAppHome() {
+    return Scaffold(
+        body: Center(
+          child: _pages.elementAt(_selectedIndex),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.restaurant),
+            //   label: 'Macros',
+            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.timeline),
+              label: 'Weight',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fitness_center),
+              label: 'Workout',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: const Color(0xffb24dff),
+          onTap: _onItemTapped,
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<List<dynamic>>>(
+        future: Future.wait([
+          PreferenceService.svc
+              .getPreference(PreferenceConstant.defaultPageKey),
+        ]),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<List<dynamic>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return buildApp(
+                const Scaffold(body: Center(child: Text('Loading...'))));
+          } else if (snapshot.data != null &&
+              snapshot.data!.first.isNotEmpty &&
+              (snapshot.data!.first.first as Preference).value != null) {
+            Preference? page = snapshot.data!.first.first as Preference;
+            _selectedIndex = Pages.pageMap[page.value] ?? 0;
+          }
+
+          return buildApp(buildAppHome());
+        });
   }
 }

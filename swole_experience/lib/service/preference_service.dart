@@ -77,7 +77,7 @@ class PreferenceService {
         : [];
   }
 
-  Future<int> addOrUpdatePreference(Preference preference) async {
+  Future<int> setPreference(Preference preference) async {
     Database db = await svc.db;
 
     int res = await db.update(_dbName, preference.toMap(),

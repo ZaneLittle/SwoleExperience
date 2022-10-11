@@ -6,6 +6,7 @@ import 'package:swole_experience/components/preferences/settings_button.dart';
 import 'package:swole_experience/components/workouts/timer.dart';
 import 'package:swole_experience/components/workouts/workout_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/pages.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/model/workout.dart';
@@ -97,11 +98,11 @@ class _WorkoutsState extends State<Workouts> {
               day = (day < daysLength) ? day + 1 : 1;
 
               Preference newWorkoutDay = Preference(
-                preference: Constants.workoutDayPreference,
+                preference: PreferenceConstant.workoutDayKey,
                 value: day.toString(),
                 lastUpdated: DateTime.now(),
               );
-              PreferenceService.svc.addOrUpdatePreference(newWorkoutDay);
+              PreferenceService.svc.setPreference(newWorkoutDay);
 
               setState(() {});
             });
@@ -149,8 +150,7 @@ class _WorkoutsState extends State<Workouts> {
   Widget buildList(int? dayOffset) {
     return FutureBuilder<List<List<dynamic>>>(
         future: Future.wait([
-          // WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0)),
-          PreferenceService.svc.getPreference(Constants.workoutDayPreference),
+          PreferenceService.svc.getPreference(PreferenceConstant.workoutDayKey),
         ]),
         builder: (BuildContext context,
             AsyncSnapshot<List<List<dynamic>>> initSnapshot) {

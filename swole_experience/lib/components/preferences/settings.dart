@@ -41,7 +41,7 @@ class _SettingsState extends State<Settings> {
   ///                         Sub Components                                 ///
 
   DropdownButton buildWeightUnitPreferenceSelect(List<Preference> preferences) {
-    Preference? pref = findPreference(preferences, Constants.weightUnitKey);
+    Preference? pref = findPreference(preferences, PreferenceConstant.weightUnitKey);
     _weightUnitValue = pref == null ? WeightConstant.pounds : pref.value;
 
     return DropdownButton(
@@ -52,8 +52,8 @@ class _SettingsState extends State<Settings> {
                 child: Text(WeightConstant.weightUnits[unit]!), value: unit))
             .toList(),
         onChanged: (value) {
-          PreferenceService.svc.addOrUpdatePreference(Preference(
-              preference: Constants.weightUnitKey,
+          PreferenceService.svc.setPreference(Preference(
+              preference: PreferenceConstant.weightUnitKey,
               value: value,
               lastUpdated: DateTime.now()));
           setState(() {
