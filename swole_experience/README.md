@@ -25,3 +25,28 @@ Resource: https://docs.flutter.dev/deployment/android
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+## Running on Android
+- Simple! Run it through android studio - it does all the work for you
+
+
+## Running on iOS (on a mac)
+1. Install Xcode
+2. Run the simulator (cmd+space and search "Simulator")
+2. From the terminal: flutter run -d macos
+3. From VS Code
+  a. Ensure "iPhone" is selected as the device
+  b. Run and debug as flutter
+
+
+#### Troubleshooting
+- Error: `Exception: Podfile is missing` 
+  - Solution: `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
+
+- Error: `CocoaPods not installed`
+  - Solution: `sudo gem install cocoapods`
+
+- The keyboard doesn't show up in the emulator
+  - This is just a feature of the emulator, not an actual bug. 
+  - To show the keyboard: `cmd + shift + k`
