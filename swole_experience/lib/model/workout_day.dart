@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_history.dart';
+import 'package:swole_experience/util/converter.dart';
 
 class WorkoutDay extends Workout {
   WorkoutDay({
@@ -10,7 +14,13 @@ class WorkoutDay extends Workout {
     required sets,
     required reps,
     notes,
-  }) : super(id: id, name: name, weight: weight, sets: sets, reps: reps, notes: notes);
+  }) : super(
+            id: id,
+            name: name,
+            weight: weight,
+            sets: sets,
+            reps: reps,
+            notes: notes);
 
   final int day;
   final int dayOrder;
@@ -56,5 +66,18 @@ class WorkoutDay extends Workout {
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
     );
+  }
+
+  WorkoutHistory toWorkoutHistory({String? historyId, DateTime? date}) {
+    DateTime dateToLog = date ?? DateTime.now();
+    return WorkoutHistory(
+        id: historyId ?? Random().nextInt(9999).toString(),
+        workoutId: id,
+        date: Converter().truncateToDay(dateToLog).toString(),
+        name: name,
+        weight: weight,
+        sets: sets,
+        reps: reps,
+        notes: notes);
   }
 }

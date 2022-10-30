@@ -36,20 +36,44 @@ class _WorkoutsState extends State<Workouts> {
   String dayText = 'Today';
   bool checkHistory = false;
 
-  FutureOr rebuild(WorkoutDay? value) {
-    WorkoutService.svc.getUniqueDays().then((daysLength) {
-      saveWorkout();
+  FutureOr rebuild(WorkoutDay? value, {bool save = true}) {
+    setState(() {});
 
-      workingOffset = 0;
-      totalOffset = 0;
-      day = (day < daysLength) ? day + 1 : 1;
-      setState(() {});
+    totalOffset = 0;
+    workingOffset = 0;
 
-      build(context);
-    });
+    build(context);
   }
 
   ///                             Helpers                                    ///
+
+  dynamic getRequest(int dayOffset) {
+    List<Future<List<dynamic>>> req;
+    if (totalOffset > 0) {
+      req = [WorkoutService.svc.getWorkouts(day: day + dayOffset)];
+    } else {
+      DateTime now = DateTime.now();
+      DateTime date = DateTime(now.year, now.month, now.day + totalOffset);
+      if (totalOffset == 0) {
+        req = [
+          WorkoutService.svc.getWorkouts(day: day + dayOffset),
+          WorkoutHistoryService.svc.getWorkoutHistory(date: date.toString())
+        ];
+      } else {
+        checkHistory = true;
+        req = [
+          WorkoutHistoryService.svc.getWorkoutHistory(date: date.toString())
+        ];
+      }
+    }
+    return req;
+  }
+
+  void shiftDay(int daysLength) {
+    workingOffset = 0;
+    totalOffset = 0;
+    day = (day < daysLength) ? day + 1 : 1;
+  }
 
   void updateView(int offset) {
     workingOffset += offset;
@@ -75,16 +99,7 @@ class _WorkoutsState extends State<Workouts> {
       } else {
         WorkoutDay w = workouts.first;
 
-        WorkoutHistoryService.svc.createWorkoutHistory(WorkoutHistory(
-          id: Random().nextInt(9999).toString(),
-          workoutId: w.id,
-          date: Converter().truncateToDay(DateTime.now()).toString(),
-          name: w.name,
-          sets: w.sets,
-          reps: w.reps,
-          weight: w.weight,
-          notes: w.notes,
-        ));
+        WorkoutHistoryService.svc.createWorkoutHistory(w.toWorkoutHistory());
       }
     });
   }
@@ -146,21 +161,21 @@ class _WorkoutsState extends State<Workouts> {
                 child: SettingsButton(rebuildCallback: rebuild)),
             checkHistory || isWorkoutsPopulated(dataSnapshot)
                 ? IconButton(
-                onPressed: () => updateView(-1),
-                icon: const Icon(Icons.keyboard_arrow_left,
-                    color: CommonStyles.primaryColour))
+                    onPressed: () => updateView(-1),
+                    icon: const Icon(Icons.keyboard_arrow_left,
+                        color: CommonStyles.primaryColour))
                 : Container(),
             checkHistory || isWorkoutsPopulated(dataSnapshot)
                 ? Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(dayText,
-                    style: const TextStyle(fontWeight: FontWeight.bold)))
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(dayText,
+                        style: const TextStyle(fontWeight: FontWeight.bold)))
                 : Container(),
             checkHistory || isWorkoutsPopulated(dataSnapshot)
                 ? IconButton(
-                onPressed: () => updateView(1),
-                icon: const Icon(Icons.keyboard_arrow_right,
-                    color: CommonStyles.primaryColour))
+                    onPressed: () => updateView(1),
+                    icon: const Icon(Icons.keyboard_arrow_right,
+                        color: CommonStyles.primaryColour))
                 : Container(),
             const SizedBox(width: 64)
           ],
@@ -175,12 +190,14 @@ class _WorkoutsState extends State<Workouts> {
       return const SizedBox(height: 48);
     } else {
       return ElevatedButton(
-          onPressed: () {
-              saveWorkout();
-              day++;
-              setDayPreference();
-              setState(() {});
-          },
+          onPressed: () =>
+              WorkoutService.svc.getUniqueDays().then((daysLength) {
+                saveWorkout();
+                shiftDay(daysLength);
+                setDayPreference();
+                setState(() {});
+                build(context);
+              }),
           child: const Text('Complete Day'),
           style: ElevatedButton.styleFrom(primary: CommonStyles.primaryColour));
     }
@@ -200,24 +217,8 @@ class _WorkoutsState extends State<Workouts> {
                 dayPref: initSnapshot.data?[0] as List<Preference>?,
                 offset: dayOffset ?? 0);
 
-            List<Future<List<dynamic>>> req;
-            if (totalOffset >= 0) {
-              req = [
-                WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0))
-              ];
-            } else {
-              checkHistory = true;
-              DateTime now = DateTime.now();
-              DateTime date =
-              DateTime(now.year, now.month, now.day + (dayOffset ?? 0));
-              req = [
-                WorkoutHistoryService.svc.getWorkoutHistory(
-                    date: date.toString())
-              ];
-            }
-
             return FutureBuilder<List<List<dynamic>>>(
-                future: Future.wait(req),
+                future: Future.wait(getRequest(dayOffset ?? 0)),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<List<dynamic>>> finalSnapshot) {
                   finalSnapshot.data?.add(initSnapshot.data ?? []);

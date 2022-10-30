@@ -1,4 +1,5 @@
 import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
 
 class WorkoutHistory extends Workout {
   WorkoutHistory({
@@ -10,13 +11,19 @@ class WorkoutHistory extends Workout {
     required sets,
     required reps,
     notes,
-  }) : super(id: id, name: name, weight: weight, sets: sets, reps: reps, notes: notes);
+  }) : super(
+            id: id,
+            name: name,
+            weight: weight,
+            sets: sets,
+            reps: reps,
+            notes: notes);
 
   final String workoutId;
   final String date;
 
   WorkoutHistory.fromMap(Map<String, dynamic> map)
-      : workoutId =  map['workoutId'] as String,
+      : workoutId = map['workoutId'] as String,
         date = map['date'] as String,
         super.fromMap(map);
 
@@ -26,7 +33,6 @@ class WorkoutHistory extends Workout {
     wMap.addAll({
       'workoutId': workoutId,
       'date': date,
-
     });
     return wMap;
   }
@@ -57,5 +63,17 @@ class WorkoutHistory extends Workout {
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
     );
+  }
+
+  WorkoutDay toWorkoutDay({int? day, int? dayOrder}) {
+    return WorkoutDay(
+        id: workoutId,
+        day: day ?? 0,
+        dayOrder: dayOrder ?? 0,
+        name: name,
+        weight: weight,
+        sets: sets,
+        reps: reps,
+        notes: notes);
   }
 }

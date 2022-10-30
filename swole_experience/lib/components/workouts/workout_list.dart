@@ -38,10 +38,11 @@ class _WorkoutListState extends State<WorkoutList> {
 
   FutureOr rebuildDynamic(dynamic value) => rebuild(workout: value);
 
-  bool dataIsEmpty() => !widget.dataSnapshot.hasData ||
-        widget.dataSnapshot.data == null ||
-        widget.dataSnapshot.data!.isEmpty ||
-        widget.dataSnapshot.data![0].isEmpty;
+  bool dataIsEmpty() =>
+      !widget.dataSnapshot.hasData ||
+      widget.dataSnapshot.data == null ||
+      widget.dataSnapshot.data!.isEmpty ||
+      widget.dataSnapshot.data![0].isEmpty;
 
   Widget buildList() {
     if (widget.dataSnapshot.connectionState == ConnectionState.waiting) {
@@ -50,9 +51,9 @@ class _WorkoutListState extends State<WorkoutList> {
       return TextButton(
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const WorkoutsConfigure()))
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WorkoutsConfigure()))
                 .then(rebuildDynamic);
           },
           child: Align(
@@ -86,7 +87,8 @@ class _WorkoutListState extends State<WorkoutList> {
                         'No workouts logged this day',
                         style: TextStyle(color: CommonStyles.primaryColour),
                       )),
-                  Icon(Icons.arrow_circle_right, color: CommonStyles.primaryColour),
+                  Icon(Icons.arrow_circle_right,
+                      color: CommonStyles.primaryColour),
                   Padding(
                       padding: EdgeInsets.only(top: 24),
                       child: Text(
@@ -96,23 +98,26 @@ class _WorkoutListState extends State<WorkoutList> {
                 ],
               )));
     } else {
-      List<dynamic> data = widget.dataSnapshot.requireData[0];
-      if (widget.history) {
-        data.map((w) {
-          if(w is WorkoutHistory) {
-            return w; // TODO: convert to WorkoutDay 
-          }
-          return w;
-        } );
-      }
       return ListView(
         controller: _scrollController,
-        children: data
-            .map((w) => WorkoutCard(
-                  workout: w,
-                  rebuildCallback: rebuild,
-                ))
-            .toList(),
+        children:
+            widget.dataSnapshot.requireData.expand((e) => e).toList().map((w) {
+              // TODO: add a separation for upcoming / already complete
+          dynamic workout;
+          if (w is WorkoutDay) {
+            workout = w;
+          } else if (w is WorkoutHistory) {
+            workout = w.toWorkoutDay();
+          }
+          if (workout != null) {
+            return WorkoutCard(
+              workout: workout,
+              rebuildCallback: rebuild,
+            );
+          } else {
+            return Container();
+          }
+        }).toList(),
       );
     }
   }
