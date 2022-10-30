@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:swole_experience/components/AlertSnackBar.dart';
-import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
 
 /// General utility functions
 class Util {
@@ -23,8 +23,8 @@ class Util {
   ///   - key = day
   ///   - value = list of workouts for that day
   /// Note: Returned map is unordered at the day level
-  Map<int, List<Workout>> getWorkoutDays(List<Workout> workouts) {
-    Map<int, List<Workout>> workoutMap = { };
+  Map<int, List<WorkoutDay>> getWorkoutDays(List<WorkoutDay> workouts) {
+    Map<int, List<WorkoutDay>> workoutMap = { };
 
     for (var workout in workouts) {
       workoutMap[workout.day] != null

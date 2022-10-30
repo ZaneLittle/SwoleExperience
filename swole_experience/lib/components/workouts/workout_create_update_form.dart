@@ -6,7 +6,7 @@ import 'package:logger/logger.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
-import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/util/validator.dart';
 
@@ -19,7 +19,7 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
     required this.rebuildCallback,
   }) : super(key: key);
 
-  final Workout? workout;
+  final WorkoutDay? workout;
   final int day;
   final int defaultOrder;
   final Function rebuildCallback;
@@ -46,7 +46,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   TextEditingController _notesController = TextEditingController();
 
   void createWorkout() {
-    Workout workout = Workout(
+    WorkoutDay workout = WorkoutDay(
       day: int.tryParse(_dayController.value.text) ?? widget.day,
       id: Random().nextInt(9999).toString(),
       dayOrder: widget.defaultOrder,
@@ -64,7 +64,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
   void updateWorkout() {
     if (widget.workout != null) {
-      Workout workout = Workout(
+      WorkoutDay workout = WorkoutDay(
         day: int.tryParse(_dayController.value.text) ?? widget.day,
         id: widget.workout!.id,
         dayOrder: widget.defaultOrder,

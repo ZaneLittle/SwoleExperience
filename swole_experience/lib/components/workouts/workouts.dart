@@ -1,18 +1,21 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import 'package:swole_experience/components/preferences/settings_button.dart';
 import 'package:swole_experience/components/workouts/timer.dart';
 import 'package:swole_experience/components/workouts/workout_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-import 'package:swole_experience/constants/pages.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/model/preference.dart';
-import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
+import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/workout_history_service.dart';
 import 'package:swole_experience/service/workout_service.dart';
-
+import 'package:swole_experience/util/converter.dart';
 
 class Workouts extends StatefulWidget {
   const Workouts({Key? key, this.context}) : super(key: key);
@@ -24,17 +27,29 @@ class Workouts extends StatefulWidget {
 }
 
 class _WorkoutsState extends State<Workouts> {
+  final Logger logger = Logger();
   final GlobalKey<_WorkoutsState> _workoutsKey = GlobalKey<_WorkoutsState>();
 
   int totalOffset = 0;
   int workingOffset = 0;
   int day = 1;
   String dayText = 'Today';
+  bool checkHistory = false;
 
-  FutureOr rebuild(Workout? value) {
-    setState(() {});
-    build(context);
+  FutureOr rebuild(WorkoutDay? value) {
+    WorkoutService.svc.getUniqueDays().then((daysLength) {
+      saveWorkout();
+
+      workingOffset = 0;
+      totalOffset = 0;
+      day = (day < daysLength) ? day + 1 : 1;
+      setState(() {});
+
+      build(context);
+    });
   }
+
+  ///                             Helpers                                    ///
 
   void updateView(int offset) {
     workingOffset += offset;
@@ -53,63 +68,34 @@ class _WorkoutsState extends State<Workouts> {
     });
   }
 
-  Widget buildDaySelect(AsyncSnapshot<List<List<dynamic>>> dataSnapshot) {
-    return Padding(
-        padding: const EdgeInsets.only(top: 40),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-                padding: const EdgeInsets.only(top: 0),
-                child: SettingsButton(rebuildCallback: rebuild)),
-            isWorkoutsPopulated(dataSnapshot)
-                ? IconButton(
-                    onPressed: () => updateView(-1),
-                    icon: const Icon(Icons.keyboard_arrow_left,
-                        color: CommonStyles.primaryColour))
-                : Container(),
-            isWorkoutsPopulated(dataSnapshot)
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(dayText,
-                        style: const TextStyle(fontWeight: FontWeight.bold)))
-                : Container(),
-            isWorkoutsPopulated(dataSnapshot)
-                ? IconButton(
-                    onPressed: () => updateView(1),
-                    icon: const Icon(Icons.keyboard_arrow_right,
-                        color: CommonStyles.primaryColour))
-                : Container(),
-            const SizedBox(width: 64)
-          ],
+  void saveWorkout() {
+    WorkoutService.svc.getWorkouts(day: day).then((List<WorkoutDay> workouts) {
+      if (workouts.isEmpty) {
+        logger.e("FATAL: unable to find workout to save, aborting.");
+      } else {
+        WorkoutDay w = workouts.first;
+
+        WorkoutHistoryService.svc.createWorkoutHistory(WorkoutHistory(
+          id: Random().nextInt(9999).toString(),
+          workoutId: w.id,
+          date: Converter().truncateToDay(DateTime.now()).toString(),
+          name: w.name,
+          sets: w.sets,
+          reps: w.reps,
+          weight: w.weight,
+          notes: w.notes,
         ));
+      }
+    });
   }
 
-  Widget buildCompleteDayButton(
-      AsyncSnapshot<List<List<dynamic>>> dataSnapshot) {
-    if (!isWorkoutsPopulated(dataSnapshot)) {
-      return Container();
-    } else {
-      return ElevatedButton(
-          onPressed: () {
-            WorkoutService.svc.getUniqueDays().then((daysLength) {
-              workingOffset = 0;
-              totalOffset = 0;
-              day = (day < daysLength) ? day + 1 : 1;
-
-              Preference newWorkoutDay = Preference(
-                preference: PreferenceConstant.workoutDayKey,
-                value: day.toString(),
-                lastUpdated: DateTime.now(),
-              );
-              PreferenceService.svc.setPreference(newWorkoutDay);
-
-              setState(() {});
-            });
-          },
-          child: const Text('Complete Day'),
-          style: ElevatedButton.styleFrom(primary: CommonStyles.primaryColour));
-    }
+  void setDayPreference() {
+    Preference newWorkoutDay = Preference(
+      preference: PreferenceConstant.workoutDayKey,
+      value: day.toString(),
+      lastUpdated: DateTime.now(),
+    );
+    PreferenceService.svc.setPreference(newWorkoutDay);
   }
 
   bool isWorkoutsPopulated(AsyncSnapshot<List<List<dynamic>>> dataSnapshot) {
@@ -147,6 +133,59 @@ class _WorkoutsState extends State<Workouts> {
     }
   }
 
+  ///                             Widgets                                    ///
+
+  Widget buildDaySelect(AsyncSnapshot<List<List<dynamic>>> dataSnapshot) {
+    return Padding(
+        padding: const EdgeInsets.only(top: 40),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+                padding: const EdgeInsets.only(top: 0),
+                child: SettingsButton(rebuildCallback: rebuild)),
+            checkHistory || isWorkoutsPopulated(dataSnapshot)
+                ? IconButton(
+                onPressed: () => updateView(-1),
+                icon: const Icon(Icons.keyboard_arrow_left,
+                    color: CommonStyles.primaryColour))
+                : Container(),
+            checkHistory || isWorkoutsPopulated(dataSnapshot)
+                ? Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(dayText,
+                    style: const TextStyle(fontWeight: FontWeight.bold)))
+                : Container(),
+            checkHistory || isWorkoutsPopulated(dataSnapshot)
+                ? IconButton(
+                onPressed: () => updateView(1),
+                icon: const Icon(Icons.keyboard_arrow_right,
+                    color: CommonStyles.primaryColour))
+                : Container(),
+            const SizedBox(width: 64)
+          ],
+        ));
+  }
+
+  Widget buildCompleteDayButton(
+      AsyncSnapshot<List<List<dynamic>>> dataSnapshot) {
+    if (!isWorkoutsPopulated(dataSnapshot)) {
+      return Container();
+    } else if (totalOffset != 0) {
+      return const SizedBox(height: 48);
+    } else {
+      return ElevatedButton(
+          onPressed: () {
+              saveWorkout();
+              day++;
+              setDayPreference();
+              setState(() {});
+          },
+          child: const Text('Complete Day'),
+          style: ElevatedButton.styleFrom(primary: CommonStyles.primaryColour));
+    }
+  }
+
   Widget buildList(int? dayOffset) {
     return FutureBuilder<List<List<dynamic>>>(
         future: Future.wait([
@@ -160,25 +199,42 @@ class _WorkoutsState extends State<Workouts> {
             setupDay(
                 dayPref: initSnapshot.data?[0] as List<Preference>?,
                 offset: dayOffset ?? 0);
+
+            List<Future<List<dynamic>>> req;
+            if (totalOffset >= 0) {
+              req = [
+                WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0))
+              ];
+            } else {
+              checkHistory = true;
+              DateTime now = DateTime.now();
+              DateTime date =
+              DateTime(now.year, now.month, now.day + (dayOffset ?? 0));
+              req = [
+                WorkoutHistoryService.svc.getWorkoutHistory(
+                    date: date.toString())
+              ];
+            }
+
             return FutureBuilder<List<List<dynamic>>>(
-              future: Future.wait([
-                WorkoutService.svc.getWorkouts(day: day + (dayOffset ?? 0)),
-              ]),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<List<dynamic>>> finalSnapshot) {
+                future: Future.wait(req),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<List<dynamic>>> finalSnapshot) {
+                  finalSnapshot.data?.add(initSnapshot.data ?? []);
 
-                finalSnapshot.data?.add(initSnapshot.data ?? []);
-
-                return Column(
-                  children: [
-                    buildDaySelect(finalSnapshot),
-                    WorkoutList(dataSnapshot: finalSnapshot, rebuildCallback: rebuild),
-                    buildCompleteDayButton(finalSnapshot),
-                    const WorkoutTimer(),
-                  ],
-                );
-              }
-            );
+                  return Column(
+                    children: [
+                      buildDaySelect(finalSnapshot),
+                      WorkoutList(
+                        dataSnapshot: finalSnapshot,
+                        rebuildCallback: rebuild,
+                        history: checkHistory,
+                      ),
+                      buildCompleteDayButton(finalSnapshot),
+                      const WorkoutTimer(),
+                    ],
+                  );
+                });
           }
         });
   }

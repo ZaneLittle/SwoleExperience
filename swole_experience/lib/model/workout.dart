@@ -1,8 +1,6 @@
 class Workout {
   Workout({
     required this.id,
-    required this.day,
-    required this.dayOrder,
     required this.name,
     required this.weight,
     required this.sets,
@@ -11,8 +9,6 @@ class Workout {
   });
 
   final String id;
-  final int day;
-  final int dayOrder;
   final String name;
   final double weight;
   final int sets;
@@ -21,8 +17,6 @@ class Workout {
 
   Workout.fromMap(Map<String, dynamic> map)
       : id =  map['id'] as String,
-        day = map['day'] as int,
-        dayOrder = map['dayOrder'] as int,
         name = map['name'] as String,
         weight = map['weight'] as double,
         sets = map['sets'] as int,
@@ -32,8 +26,6 @@ class Workout {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'day': day,
-      'dayOrder': dayOrder,
       'name': name,
       'weight': weight,
       'sets': sets,
@@ -44,13 +36,11 @@ class Workout {
 
   @override
   String toString() {
-    return 'Workout:\n\tID:$id\n\tDay:$day\n\tOrder:$dayOrder\n\tName:$name\n\tWeight:$weight\n\tSets:$sets\n\tReps:$reps\n\tNotes:$notes';
+    return 'Workout:\n\tID:$id\n\tName:$name\n\tWeight:$weight\n\tSets:$sets\n\tReps:$reps\n\tNotes:$notes';
   }
 
   Workout copy({
     String? id,
-    int? day,
-    int? dayOrder,
     String? name,
     double? weight,
     int? sets,
@@ -59,8 +49,6 @@ class Workout {
   }) {
     return Workout(
       id: id ?? this.id,
-      day: day ?? this.day,
-      dayOrder: dayOrder ?? this.dayOrder,
       name: name ?? this.name,
       weight: weight ?? this.weight,
       sets: sets ?? this.sets,

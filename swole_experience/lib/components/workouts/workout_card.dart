@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/workout_service.dart';
 
 class WorkoutCard extends StatefulWidget {
@@ -18,7 +18,7 @@ class WorkoutCard extends StatefulWidget {
 
   final bool allowDelete;
   final BuildContext? context;
-  final Workout workout;
+  final WorkoutDay workout;
   final Function rebuildCallback;
 
   @override
@@ -44,7 +44,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     return (notes.length > 60 || notes.contains('\n')) ? 62 : 38;
   }
 
-  void onDismissed(DismissDirection direction, Workout w) {
+  void onDismissed(DismissDirection direction, WorkoutDay w) {
     if (direction == DismissDirection.startToEnd && widget.allowDelete) {
       // TODO: do we just set to day 0 instead of deleting?
       WorkoutService.svc.removeWorkout(widget.workout.id);
@@ -59,7 +59,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     defaultOrder: w.dayOrder,
                     workout: w,
                     rebuildCallback: (
-                        {Workout? workout, bool delete = false, bool update = false}) {
+                        {WorkoutDay? workout, bool delete = false, bool update = false}) {
                       widget.rebuildCallback(workout: workout, delete: delete, update: update);
                     }));
           });
@@ -69,8 +69,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
     }
   }
 
-  Widget buildList(Workout? workout) {
-    Workout w = workout ?? widget.workout;
+  Widget buildList(WorkoutDay? workout) {
+    WorkoutDay w = workout ?? widget.workout;
 
     return Dismissible(
         onDismissed: (DismissDirection direction) => onDismissed(direction, w),
@@ -161,7 +161,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   @override
-  Widget build(BuildContext context, {Workout? rebuildWorkout}) {
+  Widget build(BuildContext context, {WorkoutDay? rebuildWorkout}) {
     return SizedBox(
         key: _workoutListKey,
         height: getHeight(),

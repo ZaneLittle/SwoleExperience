@@ -7,7 +7,7 @@ import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-import 'package:swole_experience/model/workout.dart';
+import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
@@ -34,7 +34,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
   bool shouldFetch = false;
 
-  Map<int, List<Workout>> workoutMap = {
+  Map<int, List<WorkoutDay>> workoutMap = {
     1: [],
   };
 
@@ -46,18 +46,18 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
 
   ///                         Processing                                    ///
 
-  void initWorkoutMap(List<Workout> workouts) {
+  void initWorkoutMap(List<WorkoutDay> workouts) {
     for (int key in workoutMap.keys) {
       workoutMap[key] = [];
     }
 
-    Map<int, List<Workout>> _workoutMap = Util().getWorkoutDays(workouts);
+    Map<int, List<WorkoutDay>> _workoutMap = Util().getWorkoutDays(workouts);
     for (int day = 1; day <= _workoutMap.keys.length; day++) {
       workoutMap[day] = _workoutMap[day]!;
     }
   }
 
-  void rebuild({Workout? workout, bool delete = false, bool update = false}) {
+  void rebuild({WorkoutDay? workout, bool delete = false, bool update = false}) {
     setState(() {
       if (workout != null && (delete || update)) {
         workoutMap[workout.day]?.removeAt(workout.dayOrder);
@@ -114,8 +114,8 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             workoutMap[nextDay] = [];
 
             // Update the day for each of the records
-            for (Workout workout in workoutMap[day]!) {
-              Workout updatedWorkout = Workout(
+            for (WorkoutDay workout in workoutMap[day]!) {
+              WorkoutDay updatedWorkout = WorkoutDay(
                 id: workout.id,
                 day: day,
                 dayOrder: workout.dayOrder,
@@ -148,9 +148,9 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   /// Update the order of each workout in the workout map of a given day based on the order it appears in the list
   void reorderDay(int day) {
     for (int i = 0; i < workoutMap[day]!.length; i++) {
-      Workout w = workoutMap[day]![i];
+      WorkoutDay w = workoutMap[day]![i];
       if (w.dayOrder != i) {
-        Workout newW = w.copy(dayOrder: i);
+        WorkoutDay newW = w.copy(dayOrder: i);
         workoutMap[day]![i] = newW;
         WorkoutService.svc.updateWorkout(workoutMap[day]![i].copy(dayOrder: i));
       }
@@ -204,7 +204,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   }
 
   /// Workouts list is intended to be constrained for the day
-  Widget buildDay(List<Workout> workouts, int day) {
+  Widget buildDay(List<WorkoutDay> workouts, int day) {
     // Cast is necessary, otherwise it auto assigns List<Widget> to
     // List<WorkoutCard> and falls over when adding the button
     List<Widget> workoutList = workouts
@@ -234,7 +234,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                         newIndex = workoutMap[day]!.length - 1;
                       }
 
-                      Workout w = workoutMap[day]!.removeAt(oldIndex);
+                      WorkoutDay w = workoutMap[day]!.removeAt(oldIndex);
                       workoutMap[day]!.insert(newIndex, w);
 
                       reorderDay(day);
@@ -284,8 +284,8 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('Loading...'));
                 } else {
-                  List<Workout> workouts =
-                      snapshot.requireData[0] as List<Workout>;
+                  List<WorkoutDay> workouts =
+                      snapshot.requireData[0] as List<WorkoutDay>;
                   initWorkoutMap(workouts);
                   shouldFetch = false;
 
