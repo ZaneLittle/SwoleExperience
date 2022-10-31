@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/workout_service.dart';
 
@@ -18,7 +19,7 @@ class WorkoutCard extends StatefulWidget {
 
   final bool allowDelete;
   final BuildContext? context;
-  final WorkoutDay workout;
+  final Workout workout;
   final Function rebuildCallback;
 
   @override
@@ -70,15 +71,18 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   Widget buildList(WorkoutDay? workout) {
-    WorkoutDay w = workout ?? widget.workout;
+    Workout w = workout ?? widget.workout;
+    DismissDirection dismissDirection = widget.allowDelete
+        ? DismissDirection.horizontal
+        : w is WorkoutDay
+          ? DismissDirection.endToStart
+          : DismissDirection.none;
 
     return Dismissible(
-        onDismissed: (DismissDirection direction) => onDismissed(direction, w),
+        onDismissed: (DismissDirection direction) => onDismissed(direction, w as WorkoutDay),
         key: ValueKey("_workoutCard${widget.workout.id}_${Random().nextInt(9999).toString()}"),
         resizeDuration: const Duration(milliseconds: 50),
-        direction: widget.allowDelete
-            ? DismissDirection.horizontal
-            : DismissDirection.endToStart,
+        direction: dismissDirection,
         background: widget.allowDelete
             ? Container(
                 color: Colors.red,
