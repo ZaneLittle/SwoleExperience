@@ -8,14 +8,18 @@ import 'package:swole_experience/model/workout_history.dart';
 /// WeightHistoryService provides an interface to the `workouthistory` table.
 /// This table stores the workouts the user has completed
 /// Weight = {
-///   TEXT id          = uuid for the workouthistory record
-///   TEXT workoutId   = uuid of the workout (foreign key on table `workout`)
-///   TEXT date        = Date the workout was performed, represented as a string
-///   TEXT name        = Name of the exercise
-///   FLOAT weight     = Weight for the exercise
-///   INTEGER sets     = number of sets to perform
-///   INTEGER reps     = number of reps to aim for
-///   TEXT notes       = Any notes the user wants to add to this record
+///   TEXT id               = uuid for the workouthistory record
+///   TEXT workoutId        = uuid of the workout (foreign key on table `workout`)
+///   TEXT date             = Date the workout was performed, represented as a string
+///   TEXT name             = Name of the exercise
+///   FLOAT weight          = Weight for the exercise
+///   INTEGER sets          = number of sets to perform
+///   INTEGER reps          = number of reps to aim for
+///   TEXT notes            = Any notes the user wants to add to this record
+///   TEXT supersetParentId = ID of a superset workout object (Comes before)
+///   TEXT supersetChildId  = ID of a superset workout object (Comes after)
+///   TEXT altSetParentId   = ID of an alternative set (takes priority)
+///   TEXT altSetChildId    = ID of an alternative set (foreign object takes priority)
 /// }
 /// https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
 class WorkoutHistoryService {
@@ -50,7 +54,11 @@ class WorkoutHistoryService {
         weight FLOAT,
         sets INTEGER,
         reps INTEGER,
-        notes TEXT
+        notes TEXT,
+        supersetParentId TEXT,
+        supersetChildId TEXT,
+        altSetParentId TEXT,
+        altSetChildId TEXT   
         )
     ''');
   }
