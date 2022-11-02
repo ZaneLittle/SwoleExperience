@@ -11,13 +11,22 @@ class WorkoutHistory extends Workout {
     required sets,
     required reps,
     notes,
+    supersetParent,
+    supersetChild,
+    altParent,
+    altChild,
   }) : super(
-            id: id,
-            name: name,
-            weight: weight,
-            sets: sets,
-            reps: reps,
-            notes: notes);
+          id: id,
+          name: name,
+          weight: weight,
+          sets: sets,
+          reps: reps,
+          notes: notes,
+          supersetParent: supersetParent,
+          supersetChild: supersetChild,
+          altParent: altParent,
+          altChild: altChild,
+        );
 
   final String workoutId;
   final String date;
@@ -52,6 +61,10 @@ class WorkoutHistory extends Workout {
     int? sets,
     int? reps,
     String? notes,
+    Workout? supersetParent,
+    Workout? supersetChild,
+    Workout? altParent,
+    Workout? altChild,
   }) {
     return WorkoutHistory(
       id: id ?? this.id,
@@ -62,18 +75,27 @@ class WorkoutHistory extends Workout {
       sets: sets ?? this.sets,
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
+      supersetParent: supersetParent ?? this.supersetParent,
+      supersetChild: supersetChild ?? this.supersetChild,
+      altParent: altParent ?? this.altParent,
+      altChild: altChild ?? this.altChild,
     );
   }
 
   WorkoutDay toWorkoutDay({int? day, int? dayOrder}) {
     return WorkoutDay(
-        id: workoutId,
-        day: day ?? 0,
-        dayOrder: dayOrder ?? 0,
-        name: name,
-        weight: weight,
-        sets: sets,
-        reps: reps,
-        notes: notes);
+      id: workoutId,
+      day: day ?? 0,
+      dayOrder: dayOrder ?? 0,
+      name: name,
+      weight: weight,
+      sets: sets,
+      reps: reps,
+      notes: notes,
+      supersetParent: supersetParent,
+      supersetChild: supersetChild,
+      altParent: altParent,
+      altChild: altChild,
+    );
   }
 }

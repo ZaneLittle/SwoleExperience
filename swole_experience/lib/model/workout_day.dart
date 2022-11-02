@@ -14,13 +14,22 @@ class WorkoutDay extends Workout {
     required sets,
     required reps,
     notes,
+    supersetParent,
+    supersetChild,
+    altParent,
+    altChild,
   }) : super(
-            id: id,
-            name: name,
-            weight: weight,
-            sets: sets,
-            reps: reps,
-            notes: notes);
+          id: id,
+          name: name,
+          weight: weight,
+          sets: sets,
+          reps: reps,
+          notes: notes,
+          supersetParent: supersetParent,
+          supersetChild: supersetChild,
+          altParent: altParent,
+          altChild: altChild,
+        );
 
   final int day;
   final int dayOrder;
@@ -55,6 +64,10 @@ class WorkoutDay extends Workout {
     int? sets,
     int? reps,
     String? notes,
+    Workout? supersetParent,
+    Workout? supersetChild,
+    Workout? altParent,
+    Workout? altChild,
   }) {
     return WorkoutDay(
       id: id ?? this.id,
@@ -65,19 +78,28 @@ class WorkoutDay extends Workout {
       sets: sets ?? this.sets,
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
+      supersetParent: supersetParent ?? this.supersetParent,
+      supersetChild: supersetChild ?? this.supersetChild,
+      altParent: altParent ?? this.altParent,
+      altChild: altChild ?? this.altChild,
     );
   }
 
   WorkoutHistory toWorkoutHistory({String? historyId, DateTime? date}) {
     DateTime dateToLog = date ?? DateTime.now();
     return WorkoutHistory(
-        id: historyId ?? Random().nextInt(9999).toString(),
-        workoutId: id,
-        date: Converter().truncateToDay(dateToLog).toString(),
-        name: name,
-        weight: weight,
-        sets: sets,
-        reps: reps,
-        notes: notes);
+      id: historyId ?? Random().nextInt(9999).toString(),
+      workoutId: id,
+      date: Converter().truncateToDay(dateToLog).toString(),
+      name: name,
+      weight: weight,
+      sets: sets,
+      reps: reps,
+      notes: notes,
+      supersetParent: supersetParent,
+      supersetChild: supersetChild,
+      altParent: altParent,
+      altChild: altChild,
+    );
   }
 }

@@ -15,11 +15,15 @@ import 'package:swole_experience/model/workout_day.dart';
 ///                     TODO: Surface those not in use somehow,
 ///   INTEGER dayOrder = Order the exercises is intended to be performed in for the day
 ///                     *Note* Index starts at 1
-///   TEXT name        = Name of the exercise
-///   FLOAT weight     = Weight for the exercise
-///   INTEGER sets     = number of sets to perform
-///   INTEGER reps     = number of reps to aim for
-///   TEXT notes       = Any notes the user wants to add to this record
+///   TEXT name             = Name of the exercise
+///   FLOAT weight          = Weight for the exercise
+///   INTEGER sets          = number of sets to perform
+///   INTEGER reps          = number of reps to aim for
+///   TEXT notes            = Any notes the user wants to add to this record
+///   TEXT supersetParentId = ID of a superset workout object (Comes before)
+///   TEXT supersetChildId  = ID of a superset workout object (Comes after)
+///   TEXT altSetParentId   = ID of an alternative set (takes priority)
+///   TEXT altSetChildId    = ID of an alternative set (foreign object takes priority)
 /// }
 /// https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
 class WorkoutService {
@@ -54,7 +58,11 @@ class WorkoutService {
         weight FLOAT,
         sets INTEGER,
         reps INTEGER,
-        notes TEXT   
+        notes TEXT,
+        supersetParentId TEXT,
+        supersetChildId TEXT,
+        altSetParentId TEXT,
+        altSetChildId TEXT        
         )
     ''');
   }
