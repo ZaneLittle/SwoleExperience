@@ -48,20 +48,23 @@ class _WorkoutListState extends State<WorkoutList> {
 
   ///                             Widgets                                    ///
   Widget buildHistoryHeader() {
-    return const Padding(padding: EdgeInsets.only(top: 24, bottom: 8), child: Align(
-      alignment: Alignment.center,
-      child: Text('Completed',
-        style: TextStyle(color: CommonStyles.primaryColour),
-    )));
+    return const Padding(
+        padding: EdgeInsets.only(top: 24, bottom: 8),
+        child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              'Completed',
+              style: TextStyle(color: CommonStyles.primaryColour),
+            )));
   }
 
   TextButton buildAddWorkoutPlaceholder() {
     return TextButton(
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const WorkoutsConfigure()))
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WorkoutsConfigure()))
               .then(rebuildDynamic);
         },
         child: Align(
@@ -120,9 +123,12 @@ class _WorkoutListState extends State<WorkoutList> {
       return ListView(
         controller: _scrollController,
         children: widget.dataSnapshot.requireData
-            .map((data) {
-              List<Widget> cards = (data.first is WorkoutHistory) ? [buildHistoryHeader()] : [];
-              if (data.first is Workout) {
+          .map((data) {
+            List<Widget> cards = [];
+            if (data.isNotEmpty) {
+              if (data.first is WorkoutHistory) {
+                cards = [buildHistoryHeader()];
+              } else if (data.first is WorkoutDay) {
                 cards.addAll(data.map((w) {
                   return WorkoutCard(
                     workout: w,
@@ -130,10 +136,11 @@ class _WorkoutListState extends State<WorkoutList> {
                   );
                 }));
               }
-              return cards;
-            })
-            .expand((e) => e)
-            .toList(),
+            }
+            return cards;
+          })
+          .expand((e) => e)
+          .toList(),
       );
     }
   }

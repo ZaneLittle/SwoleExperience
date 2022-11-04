@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/model/workout_day.dart';
@@ -17,12 +18,14 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
     required this.day,
     required this.defaultOrder,
     required this.rebuildCallback,
+    this.workoutsInDay,
   }) : super(key: key);
 
   final WorkoutDay? workout;
   final int day;
   final int defaultOrder;
   final Function rebuildCallback;
+  final List<WorkoutDay>? workoutsInDay;
 
   @override
   State<WorkoutCreateUpdateForm> createState() =>
@@ -44,6 +47,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   final TextEditingController _dayController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
+  String? _alternativeId;
+  String? _supersetId;
 
   void createWorkout() {
     WorkoutDay workout = WorkoutDay(
@@ -59,7 +64,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
     WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
       return handleSaveError('create', error, stackTrace);
-    }).then((res) => res != 0 ? widget.rebuildCallback(workout: workout) : null);
+    }).then(
+        (res) => res != 0 ? widget.rebuildCallback(workout: workout) : null);
   }
 
   void updateWorkout() {
@@ -81,7 +87,9 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
         return handleSaveError('update', error, stackTrace);
       }).then((res) {
-        res != 0 ? widget.rebuildCallback(workout: workout, update: true) : null;
+        res != 0
+            ? widget.rebuildCallback(workout: workout, update: true)
+            : null;
       });
     } else {
       logger.e(
@@ -119,67 +127,61 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     }
 
     return Expanded(
-            key: _nameFieldKey,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 12, bottom: 18, left: 32, right: 32),
-              child: TextFormField(
-                  controller: _nameController,
-                  validator: (String? value) => Validator.stringValidator(value,
-                      defaultValue: widget.workout?.name),
-                  decoration: const InputDecoration(hintText: 'Name')),
-            ));
+        key: _nameFieldKey,
+        child: Padding(
+          padding:
+              const EdgeInsets.only(top: 12, bottom: 18, left: 32, right: 32),
+          child: TextFormField(
+              controller: _nameController,
+              validator: (String? value) => Validator.stringValidator(value,
+                  defaultValue: widget.workout?.name),
+              decoration: const InputDecoration(hintText: 'Name')),
+        ));
   }
 
   Widget buildWeightField() {
     return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, bottom: 12, left: 32, right: 12),
-              child: TextFormField(
-                  controller: _weightController,
-                  validator: (String? value) => Validator.doubleValidator(value,
-                      defaultValue: widget.workout?.weight),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.weight.toString() ?? 'Weight',
-                      helperText: 'Weight')),
-            ));
+        child: Padding(
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 32, right: 12),
+      child: TextFormField(
+          controller: _weightController,
+          validator: (String? value) => Validator.doubleValidator(value,
+              defaultValue: widget.workout?.weight),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+              hintText: widget.workout?.weight.toString() ?? 'Weight',
+              helperText: 'Weight')),
+    ));
   }
 
   Widget buildSetsField() {
     return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, bottom: 12, left: 12, right: 12),
-              child: TextFormField(
-                  controller: _setsController,
-                  validator: (String? value) => Validator.intValidator(value,
-                      defaultValue: widget.workout?.sets),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: false),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.sets.toString() ?? 'Sets',
-                      helperText: 'Sets')),
-            ));
+        child: Padding(
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 12, right: 12),
+      child: TextFormField(
+          controller: _setsController,
+          validator: (String? value) =>
+              Validator.intValidator(value, defaultValue: widget.workout?.sets),
+          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+          decoration: InputDecoration(
+              hintText: widget.workout?.sets.toString() ?? 'Sets',
+              helperText: 'Sets')),
+    ));
   }
 
   Widget buildRepsField() {
     return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, bottom: 12, left: 12, right: 32),
-              child: TextFormField(
-                  controller: _repsController,
-                  validator: (String? value) => Validator.intValidator(value,
-                      defaultValue: widget.workout?.reps),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: false),
-                  decoration: InputDecoration(
-                      hintText: widget.workout?.reps.toString() ?? 'Reps',
-                      helperText: 'Reps')),
-            ));
+        child: Padding(
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 12, right: 32),
+      child: TextFormField(
+          controller: _repsController,
+          validator: (String? value) =>
+              Validator.intValidator(value, defaultValue: widget.workout?.reps),
+          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+          decoration: InputDecoration(
+              hintText: widget.workout?.reps.toString() ?? 'Reps',
+              helperText: 'Reps')),
+    ));
   }
 
   Widget buildNotesField() {
@@ -204,6 +206,17 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         ));
   }
 
+  Widget buildAltDropdown() {
+    return DropdownButton(
+      value: _alternativeId,
+      items: widget.workoutsInDay
+          ?.map((workout) =>
+              DropdownMenuItem(child: Text(workout.name), value: workout.id))
+          .toList(),
+      onChanged: (value) => _alternativeId = value as String,
+    );
+  }
+
   Widget buildConfirmCancel() {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
       IconButton(
@@ -211,7 +224,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         icon: const Icon(Icons.cancel),
         onPressed: () {
           Navigator.of(context).pop();
-          widget.rebuildCallback(workout: widget.workout, update: widget.workout != null);
+          widget.rebuildCallback(
+              workout: widget.workout, update: widget.workout != null);
         },
       ),
       IconButton(
@@ -238,13 +252,16 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
           children: <Widget>[
             Row(children: [
               buildNameField(),
-            ]),
+            ],),
             Row(children: [
               buildWeightField(),
               buildSetsField(),
               buildRepsField(),
-            ]),
+            ],),
             buildNotesField(),
+            Row(children: [
+              Toggles.alternativeWorkouts ? buildAltDropdown() : Container(),
+            ],),
             buildConfirmCancel(),
             SizedBox(height: MediaQuery.of(context).size.height * .34)
           ],

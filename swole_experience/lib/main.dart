@@ -4,7 +4,6 @@ import 'package:swole_experience/components/workouts/workouts.dart';
 import 'package:swole_experience/components/weight_tracker/weight_tracker.dart';
 import 'package:swole_experience/constants/pages.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
-import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
 
@@ -34,7 +33,7 @@ class StatefulApp extends StatefulWidget {
 class _AppState extends State<StatefulApp> {
   int _selectedIndex = 0; // Default to weight tracker open
   static final List<Widget> _pages = <Widget>[
-    Toggles.macros ? const Text('Macros Coming soon',) : Container(),
+    // Toggles.macros ? const Text('Macros Coming soon',) : Container(),
     const WeightTracker(),
     const Workouts(),
   ];
