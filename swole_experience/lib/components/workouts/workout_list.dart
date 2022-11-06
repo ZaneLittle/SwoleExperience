@@ -133,6 +133,7 @@ class _WorkoutListState extends State<WorkoutList> {
                   return WorkoutCard(
                     workout: w,
                     rebuildCallback: rebuild,
+                    workoutsInDay: data as List<WorkoutDay>,
                   );
                 }));
               }

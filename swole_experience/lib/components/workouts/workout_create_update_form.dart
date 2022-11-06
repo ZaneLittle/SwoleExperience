@@ -39,8 +39,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       GlobalKey<_WorkoutCreateUpdateFormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _nameFieldKey =
       GlobalKey<_WorkoutCreateUpdateFormState>();
+  final GlobalKey<_WorkoutCreateUpdateFormState> _altDropdownKey =
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final Logger logger = Logger();
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _altScrollController = ScrollController();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _setsController = TextEditingController();
   final TextEditingController _repsController = TextEditingController();
@@ -60,6 +63,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       reps: int.parse(_repsController.value.text),
       weight: double.parse(_weightController.value.text),
       notes: _notesController.value.text,
+      altParentId: _alternativeId,
     );
 
     WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
@@ -82,6 +86,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         weight: double.tryParse(_weightController.value.text) ??
             widget.workout!.weight,
         notes: _notesController.value.text,
+        altParentId: _alternativeId,
       );
 
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
@@ -107,7 +112,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   int handleSaveError(String operation, Object? error, StackTrace? stackTrace) {
-    logger.e("Error ${operation}ing workout $error", stackTrace);
+    logger.e("Error ${operation}ing workout: $error", error, stackTrace);
     const AlertSnackBar(
       message: "Unable to update or create the workout.",
       state: SnackBarState.failure,
@@ -207,14 +212,55 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   Widget buildAltDropdown() {
-    return DropdownButton(
-      value: _alternativeId,
-      items: widget.workoutsInDay
-          ?.map((workout) =>
-              DropdownMenuItem(child: Text(workout.name), value: workout.id))
-          .toList(),
-      onChanged: (value) => _alternativeId = value as String,
-    );
+    if (widget.workoutsInDay != null && widget.workoutsInDay!.isNotEmpty) {
+      if (widget.workout?.altParentId != null && _alternativeId == null) {
+        _alternativeId = widget.workout?.altParentId;
+      }
+
+      List<DropdownMenuItem<String>> dropdownList = [
+        const DropdownMenuItem(
+            value: '',
+            child:
+                Text('Alternative For', style: TextStyle(color: Colors.grey)))
+      ];
+      dropdownList.addAll(widget.workoutsInDay!
+          .where((w) => w.id != widget.workout?.id)
+          .map((workout) =>
+              DropdownMenuItem(child: Text(workout.name), value: workout.id)));
+
+      List<Widget> otherAlternatives = [const Text('TODO')];
+
+      return Expanded(
+          key: _altDropdownKey,
+          child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 12, bottom: 18, left: 32, right: 32),
+              child: Column(children: [
+                DropdownButton(
+                    value: _alternativeId,
+                    hint: const Text('Alternative For'),
+                    isExpanded: true,
+                    items: dropdownList,
+                    onChanged: (value) => setState(() {
+                          _alternativeId = value as String;
+                        })),
+                otherAlternatives.isNotEmpty
+                    ? ExpansionTile(
+                        title: const Text('Other Alternatives',
+                            style: TextStyle(fontSize: 14, color: Colors.grey)),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .25,
+                            child: ListView(
+                                controller: _altScrollController,
+                                children: otherAlternatives),
+                          )
+                        ],
+                      )
+                    : Container(),
+              ])));
+    }
+    return Container();
   }
 
   Widget buildConfirmCancel() {
@@ -250,18 +296,24 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         child: ListView(
           controller: _scrollController,
           children: <Widget>[
-            Row(children: [
-              buildNameField(),
-            ],),
-            Row(children: [
-              buildWeightField(),
-              buildSetsField(),
-              buildRepsField(),
-            ],),
+            Row(
+              children: [
+                buildNameField(),
+              ],
+            ),
+            Row(
+              children: [
+                buildWeightField(),
+                buildSetsField(),
+                buildRepsField(),
+              ],
+            ),
+            Row(
+              children: [
+                Toggles.alternativeWorkouts ? buildAltDropdown() : Container(),
+              ],
+            ),
             buildNotesField(),
-            Row(children: [
-              Toggles.alternativeWorkouts ? buildAltDropdown() : Container(),
-            ],),
             buildConfirmCancel(),
             SizedBox(height: MediaQuery.of(context).size.height * .34)
           ],

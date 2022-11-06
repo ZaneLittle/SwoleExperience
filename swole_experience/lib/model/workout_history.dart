@@ -11,10 +11,8 @@ class WorkoutHistory extends Workout {
     required sets,
     required reps,
     notes,
-    supersetParent,
-    supersetChild,
-    altParent,
-    altChild,
+    supersetParentId,
+    altParentId,
   }) : super(
           id: id,
           name: name,
@@ -22,10 +20,8 @@ class WorkoutHistory extends Workout {
           sets: sets,
           reps: reps,
           notes: notes,
-          supersetParent: supersetParent,
-          supersetChild: supersetChild,
-          altParent: altParent,
-          altChild: altChild,
+          supersetParentId: supersetParentId,
+          altParentId: altParentId,
         );
 
   final String workoutId;
@@ -61,10 +57,8 @@ class WorkoutHistory extends Workout {
     int? sets,
     int? reps,
     String? notes,
-    Workout? supersetParent,
-    Workout? supersetChild,
-    Workout? altParent,
-    Workout? altChild,
+    String? supersetParentId,
+    String? altParentId,
   }) {
     return WorkoutHistory(
       id: id ?? this.id,
@@ -75,10 +69,8 @@ class WorkoutHistory extends Workout {
       sets: sets ?? this.sets,
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
-      supersetParent: supersetParent ?? this.supersetParent,
-      supersetChild: supersetChild ?? this.supersetChild,
-      altParent: altParent ?? this.altParent,
-      altChild: altChild ?? this.altChild,
+      supersetParentId: supersetParentId ?? this.supersetParentId,
+      altParentId: altParentId ?? this.altParentId,
     );
   }
 
@@ -92,10 +84,8 @@ class WorkoutHistory extends Workout {
       sets: sets,
       reps: reps,
       notes: notes,
-      supersetParent: supersetParent,
-      supersetChild: supersetChild,
-      altParent: altParent,
-      altChild: altChild,
+      supersetParentId: supersetParentId,
+      altParentId: altParentId,
     );
   }
 }

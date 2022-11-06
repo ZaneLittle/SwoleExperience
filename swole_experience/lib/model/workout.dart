@@ -6,10 +6,8 @@ class Workout {
     required this.sets,
     required this.reps,
     this.notes,
-    this.supersetParent,
-    this.supersetChild,
-    this.altParent,
-    this.altChild,
+    this.supersetParentId,
+    this.altParentId,
   });
 
   final String id;
@@ -18,10 +16,8 @@ class Workout {
   final int sets;
   final int reps;
   final String? notes;
-  final Workout? supersetParent;
-  final Workout? supersetChild;
-  final Workout? altParent;
-  final Workout? altChild;
+  final String? supersetParentId;
+  final String? altParentId;
 
 
   Workout.fromMap(Map<String, dynamic> map)
@@ -31,10 +27,8 @@ class Workout {
         sets = map['sets'] as int,
         reps = map['reps'] as int,
         notes = map['notes'] as String?,
-        supersetParent = map['supersetParent'] as Workout?,
-        supersetChild = map['supersetChild'] as Workout?,
-        altParent = map['altChild'] as Workout?,
-        altChild = map['altParent'] as Workout?;
+        supersetParentId = map['supersetParentId'] as String?, // TODO: how do?
+        altParentId = map['altChildId'] as String?; // TODO: how do?
 
   Map<String, dynamic> toMap() {
     return {
@@ -44,10 +38,8 @@ class Workout {
       'sets': sets,
       'reps': reps,
       'notes': notes,
-      'supersetParent': supersetParent,
-      'supersetChild': supersetChild,
-      'altParent': altParent,
-      'altChild': altChild,
+      'supersetParentId': supersetParentId,
+      'altParentId': altParentId,
     };
   }
 
@@ -60,10 +52,8 @@ class Workout {
         '\n\tSets:$sets'
         '\n\tReps:$reps'
         '\n\tNotes:$notes'
-        '\n\tSuperset (Parent):${supersetParent.toString()}'
-        '\n\tSuperset (Child):${supersetChild.toString()}'
-        '\n\tAlternative (Parent):${altParent.toString()}'
-        '\n\tAlternative (Child):${altChild.toString()}';
+        '\n\tSuperset ID (Parent):${supersetParentId.toString()}'
+        '\n\tAlternative ID (Parent):${altParentId.toString()}';
   }
 
   Workout copy({
@@ -73,10 +63,8 @@ class Workout {
     int? sets,
     int? reps,
     String? notes,
-    Workout? supersetParent,
-    Workout? supersetChild,
-    Workout? altParent,
-    Workout? altChild,
+    String? supersetParentId,
+    String? altParentId,
   }) {
     return Workout(
       id: id ?? this.id,
@@ -85,10 +73,8 @@ class Workout {
       sets: sets ?? this.sets,
       reps: reps ?? this.reps,
       notes: notes ?? this.notes,
-      supersetParent: supersetParent ?? this.supersetParent,
-      supersetChild: supersetChild ?? this.supersetChild,
-      altParent: altParent ?? this.altParent,
-      altChild: altChild ?? this.altChild,
+      supersetParentId: supersetParentId ?? this.supersetParentId,
+      altParentId: altParentId ?? this.altParentId,
     );
   }
 }

@@ -2,7 +2,7 @@
 class Toggles {
   static const macros = false;
 
-  static const alternativeWorkouts = true;
+  static const alternativeWorkouts = false;
 
   static const supersets = false;
 }

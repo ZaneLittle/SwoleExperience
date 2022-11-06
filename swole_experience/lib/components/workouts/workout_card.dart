@@ -15,12 +15,14 @@ class WorkoutCard extends StatefulWidget {
     this.allowDelete = false,
     required this.workout,
     required this.rebuildCallback,
+    this.workoutsInDay
   }) : super(key: key);
 
   final bool allowDelete;
   final BuildContext? context;
   final Workout workout;
   final Function rebuildCallback;
+  final List<WorkoutDay>? workoutsInDay;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -62,11 +64,13 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     rebuildCallback: (
                         {WorkoutDay? workout, bool delete = false, bool update = false}) {
                       widget.rebuildCallback(workout: workout, delete: delete, update: update);
-                    }));
+                    },
+                    workoutsInDay: widget.workoutsInDay,
+                ));
           });
     } else {
       widget.rebuildCallback(workout: w);
-      //TODO: Mark as done
+      //TODO: Mark as done?
     }
   }
 

@@ -12,8 +12,7 @@ import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
-  const WorkoutsConfigure(
-      {Key? key, this.context, this.freshBuild = false})
+  const WorkoutsConfigure({Key? key, this.context, this.freshBuild = false})
       : super(key: key);
 
   final BuildContext? context;
@@ -57,7 +56,8 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     }
   }
 
-  void rebuild({WorkoutDay? workout, bool delete = false, bool update = false}) {
+  void rebuild(
+      {WorkoutDay? workout, bool delete = false, bool update = false}) {
     setState(() {
       if (workout != null && (delete || update)) {
         workoutMap[workout.day]?.removeAt(workout.dayOrder);
@@ -80,15 +80,17 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     });
   }
 
-  void addExercise(int day, int defaultOrder) {
+  void addExercise(int day, int defaultOrder, List<WorkoutDay> workouts) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext ctx) {
           return SizedBox(
               child: WorkoutCreateUpdateForm(
-                  day: day,
-                  defaultOrder: defaultOrder,
-                  rebuildCallback: rebuild));
+            day: day,
+            defaultOrder: defaultOrder,
+            rebuildCallback: rebuild,
+            workoutsInDay: workouts,
+          ));
         });
   }
 
@@ -180,12 +182,13 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             )));
   }
 
-  Widget buildAddExercise(int day, int defaultOrder) {
+  Widget buildAddExercise(
+      int day, int defaultOrder, List<WorkoutDay> workouts) {
     // TODO: Add another option to pick from existing workouts
     return TextButton(
         key: Key('addButton$day'),
         onPressed: () {
-          addExercise(day, defaultOrder);
+          addExercise(day, defaultOrder, workouts);
         },
         child: Padding(
             padding: const EdgeInsets.all(8),
@@ -207,15 +210,16 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   Widget buildDay(List<WorkoutDay> workouts, int day) {
     // Cast is necessary, otherwise it auto assigns List<Widget> to
     // List<WorkoutCard> and falls over when adding the button
-    List<Widget> workoutList = workouts
-        .map((w) => WorkoutCard(
-              key: Key("_workoutCard${w.id}_${Random().nextInt(9999).toString()}"),
-              allowDelete: true,
-              workout: w,
-              rebuildCallback: rebuild,
-            ) as Widget)
-        .toList();
-    workoutList.add(buildAddExercise(day, workouts.length));
+    List<Widget> workoutList = workouts.map((w) {
+      return WorkoutCard(
+        key: Key("_workoutCard${w.id}_${Random().nextInt(9999).toString()}"),
+        allowDelete: true,
+        workout: w,
+        rebuildCallback: rebuild,
+        workoutsInDay: workouts,
+      ) as Widget;
+    }).toList();
+    workoutList.add(buildAddExercise(day, workouts.length, workouts));
     return ExpansionTile(
         title: Text('Day ' + day.toString()),
         initiallyExpanded: true,
