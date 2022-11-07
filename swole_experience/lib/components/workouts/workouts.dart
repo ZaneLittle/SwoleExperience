@@ -92,14 +92,14 @@ class _WorkoutsState extends State<Workouts> {
     });
   }
 
-  void saveWorkout() {
+  void saveWorkouts() {
     WorkoutService.svc.getWorkouts(day: day).then((List<WorkoutDay> workouts) {
       if (workouts.isEmpty) {
         logger.e("FATAL: unable to find workout to save, aborting.");
       } else {
-        WorkoutDay w = workouts.first;
-
-        WorkoutHistoryService.svc.createWorkoutHistory(w.toWorkoutHistory());
+        for (WorkoutDay w in workouts) {
+          WorkoutHistoryService.svc.createWorkoutHistory(w.toWorkoutHistory());
+        }
       }
     });
   }
@@ -192,7 +192,7 @@ class _WorkoutsState extends State<Workouts> {
       return ElevatedButton(
           onPressed: () =>
               WorkoutService.svc.getUniqueDays().then((daysLength) {
-                saveWorkout();
+                saveWorkouts();
                 shiftDay(daysLength);
                 setDayPreference();
                 setState(() {});

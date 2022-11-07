@@ -78,6 +78,20 @@ class WorkoutService {
     await db.execute('ALTER TABLE $_dbName ADD altParentId TEXT;');
   }
 
+  Future<void> _handleError(
+      DatabaseException e, int retries, Database db, WorkoutDay workout) async {
+    logger.e('Error inserting $workout. Error: $e');
+    if (e.toString().contains('no column named supersetParentId') && retries > 0) {
+      logger.i('Attempting to add supersetParentId field and retrying');
+      return await _addSupersetField(db);
+    } else if (e.toString().contains('no column named altParentId') && retries > 0) {
+      logger.i('Attempting to add supersetParentId field and retrying');
+      return await _addAltField(db);
+    } else {
+      throw e;
+    }
+  }
+
   /// Queries workouts, if given a day, it will only return the workouts for that day
   Future<List<WorkoutDay>> getWorkouts({int? day}) async {
     Database db = await svc.db;
@@ -108,24 +122,13 @@ class WorkoutService {
     return days.length;
   }
 
-  // TODO: Add this upgrade logic to WorkoutHistoryService
   Future<int> createWorkout(WorkoutDay workout, {int retries = 2}) async {
     Database db = await svc.db;
     try {
       return await db.insert(_dbName, workout.toMap());
     } on DatabaseException catch (e, _) {
-      logger.e('Error inserting $workout. Error: $e');
-      if (e.toString().contains('supersetParentId') && retries > 0) {
-        logger.i('Attempting to add supersetParentId field and retrying');
-        return await _addSupersetField(db)
-            .then((_) => createWorkout(workout, retries: retries - 1));
-      } else if (e.toString().contains('altParentId') && retries > 0) {
-        logger.i('Attempting to add supersetParentId field and retrying');
-        return await _addSupersetField(db)
-            .then((_) => createWorkout(workout, retries: retries - 1));
-      } else {
-        rethrow;
-      }
+      return _handleError(e, retries, db, workout)
+          .then((_) => createWorkout(workout, retries: retries - 1));
     }
   }
 
@@ -134,9 +137,14 @@ class WorkoutService {
     return await db.delete(_dbName, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateWorkout(WorkoutDay workout) async {
+  Future<int> updateWorkout(WorkoutDay workout, {int retries = 2}) async {
     Database db = await svc.db;
-    return await db.update(_dbName, workout.toMap(),
-        where: 'id = ?', whereArgs: [workout.id]);
+    try {
+      return await db.update(_dbName, workout.toMap(),
+          where: 'id = ?', whereArgs: [workout.id]);
+    } on DatabaseException catch (e, _) {
+      return _handleError(e, retries, db, workout)
+          .then((_) => updateWorkout(workout, retries: retries - 1));
+    }
   }
 }

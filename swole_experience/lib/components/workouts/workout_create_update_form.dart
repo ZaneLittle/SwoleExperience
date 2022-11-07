@@ -124,7 +124,40 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     widget.workout != null ? updateWorkout() : createWorkout();
   }
 
+  bool altExists() =>
+      widget.workoutsInDay
+          ?.where((w) => w.id == widget.workout?.altParentId)
+          .isNotEmpty ??
+      false;
+
   ///                               ELEMENTS                                 ///
+
+  List<Widget> getOtherAlternatives() {
+    List<Widget> otherAlternatives = [];
+    if (widget.workout != null && widget.workoutsInDay != null) {
+      otherAlternatives = widget.workoutsInDay!
+          .where((w) => w.altParentId == widget.workout?.id)
+          .map((w) => Text(w.name))
+          .toList();
+    }
+
+    return otherAlternatives;
+  }
+
+  List<DropdownMenuItem<String>> getPossibleAlternatives() {
+    List<DropdownMenuItem<String>> dropdownList = [
+      const DropdownMenuItem(
+          value: '',
+          child: Text('Alternative For', style: TextStyle(color: Colors.grey)))
+    ];
+    dropdownList.addAll(widget.workoutsInDay!
+        .where((w) =>
+            widget.workout == null ||
+            (w.id != widget.workout?.id && w.altParentId != widget.workout?.id))
+        .map((workout) =>
+            DropdownMenuItem(child: Text(workout.name), value: workout.id)));
+    return dropdownList;
+  }
 
   Widget buildNameField() {
     if (_nameController.value.text.isEmpty) {
@@ -211,54 +244,53 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         ));
   }
 
-  Widget buildAltDropdown() {
+  Widget buildAlternatives() {
     if (widget.workoutsInDay != null && widget.workoutsInDay!.isNotEmpty) {
-      if (widget.workout?.altParentId != null && _alternativeId == null) {
+      if (widget.workout?.altParentId != null &&
+          _alternativeId == null &&
+          altExists()) {
         _alternativeId = widget.workout?.altParentId;
       }
 
-      List<DropdownMenuItem<String>> dropdownList = [
-        const DropdownMenuItem(
-            value: '',
-            child:
-                Text('Alternative For', style: TextStyle(color: Colors.grey)))
-      ];
-      dropdownList.addAll(widget.workoutsInDay!
-          .where((w) => w.id != widget.workout?.id)
-          .map((workout) =>
-              DropdownMenuItem(child: Text(workout.name), value: workout.id)));
+      List<DropdownMenuItem<String>> possibleAlternatives =
+          getPossibleAlternatives();
+      List<Widget> otherAlternatives = getOtherAlternatives();
 
-      List<Widget> otherAlternatives = [const Text('TODO')];
-
-      return Expanded(
-          key: _altDropdownKey,
-          child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 12, bottom: 18, left: 32, right: 32),
-              child: Column(children: [
-                DropdownButton(
-                    value: _alternativeId,
-                    hint: const Text('Alternative For'),
-                    isExpanded: true,
-                    items: dropdownList,
-                    onChanged: (value) => setState(() {
-                          _alternativeId = value as String;
-                        })),
-                otherAlternatives.isNotEmpty
-                    ? ExpansionTile(
-                        title: const Text('Other Alternatives',
-                            style: TextStyle(fontSize: 14, color: Colors.grey)),
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * .25,
-                            child: ListView(
-                                controller: _altScrollController,
-                                children: otherAlternatives),
+      return (possibleAlternatives.length > 1 || otherAlternatives.isNotEmpty)
+          ? Expanded(
+              key: _altDropdownKey,
+              child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 12, bottom: 18, left: 32, right: 32),
+                  child: Column(children: [
+                    possibleAlternatives.length > 1
+                        ? DropdownButton(
+                            value: _alternativeId,
+                            hint: const Text('Alternative For'),
+                            isExpanded: true,
+                            items: possibleAlternatives,
+                            onChanged: (value) => setState(() {
+                                  _alternativeId = value as String;
+                                }))
+                        : Container(),
+                    otherAlternatives.isNotEmpty
+                        ? ExpansionTile(
+                            title: const Text('Alternatives',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey)),
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .25,
+                                child: ListView(
+                                    controller: _altScrollController,
+                                    children: otherAlternatives),
+                              )
+                            ],
                           )
-                        ],
-                      )
-                    : Container(),
-              ])));
+                        : Container(),
+                  ])))
+          : Container();
     }
     return Container();
   }
@@ -310,7 +342,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
             ),
             Row(
               children: [
-                Toggles.alternativeWorkouts ? buildAltDropdown() : Container(),
+                Toggles.alternativeWorkouts ? buildAlternatives() : Container(),
               ],
             ),
             buildNotesField(),

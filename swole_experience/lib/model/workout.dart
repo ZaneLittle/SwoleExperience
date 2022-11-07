@@ -27,8 +27,8 @@ class Workout {
         sets = map['sets'] as int,
         reps = map['reps'] as int,
         notes = map['notes'] as String?,
-        supersetParentId = map['supersetParentId'] as String?, // TODO: how do?
-        altParentId = map['altChildId'] as String?; // TODO: how do?
+        supersetParentId = map['supersetParentId'] as String?,
+        altParentId = map['altParentId'] as String?;
 
   Map<String, dynamic> toMap() {
     return {

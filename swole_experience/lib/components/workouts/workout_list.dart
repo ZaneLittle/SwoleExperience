@@ -123,25 +123,29 @@ class _WorkoutListState extends State<WorkoutList> {
       return ListView(
         controller: _scrollController,
         children: widget.dataSnapshot.requireData
-          .map((data) {
-            List<Widget> cards = [];
-            if (data.isNotEmpty) {
-              if (data.first is WorkoutHistory) {
-                cards = [buildHistoryHeader()];
-              } else if (data.first is WorkoutDay) {
-                cards.addAll(data.map((w) {
-                  return WorkoutCard(
-                    workout: w,
-                    rebuildCallback: rebuild,
-                    workoutsInDay: data as List<WorkoutDay>,
-                  );
-                }));
+            .map((data) {
+              List<Widget> cards = [];
+              List<WorkoutDay> workoutsInDay = [];
+              if (data.isNotEmpty) {
+                if (data.first is WorkoutHistory) {
+                  cards = [buildHistoryHeader()];
+                } else if (data.first is WorkoutDay) {
+                  workoutsInDay = data as List<WorkoutDay>;
+                }
+                if (data.first is WorkoutDay || data.first is WorkoutHistory) {
+                  cards.addAll(data.map((w) {
+                    return WorkoutCard(
+                      workout: w,
+                      rebuildCallback: rebuild,
+                      workoutsInDay: workoutsInDay,
+                    );
+                  }));
+                }
               }
-            }
-            return cards;
-          })
-          .expand((e) => e)
-          .toList(),
+              return cards;
+            })
+            .expand((e) => e)
+            .toList(),
       );
     }
   }

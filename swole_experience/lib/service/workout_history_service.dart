@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +23,8 @@ import 'package:swole_experience/model/workout_history.dart';
 /// https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md
 class WorkoutHistoryService {
   static const String _dbName = 'workouthistory';
+
+  static final Logger logger = Logger();
 
   WorkoutHistoryService._privateConstructor();
 
@@ -59,6 +62,28 @@ class WorkoutHistoryService {
     ''');
   }
 
+  Future<void> _addSupersetField(Database db) async {
+    await db.execute('ALTER TABLE $_dbName ADD supersetParentId TEXT;');
+  }
+
+  Future<void> _addAltField(Database db) async {
+    await db.execute('ALTER TABLE $_dbName ADD altParentId TEXT;');
+  }
+
+  Future<void> _handleError(
+      DatabaseException e, int retries, Database db, WorkoutHistory workout) async {
+    logger.e('Error inserting $workout. Error: $e');
+    if (e.toString().contains('no column named supersetParentId') && retries > 0) {
+      logger.i('Attempting to add supersetParentId field and retrying');
+      return await _addSupersetField(db);
+    } else if (e.toString().contains('no column named altParentId') && retries > 0) {
+      logger.i('Attempting to add supersetParentId field and retrying');
+      return await _addAltField(db);
+    } else {
+      throw e;
+    }
+  }
+
   /// Queries workout history
   /// If given a date, it will only return the workout(s) for that date
   Future<List<WorkoutHistory>> getWorkoutHistory({String? date}) async {
@@ -80,19 +105,24 @@ class WorkoutHistoryService {
         : [];
   }
 
-  Future<int> createWorkoutHistory(WorkoutHistory workout) async {
+  Future<int> createWorkoutHistory(WorkoutHistory workout, {int retries = 2}) async {
     Database db = await svc.db;
-    return await db.insert(_dbName, workout.toMap());
+    try {
+      return await db.insert(_dbName, workout.toMap());
+    } on DatabaseException catch (e, _) {
+      return _handleError(e, retries, db, workout)
+          .then((_) => createWorkoutHistory(workout, retries: retries - 1));
+    }
   }
 
-  Future<int> removeWorkoutHistory(String id) async {
+  Future<int> updateWorkoutHistory(WorkoutHistory workout, {int retries = 2}) async {
     Database db = await svc.db;
-    return await db.delete(_dbName, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<int> updateWorkoutHistory(WorkoutHistory workout) async {
-    Database db = await svc.db;
-    return await db.update(_dbName, workout.toMap(),
-        where: 'id = ?', whereArgs: [workout.id]);
+    try {
+      return await db.update(_dbName, workout.toMap(),
+          where: 'id = ?', whereArgs: [workout.id]);
+    } on DatabaseException catch (e, _) {
+      return _handleError(e, retries, db, workout)
+          .then((_) => updateWorkoutHistory(workout, retries: retries - 1));
+    }
   }
 }
