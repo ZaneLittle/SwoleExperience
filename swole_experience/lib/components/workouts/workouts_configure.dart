@@ -214,6 +214,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       return WorkoutCard(
         key: Key("_workoutCard${w.id}_${Random().nextInt(9999).toString()}"),
         allowDelete: true,
+        allowUpdate: true,
         workout: w,
         rebuildCallback: rebuild,
         workoutsInDay: workouts,

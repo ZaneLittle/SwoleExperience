@@ -92,4 +92,6 @@ class WorkoutDay extends Workout {
       altParentId: altParentId,
     );
   }
+
+  bool isAlternative(List<Workout> workouts) => workouts.where((w) => w.id == altParentId).isNotEmpty;
 }

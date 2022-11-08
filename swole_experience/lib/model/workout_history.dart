@@ -88,4 +88,6 @@ class WorkoutHistory extends Workout {
       altParentId: altParentId,
     );
   }
+
+  bool isAlternative(List<WorkoutHistory> workouts) => workouts.where((w) => w.workoutId == altParentId).isNotEmpty;
 }

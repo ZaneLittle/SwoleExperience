@@ -46,6 +46,15 @@ class _WorkoutListState extends State<WorkoutList> {
       widget.dataSnapshot.data!.isEmpty ||
       widget.dataSnapshot.data![0].isEmpty;
 
+  List<Workout> getAlternatives(Workout workout, List<Workout> workoutList) {
+    String id = workout is WorkoutHistory ? workout.workoutId : workout.id;
+    List<Workout> alternatives = workoutList.where((w) => w.altParentId == id).toList();
+    for (Workout w in alternatives) {
+      alternatives.addAll(getAlternatives(w, workoutList));
+    }
+    return alternatives;
+  }
+
   ///                             Widgets                                    ///
   Widget buildHistoryHeader() {
     return const Padding(
@@ -133,11 +142,14 @@ class _WorkoutListState extends State<WorkoutList> {
                   workoutsInDay = data as List<WorkoutDay>;
                 }
                 if (data.first is WorkoutDay || data.first is WorkoutHistory) {
-                  cards.addAll(data.map((w) {
+                  cards.addAll(data.where((w) => !w.isAlternative(data)).map((w) {
                     return WorkoutCard(
                       workout: w,
+                      allowDelete: false,
+                      allowUpdate: false,
                       rebuildCallback: rebuild,
                       workoutsInDay: workoutsInDay,
+                      alternatives: getAlternatives(w, data as List<Workout>)
                     );
                   }));
                 }

@@ -19,9 +19,8 @@ class Workout {
   final String? supersetParentId;
   final String? altParentId;
 
-
   Workout.fromMap(Map<String, dynamic> map)
-      : id =  map['id'] as String,
+      : id = map['id'] as String,
         name = map['name'] as String,
         weight = map['weight'] as double,
         sets = map['sets'] as int,
@@ -76,5 +75,9 @@ class Workout {
       supersetParentId: supersetParentId ?? this.supersetParentId,
       altParentId: altParentId ?? this.altParentId,
     );
+  }
+
+  bool hasNote() {
+    return notes != null && notes != '';
   }
 }
