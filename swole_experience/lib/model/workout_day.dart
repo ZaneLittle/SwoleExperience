@@ -93,5 +93,15 @@ class WorkoutDay extends Workout {
     );
   }
 
-  bool isAlternative(List<Workout> workouts) => workouts.where((w) => w.id == altParentId).isNotEmpty;
+  bool altExists(List<Workout> workouts) =>
+      workouts.where((w) => w.id == altParentId).isNotEmpty;
+
+  bool supersetExists(List<Workout> workouts) =>
+      workouts.where((w) => w.id == supersetParentId).isNotEmpty;
+
+  bool isAlternative(List<Workout> workouts) =>
+      workouts.where((w) => w.id == altParentId).isNotEmpty;
+
+  bool isSuperset(List<Workout> workouts) =>
+      workouts.where((w) => w.supersetParentId == id).isNotEmpty;
 }

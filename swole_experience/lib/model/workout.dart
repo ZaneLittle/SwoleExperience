@@ -1,3 +1,5 @@
+import 'package:swole_experience/model/workout_history.dart';
+
 class Workout {
   Workout({
     required this.id,
@@ -79,5 +81,23 @@ class Workout {
 
   bool hasNote() {
     return notes != null && notes != '';
+  }
+
+  /// Returns a subset of @param workoutList that are alternatives for `this`
+  List<Workout> getAlternatives(List<Workout> workoutList) {
+    String id =
+        this is WorkoutHistory ? (this as WorkoutHistory).workoutId : this.id;
+    List<Workout> alternatives =
+        workoutList.where((w) => w.altParentId == id).toList();
+    return alternatives;
+  }
+
+  /// Returns a subset of @param workoutList that are supersets of `this`
+  List<Workout> getSupersets(List<Workout> workoutList) {
+    String id =
+        this is WorkoutHistory ? (this as WorkoutHistory).workoutId : this.id;
+    List<Workout> supersets =
+        workoutList.where((w) => w.supersetParentId == id).toList();
+    return supersets;
   }
 }

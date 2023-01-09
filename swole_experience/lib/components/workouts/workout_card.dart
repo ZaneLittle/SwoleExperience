@@ -17,7 +17,8 @@ class WorkoutCard extends StatefulWidget {
       required this.workout,
       required this.rebuildCallback,
       this.workoutsInDay,
-      this.alternatives})
+      this.alternatives,
+      this.supersets})
       : super(key: key);
 
   final bool allowDelete;
@@ -27,6 +28,7 @@ class WorkoutCard extends StatefulWidget {
   final Function rebuildCallback;
   final List<WorkoutDay>? workoutsInDay;
   final List<Workout>? alternatives;
+  final List<Workout>? supersets;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -40,15 +42,61 @@ class _WorkoutCardState extends State<WorkoutCard> {
   final ScrollController _horizontalScrollController = ScrollController();
 
   double getHeight() {
-    List<Workout> workouts = [widget.workout];
-    workouts.addAll(widget.alternatives ?? []);
-    bool hasNote = workouts.where((w) => w.hasNote()).isNotEmpty;
-    return hasNote ? getNoteHeight(widget.workout.notes!) + 80 : 80;
+    double baseHeight = 96;
+    double maxNoteHeight = getMaxNoteHeight();
+    double supersetHeight = getSupersetHeight();
+
+    return baseHeight + maxNoteHeight + supersetHeight;
+  }
+
+  double getSupersetHeight() {
+    if (widget.supersets == null) {
+      return 0;
+    }
+
+    return widget.supersets!.length * 62;
+  }
+
+  double getMaxNoteHeight() {
+    double maxNoteHeight = 0;
+
+    List<String> notes = [];
+    String? mainNote = getMainNote();
+    if (mainNote != null) {
+      notes.add(mainNote);
+    }
+    notes.addAll(
+        widget.alternatives?.where((w) => w.hasNote()).map((w) => w.notes!) ??
+            []);
+
+    for (String note in notes) {
+      if (note.trim().length > 60 || note.trim().contains('\n')) {
+        return 62;
+      } else if (note.trim().isNotEmpty){
+        maxNoteHeight = 38;
+      }
+    }
+    return maxNoteHeight;
   }
 
   /// Scale notes to a max of 3 lines
   double getNoteHeight(String notes) {
     return (notes.length > 60 || notes.contains('\n')) ? 62 : 38;
+  }
+
+  /// The "main note" is comprised of the primary workout's note with the notes
+  /// of the supersets appended to it
+  String? getMainNote() {
+    String? note = widget.workout.notes;
+    for (Workout superset in widget.supersets ?? []) {
+      if (note != null) {
+        // TODO: no string concat - is this the best way of doing that?
+        note += "\n${superset.notes}";
+      } else {
+        note = superset.notes;
+      }
+    }
+    return note;
   }
 
   DismissDirection getDismissDirection() {
@@ -95,7 +143,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   List<Widget> buildCardList(Workout w) {
     List<Widget> cards = [
-      buildCard(w, hasNext: widget.alternatives?.isNotEmpty ?? false)
+      buildCard(w, hasNext: widget.alternatives?.isNotEmpty ?? false, isMain: true)
     ];
     int len = widget.alternatives?.length ?? 0;
     for (int i = 0; i < len; i++) {
@@ -106,7 +154,6 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   Widget buildAltNextIndicator() {
-    // return const Card(color: CommonStyles.primaryColour, child: Text(">"));
     return const Icon(Icons.chevron_right,
         color: CommonStyles.primaryColour, size: 18);
   }
@@ -129,58 +176,91 @@ class _WorkoutCardState extends State<WorkoutCard> {
     );
   }
 
-  Widget buildCard(Workout w,
-      {bool hasPrevious = false, bool hasNext = false}) {
-    return SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Card(
-            child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          child: Column(children: [
-            Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: buildNameRow(w, hasPrevious: hasPrevious, hasNext: hasNext)),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Row(
-                children: [
-                  const Text('Weight: '),
-                  Text(w.weight.toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold))
-                ],
-              ),
-              Row(
-                children: [
-                  const Text('Sets: '),
-                  Text(w.sets.toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold))
-                ],
-              ),
-              Row(
-                children: [
-                  const Text('Reps: '),
-                  Text(w.reps.toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold))
-                ],
-              ),
-            ]),
-            w.hasNote()
-                ? Card(
-                    color: const Color(0x33ffffff),
-                    child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: getNoteHeight(widget.workout.notes!) - 7,
-                        child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: ListView(
-                                controller: _scrollController,
-                                children: [
-                                  Text(widget.workout.notes!,
-                                      style: const TextStyle(
-                                          fontStyle: FontStyle.italic))
-                                ]))))
-                : Container()
+  Widget buildNotes(Workout w, {bool isMain = false}) {
+    String? note = "";
+    if (isMain) {
+      note = getMainNote();
+    } else {
+      note = w.notes;
+    }
+
+    if (note?.isEmpty ?? true) {
+      return Container();
+    } else {
+      return Card(
+          color: const Color(0x33ffffff),
+          child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: getNoteHeight(w.notes!) - 7,
+              child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ListView(controller: _scrollController, children: [
+                    Text(w.notes!,
+                        style: const TextStyle(fontStyle: FontStyle.italic))
+                  ]))));
+    }
+  }
+
+  List<Widget> buildSupersets() {
+    if (widget.supersets?.isEmpty ?? true) {
+      return [Container()];
+    }
+
+    List<Widget> supersetWidgets = [];
+    for (Workout superset in widget.supersets!) {
+      supersetWidgets.add(buildInfoSection(superset, false, false));
+    }
+    return supersetWidgets;
+  }
+
+  Widget buildInfoSection(Workout w, bool hasPrevious, bool hasNext) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(children: [
+          Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child:
+                  buildNameRow(w, hasPrevious: hasPrevious, hasNext: hasNext)),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(
+              children: [
+                const Text('Weight: '),
+                Text(w.weight.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold))
+              ],
+            ),
+            Row(
+              children: [
+                const Text('Sets: '),
+                Text(w.sets.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold))
+              ],
+            ),
+            Row(
+              children: [
+                const Text('Reps: '),
+                Text(w.reps.toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold))
+              ],
+            ),
           ]),
-        )));
+        ]));
+  }
+
+  Widget buildCard(Workout w,
+      {bool hasPrevious = false, bool hasNext = false, bool isMain = false,}) {
+    List<Widget> cardBody = [];
+    cardBody.add(buildInfoSection(w, hasPrevious, hasNext));
+    (isMain) ? cardBody.addAll(buildSupersets()) : null;
+    cardBody.add(buildNotes(w));
+
+      return SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                child: Column(children: cardBody),
+              )));
   }
 
   Widget buildList(WorkoutDay? workout) {
@@ -226,7 +306,6 @@ class _WorkoutCardState extends State<WorkoutCard> {
               controller: _horizontalScrollController,
               scrollDirection: Axis.horizontal,
               children: buildCardList(w)),
-          // buildCard(w)
         ));
   }
 

@@ -90,4 +90,6 @@ class WorkoutHistory extends Workout {
   }
 
   bool isAlternative(List<WorkoutHistory> workouts) => workouts.where((w) => w.workoutId == altParentId).isNotEmpty;
+
+  bool isSuperset(List<WorkoutHistory> workouts) => workouts.where((w) => w.workoutId == supersetParentId).isNotEmpty;
 }
