@@ -3,8 +3,9 @@ import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_history.dart';
-
+import 'package:swole_experience/util/converter.dart';
 
 /// WeightHistoryService provides an interface to the `workouthistory` table.
 /// This table stores the workouts the user has completed
@@ -28,7 +29,8 @@ class WorkoutHistoryService {
 
   WorkoutHistoryService._privateConstructor();
 
-  static final WorkoutHistoryService svc = WorkoutHistoryService._privateConstructor();
+  static final WorkoutHistoryService svc =
+      WorkoutHistoryService._privateConstructor();
 
   static Database? _db;
 
@@ -70,13 +72,15 @@ class WorkoutHistoryService {
     await db.execute('ALTER TABLE $_dbName ADD altParentId TEXT;');
   }
 
-  Future<void> _handleError(
-      DatabaseException e, int retries, Database db, WorkoutHistory workout) async {
+  Future<void> _handleError(DatabaseException e, int retries, Database db,
+      WorkoutHistory workout) async {
     logger.e('Error inserting $workout. Error: $e');
-    if (e.toString().contains('no column named supersetParentId') && retries > 0) {
+    if (e.toString().contains('no column named supersetParentId') &&
+        retries > 0) {
       logger.i('Attempting to add supersetParentId field and retrying');
       return await _addSupersetField(db);
-    } else if (e.toString().contains('no column named altParentId') && retries > 0) {
+    } else if (e.toString().contains('no column named altParentId') &&
+        retries > 0) {
       logger.i('Attempting to add supersetParentId field and retrying');
       return await _addAltField(db);
     } else {
@@ -85,27 +89,71 @@ class WorkoutHistoryService {
   }
 
   /// Queries workout history
-  /// If given a date, it will only return the workout(s) for that date
-  Future<List<WorkoutHistory>> getWorkoutHistory({String? date}) async {
+  /// @param date - if provided, only instances for this date will be returned
+  /// @param startDate - if provided, instances will be queried @param dayLimit
+  ///   number of days from @startDate.
+  /// @param dayLimit - if provided, the query will reach back @dayLimit many days
+  ///   if not provided, the default is 90 if
+  Future<List<WorkoutHistory>> getWorkoutHistory(
+      {String? date, DateTime? startDate, int? dayLimit}) async {
     Database db = await svc.db;
 
-    var workouts = date != null
-        ? await db.query(
-            _dbName,
-            where: 'date = ?',
-            whereArgs: [date],
-          )
-        : await db.query(
-            _dbName,
-            orderBy: 'date DESC',
-          );
+    String? where;
+    List<Object?>? whereArgs;
+    if (date != null) {
+      where = '"date" = ?';
+      whereArgs = [date];
+    } else {
+      String dateBound = startDate != null
+          ? startDate.subtract(const Duration(days: 90)).toString()
+          : DateTime.now().subtract(const Duration(days: 90)).toString();
+
+      if (startDate != null) {
+        String startDateStr = Converter().roundToNextDay(startDate).toString();
+
+        where = '"date" >= ? AND "date" <= ?';
+        whereArgs = [dateBound, startDateStr];
+      } else {
+        where = '"date" >= ?';
+        whereArgs = [dateBound];
+      }
+    }
+
+    var workouts = await db.query(
+      _dbName,
+      where: where,
+      whereArgs: whereArgs,
+    );
 
     return workouts.isNotEmpty
         ? workouts.map((w) => WorkoutHistory.fromMap(w)).toList()
         : [];
   }
 
-  Future<int> createWorkoutHistory(WorkoutHistory workout, {int retries = 2}) async {
+  /// Queries workout history and returns a map of unique items
+  /// @param date - if provided, only instances for this date will be returned
+  /// @param startDate - if provided, instances will be queried @param dayLimit
+  ///   number of days from @startDate.
+  /// @param dayLimit - if provided, the query will reach back @dayLimit many days
+  ///   if not provided, the default is 90 if
+  Future<Map<String, List<WorkoutHistory>>> getWorkoutHistoryMap(
+      {String? date, DateTime? startDate, int? dayLimit}) async {
+
+    List<WorkoutHistory> workoutList = await getWorkoutHistory(
+        date: date, startDate: startDate, dayLimit: dayLimit);
+
+    Map<String, List<WorkoutHistory>> workoutMap = {};
+    for (WorkoutHistory workout in workoutList) {
+      workoutMap[workout.workoutId] == null
+          ? workoutMap[workout.workoutId] = [workout]
+          : workoutMap[workout.workoutId]!.add(workout);
+    }
+
+    return workoutMap;
+  }
+
+  Future<int> createWorkoutHistory(WorkoutHistory workout,
+      {int retries = 2}) async {
     Database db = await svc.db;
     try {
       return await db.insert(_dbName, workout.toMap());
@@ -115,7 +163,8 @@ class WorkoutHistoryService {
     }
   }
 
-  Future<int> updateWorkoutHistory(WorkoutHistory workout, {int retries = 2}) async {
+  Future<int> updateWorkoutHistory(WorkoutHistory workout,
+      {int retries = 2}) async {
     Database db = await svc.db;
     try {
       return await db.update(_dbName, workout.toMap(),

@@ -89,7 +89,15 @@ class WorkoutHistory extends Workout {
     );
   }
 
-  bool isAlternative(List<WorkoutHistory> workouts) => workouts.where((w) => w.workoutId == altParentId).isNotEmpty;
+  bool altExists(List<WorkoutHistory> workouts) =>
+      workouts.where((w) => w.workoutId == altParentId).isNotEmpty;
 
-  bool isSuperset(List<WorkoutHistory> workouts) => workouts.where((w) => w.workoutId == supersetParentId).isNotEmpty;
+  bool supersetExists(List<WorkoutHistory> workouts) =>
+      workouts.where((w) => w.workoutId == supersetParentId).isNotEmpty;
+
+  bool isAlternative(List<Workout> workouts) =>
+      workouts.where((w) => w.altParentId == workoutId).isNotEmpty;
+
+  bool isSuperset(List<Workout> workouts) =>
+      workouts.where((w) => w.supersetParentId == workoutId).isNotEmpty;
 }

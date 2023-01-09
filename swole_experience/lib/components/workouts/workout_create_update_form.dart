@@ -77,6 +77,10 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   void updateWorkout() {
+    if (_nameController.value.text.isNotEmpty && _nameController.value.text != widget.workout!.name) {
+      // TODO: alert the user to see if they want to use this as a synonym for the new entry or treat it as a new workout.
+      //  If they want to treat is as a new workout, re-generate the ID
+    }
     if (widget.workout != null) {
       WorkoutDay workout = WorkoutDay(
         day: int.tryParse(_dayController.value.text) ?? widget.day,
