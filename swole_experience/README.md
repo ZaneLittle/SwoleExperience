@@ -7,7 +7,7 @@ Resource: https://docs.flutter.dev/deployment/android
 
 #### The Quick and Dirty
 1. Bump the `version` in pubspec.yaml 
-  - The format is <Major>.<Minor>.<Patch>+<Build Number>
+  - The format is {Major}.{Minor}.{Patch}+{Build Number}
   - The build number needs to be sequentially bumped independant of the rest of the version and cannot decrease
 2. Build the app bundle with `flutter build appbundle`
 3. Go to the Google Play Developer Console: https://play.google.com/console/u/0/developers/7405004813265200858/app-list?pli=1
