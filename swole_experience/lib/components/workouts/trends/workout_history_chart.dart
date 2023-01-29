@@ -25,22 +25,21 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
   double minWeight = 0;
 
   void init() {
-    List<double> sortedWeights =
-        widget.workouts.map((workout) => workout.weight).toList();
-    sortedWeights.sort();
-    minWeight = sortedWeights.first;
-    maxWeight = sortedWeights.last;
-
     // Convert list of workouts to map = { Date: [1RM] }
     for (WorkoutHistory workout in widget.workouts) {
       double date =
-          Converter().toDayScale(DateTime.parse(workout.date), starting: 180);
+          Converter.toDayScale(DateTime.parse(workout.date), starting: 180);
       if (chartData.containsKey(date)) {
         chartData[date]?.add(Util.calculateOneRepMax(workout).toDouble());
       } else {
         chartData[date] = [Util.calculateOneRepMax(workout).toDouble()];
       }
     }
+
+    List<double> sortedWeights = chartData.values.expand((w) => w).toList();
+    sortedWeights.sort();
+    minWeight = sortedWeights.first;
+    maxWeight = sortedWeights.last;
   }
 
   ///                         Chart Elements                                 ///
@@ -128,25 +127,31 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
       );
 
   ///                        Data Builder                                    ///
-  List<LineChartBarData> buildSeries() {
-    return [
-      LineChartBarData(
-        isCurved: true,
-        colors: [CommonStyles.primaryColour],
-        barWidth: 4,
-        isStrokeCapRound: false,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: widget.workouts
-            .map<FlSpot>((workout) => FlSpot(
-                Converter()
-                    .toDayScale(DateTime.parse(workout.date), starting: 180)
-                    .truncateToDouble(),
-                Util.calculateOneRepMax(workout).toDouble()))
-            .toList(),
-      ),
-    ];
-  }
+  List<LineChartBarData> buildSeries() => [
+        LineChartBarData(
+          isCurved: true,
+          colors: [CommonStyles.primaryColour],
+          barWidth: 4,
+          isStrokeCapRound: false,
+          dotData: FlDotData(show: false),
+          belowBarData: gradient,
+          spots: widget.workouts
+              .map<FlSpot>((workout) => FlSpot(
+                  Converter.toDayScale(DateTime.parse(workout.date),
+                          starting: 180)
+                      .truncateToDouble(),
+                  Util.calculateOneRepMax(workout).toDouble()))
+              .toList(),
+        ),
+      ];
+
+  static BarAreaData get gradient => BarAreaData(
+        show: true,
+        colors: [
+          CommonStyles.primaryColour.withOpacity(0.4),
+          CommonStyles.tertiaryColour.withOpacity(0.4),
+        ],
+      );
 
   ///                           Build                                        ///
   @override
@@ -159,7 +164,7 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
                 height: MediaQuery.of(context).size.height * .45,
                 child: Padding(
                     padding: const EdgeInsets.only(
-                        left: 8, right: 14, top: 12, bottom: 12),
+                        left: 8, right: 14, top: 12, bottom: 14),
                     child: LineChart(
                       LineChartData(
                         lineTouchData: lineTouchData,

@@ -48,8 +48,8 @@ class _WeightEditFormState extends State<WeightEditForm> {
 
       WeightService.svc.updateWeight(updatedWeight).then((int r) {
         if (r != 0) {
-          DateTime truncatedDate = Converter().truncateToDay(updatedDateTime);
-          DateTime oldDate = Converter().truncateToDay(widget.weight.dateTime);
+          DateTime truncatedDate = Converter.truncateToDay(updatedDateTime);
+          DateTime oldDate = Converter.truncateToDay(widget.weight.dateTime);
           // Calculate averages for the new record, and the old if its different
           AverageService.svc.calculateAverages(truncatedDate.toString());
 

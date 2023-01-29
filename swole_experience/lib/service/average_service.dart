@@ -66,7 +66,7 @@ class AverageService {
         DateTime.now().subtract(const Duration(days: 60)).toString();
 
     String? startDateStr = startDate != null
-        ? Converter().roundToNextDay(startDate).toString()
+        ? Converter.roundToNextDay(startDate).toString()
         : null;
 
     var averages = startDate != null
@@ -100,14 +100,14 @@ class AverageService {
     if (longDate == null) {
       return 0;
     }
-    DateTime safeDate = Converter().truncateToDay(longDate);
+    DateTime safeDate = Converter.truncateToDay(longDate);
 
     // Build the map
     List<Weight> weights =
         await WeightService.svc.getWeights(startDate: safeDate);
     Map<DateTime, List<double>> weightMap = {};
     for (Weight weight in weights) {
-      DateTime currentDate = Converter().truncateToDay(weight.dateTime);
+      DateTime currentDate = Converter.truncateToDay(weight.dateTime);
       weightMap[currentDate] == null
           ? weightMap[currentDate] = [weight.weight]
           : weightMap[currentDate]!.add(weight.weight);

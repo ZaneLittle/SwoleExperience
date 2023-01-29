@@ -46,7 +46,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
       }).then((res) {
         if (res != 0) {
           AverageService.svc.calculateAverages(
-              Converter().truncateToDay(date).toString());
+              Converter.truncateToDay(date).toString());
         }
       }).then((res) {
         if (res != 0) {

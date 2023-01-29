@@ -34,7 +34,7 @@ class _WorkoutHistoryListState extends State<WorkoutHistoryList> {
   Widget buildList() {
     return ListView(
       controller: _scrollController,
-      children: widget.workouts.map((workout) {
+      children: widget.workouts.reversed.map((workout) {
         return buildRow(workout);
       }).toList(),
     );

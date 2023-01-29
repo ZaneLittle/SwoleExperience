@@ -213,7 +213,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   List<FlSpot> getAverageSeries(List<Average> averageSeries) {
     return averageSeries
         .map<FlSpot>((entry) => FlSpot(
-            Converter().toDayScale(entry.date).truncateToDouble(),
+            Converter.toDayScale(entry.date).truncateToDouble(),
             double.parse((entry.average).toStringAsFixed(2))))
         .toList();
   }
@@ -221,7 +221,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   List<FlSpot> getThreeDayAverageSeries(List<Average> averageSeries) {
     return averageSeries
         .map<FlSpot>((entry) => FlSpot(
-            Converter().toDayScale(entry.date).truncateToDouble(),
+            Converter.toDayScale(entry.date).truncateToDouble(),
             double.parse((entry.threeDayAverage).toStringAsFixed(2))))
         .toList();
   }
@@ -229,7 +229,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
   List<FlSpot> getSevenDayAverageSeries(List<Average> averageSeries) {
     return averageSeries
         .map<FlSpot>((entry) => FlSpot(
-            Converter().toDayScale(entry.date).truncateToDouble(),
+            Converter.toDayScale(entry.date).truncateToDouble(),
             double.parse((entry.sevenDayAverage).toStringAsFixed(2))))
         .toList();
   }
@@ -252,7 +252,7 @@ class _WeightTrendChartState extends State<WeightTrendChart> {
     Map<double, List<double>> data = <double, List<double>>{};
 
     for (Weight weight in weightList) {
-      double date = Converter().toDayScale(weight.dateTime);
+      double date = Converter.toDayScale(weight.dateTime);
       if (data.containsKey(date)) {
         data[date]?.add(weight.weight);
       } else {

@@ -46,7 +46,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         .then((int r) {
       if (r != 0) {
         AverageService.svc
-            .calculateAverages(Converter().truncateToDay(dateTime).toString())
+            .calculateAverages(Converter.truncateToDay(dateTime).toString())
             .then((res) {
           if (res != 0) {
             const AlertSnackBar(

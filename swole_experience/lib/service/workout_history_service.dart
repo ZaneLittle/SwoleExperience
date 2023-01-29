@@ -3,7 +3,6 @@ import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/util/converter.dart';
 
@@ -109,7 +108,7 @@ class WorkoutHistoryService {
           : DateTime.now().subtract(const Duration(days: 180)).toString();
 
       if (startDate != null) {
-        String startDateStr = Converter().roundToNextDay(startDate).toString();
+        String startDateStr = Converter.roundToNextDay(startDate).toString();
 
         where = '"date" >= ? AND "date" <= ?';
         whereArgs = [dateBound, startDateStr];

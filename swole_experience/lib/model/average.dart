@@ -21,7 +21,7 @@ class Average {
 
   Map<String, dynamic> toMap() {
     return {
-      'dateTime': Converter().truncateToDay(date).toString(),
+      'dateTime': Converter.truncateToDay(date).toString(),
       'average': average,
       'threeDayAverage': threeDayAverage,
       'sevenDayAverage': sevenDayAverage,

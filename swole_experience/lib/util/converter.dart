@@ -7,7 +7,7 @@ class Converter {
   ///
   /// @param DateTime date - the date to convert
   /// @param int starting - the number of days ago to start counting
-  double toDayScale(DateTime date, {int starting = 60}) {
+  static double toDayScale(DateTime date, {int starting = 60}) {
     DateTime now = DateTime.now();
     DateTime initDate = truncateToDay(date);
     DateTime startDate = DateTime(now.year, now.month, now.day - starting);
@@ -17,11 +17,11 @@ class Converter {
   }
 
   /// Converts a full DateTime into a DateTime represented date (i.e. precision to the day)
-  DateTime truncateToDay(DateTime dateTime) {
+  static DateTime truncateToDay(DateTime dateTime) {
     return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
-  DateTime roundToNextDay(DateTime dateTime)  {
+  static DateTime roundToNextDay(DateTime dateTime)  {
     return DateTime(dateTime.year, dateTime.month, dateTime.day + 1);
   }
 }

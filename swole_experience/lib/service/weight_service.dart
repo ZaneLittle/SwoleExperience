@@ -62,7 +62,7 @@ class WeightService {
         : DateTime.now().subtract(const Duration(days: 60)).toString();
 
     String? startDateStr = startDate != null
-        ? Converter().roundToNextDay(startDate).toString()
+        ? Converter.roundToNextDay(startDate).toString()
         : null;
 
     var weights = startDate != null

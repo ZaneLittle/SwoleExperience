@@ -82,7 +82,7 @@ class WorkoutDay extends Workout {
     return WorkoutHistory(
       id: historyId ?? Random().nextInt(9999).toString(),
       workoutId: id,
-      date: Converter().truncateToDay(dateToLog).toString(),
+      date: Converter.truncateToDay(dateToLog).toString(),
       name: name,
       weight: weight,
       sets: sets,
