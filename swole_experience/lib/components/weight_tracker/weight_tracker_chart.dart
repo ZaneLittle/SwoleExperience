@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:swole_experience/components/weight_tracker/line_options.dart';
 
+import 'package:swole_experience/components/weight_tracker/line_options.dart';
 import 'package:swole_experience/model/average.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/model/weight.dart';

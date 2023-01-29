@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/preferences/navigation_line.dart';
+import 'package:swole_experience/components/workouts/trends/trends.dart';
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/constants/weight_constant.dart';
@@ -20,7 +22,8 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final ScrollController _scrollController = ScrollController();
-  final Uri _feedbackUri = Uri.parse('https://github.com/ZaneLittle/SwoleExperience/issues/new/choose');
+  final Uri _feedbackUri = Uri.parse(
+      'https://github.com/ZaneLittle/SwoleExperience/issues/new/choose');
   String? _weightUnitValue;
 
   FutureOr rebuild(dynamic value) {
@@ -41,7 +44,8 @@ class _SettingsState extends State<Settings> {
   ///                         Sub Components                                 ///
 
   DropdownButton buildWeightUnitPreferenceSelect(List<Preference> preferences) {
-    Preference? pref = findPreference(preferences, PreferenceConstant.weightUnitKey);
+    Preference? pref =
+        findPreference(preferences, PreferenceConstant.weightUnitKey);
     _weightUnitValue = pref == null ? WeightConstant.pounds : pref.value;
 
     return DropdownButton(
@@ -87,21 +91,33 @@ class _SettingsState extends State<Settings> {
         lineText: 'Configure Workouts',
         onTap: () {
           Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WorkoutsConfigure(freshBuild: true)))
-              .then(rebuild);
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const WorkoutsConfigure(freshBuild: true))).then(rebuild);
         });
+  }
+
+  Widget buildTrendsLine() {
+    return Toggles.workoutTrends
+        ? NavigationLine(
+            navType: NavigationType.internal,
+            lineText: 'Workout Trends',
+            onTap: () {
+              Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Trends()))
+                  .then(rebuild);
+            })
+        : Container();
   }
 
   Widget buildFeedbackLine() {
     return NavigationLine(
-      navType: NavigationType.external,
-      lineText: 'Provide feedback on the app',
-      onTap: () {
-        Util.launchExternalUrl(_feedbackUri, context);
-      }
-    );
+        navType: NavigationType.external,
+        lineText: 'Provide feedback on the app',
+        onTap: () {
+          Util.launchExternalUrl(_feedbackUri, context);
+        });
   }
 
   ///                           Build                                        ///
@@ -133,10 +149,11 @@ class _SettingsState extends State<Settings> {
                       child: ListView(
                           controller: _scrollController,
                           children: <Widget>[
-                            buildWeightUnitLine(snapshot),
-                            buildWorkoutConfigureLine(),
-                            buildFeedbackLine(),
-                          ]));
+                        buildWeightUnitLine(snapshot),
+                        buildWorkoutConfigureLine(),
+                        buildTrendsLine(),
+                        buildFeedbackLine(),
+                      ]));
                 }
               })
         ]));

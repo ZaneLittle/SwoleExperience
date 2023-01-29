@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
+import 'package:swole_experience/model/workout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:swole_experience/components/AlertSnackBar.dart';
@@ -45,6 +46,12 @@ class Util {
         state: SnackBarState.failure,
       ).alert(context);
     }
+  }
+
+  /// Uses the Brzycki formula
+  static int calculateOneRepMax(Workout workout) {
+    double oneRepMax = workout.weight*(36/(37-workout.reps));
+    return oneRepMax.round().toInt();
   }
 }
 

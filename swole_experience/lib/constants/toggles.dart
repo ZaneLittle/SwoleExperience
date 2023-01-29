@@ -5,4 +5,6 @@ class Toggles {
   static const alternativeWorkouts = true;
 
   static const supersets = true;
+
+  static const workoutTrends = false;
 }

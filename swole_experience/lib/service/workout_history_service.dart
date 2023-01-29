@@ -105,8 +105,8 @@ class WorkoutHistoryService {
       whereArgs = [date];
     } else {
       String dateBound = startDate != null
-          ? startDate.subtract(const Duration(days: 90)).toString()
-          : DateTime.now().subtract(const Duration(days: 90)).toString();
+          ? startDate.subtract(const Duration(days: 180)).toString()
+          : DateTime.now().subtract(const Duration(days: 180)).toString();
 
       if (startDate != null) {
         String startDateStr = Converter().roundToNextDay(startDate).toString();
