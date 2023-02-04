@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
+import 'package:swole_experience/constants/toggles.dart';
 
 import 'package:swole_experience/model/preference.dart';
 
@@ -86,5 +87,17 @@ class PreferenceService {
       return await db.insert(_dbName, preference.toMap());
     }
     return res;
+  }
+
+  ///                  Utils for specific preferences                       ///
+
+  /// If the toggle is explicitly set, use that value, else use the toggle
+  Future<bool> isToggleEnabled(String featureName) async {
+    List<Preference> res = await getPreference(featureName);
+    if (res.isEmpty) {
+      return Toggles.toggleMap[featureName] ?? false;
+    } else {
+      return res.first.value == 'true';
+    }
   }
 }

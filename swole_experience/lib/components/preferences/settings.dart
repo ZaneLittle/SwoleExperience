@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/preferences/feature_toggles.dart';
 
 import 'package:swole_experience/components/preferences/navigation_line.dart';
 import 'package:swole_experience/components/workouts/trends/trends.dart';
@@ -68,7 +69,7 @@ class _SettingsState extends State<Settings> {
 
   ///                           Lines                                        ///
 
-  Widget buildWeightUnitLine(AsyncSnapshot<List<Preference>> snapshot) {
+  Widget buildWeightUnitLine(List<Preference> prefs) {
     return Card(
         child: SizedBox(
       height: 48,
@@ -79,7 +80,7 @@ class _SettingsState extends State<Settings> {
               padding: EdgeInsets.only(left: 12), child: Text('Weight Unit')),
           Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: buildWeightUnitPreferenceSelect(snapshot.data!)),
+              child: buildWeightUnitPreferenceSelect(prefs)),
         ],
       ),
     ));
@@ -98,8 +99,8 @@ class _SettingsState extends State<Settings> {
         });
   }
 
-  Widget buildTrendsLine() {
-    return Toggles.workoutTrends
+  Widget buildTrendsLine(bool enabled) {
+    return enabled
         ? NavigationLine(
             navType: NavigationType.internal,
             lineText: 'Workout Trends',
@@ -117,6 +118,18 @@ class _SettingsState extends State<Settings> {
         lineText: 'Provide feedback on the app',
         onTap: () {
           Util.launchExternalUrl(_feedbackUri, context);
+        });
+  }
+
+  Widget buildTogglesLine() {
+    return NavigationLine(
+        navType: NavigationType.internal,
+        lineText: 'Turn features on or off',
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FeatureToggles())).then(rebuild);
         });
   }
 
@@ -138,20 +151,24 @@ class _SettingsState extends State<Settings> {
         ),
         body: Column(children: <Widget>[
           FutureBuilder(
-              future: PreferenceService.svc.getAllPreferences(),
+              future: Future.wait([
+                PreferenceService.svc.getAllPreferences(),
+                PreferenceService.svc.isToggleEnabled(Toggles.workoutTrendsKey),
+            ]),
               builder: (BuildContext context,
-                  AsyncSnapshot<List<Preference>> snapshot) {
+                  AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting ||
-                    snapshot.data == null) {
+                    snapshot.data == null || snapshot.data?.first == null) {
                   return const Center(child: Text('Loading...'));
                 } else {
                   return Expanded(
                       child: ListView(
                           controller: _scrollController,
                           children: <Widget>[
-                        buildWeightUnitLine(snapshot),
+                        buildWeightUnitLine(snapshot.requireData[0] as List<Preference>),
                         buildWorkoutConfigureLine(),
-                        buildTrendsLine(),
+                        buildTrendsLine(snapshot.requireData[1]),
+                        buildTogglesLine(),
                         buildFeedbackLine(),
                       ]));
                 }

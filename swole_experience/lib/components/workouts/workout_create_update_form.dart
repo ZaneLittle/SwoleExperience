@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
+import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/model/workout_day.dart';
@@ -77,7 +78,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   }
 
   void updateWorkout() {
-    if (_nameController.value.text.isNotEmpty && _nameController.value.text != widget.workout!.name) {
+    if (_nameController.value.text.isNotEmpty &&
+        _nameController.value.text != widget.workout!.name) {
       // TODO: alert the user to see if they want to use this as a synonym for the new entry or treat it as a new workout.
       //  If they want to treat is as a new workout, re-generate the ID
     }
@@ -145,7 +147,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     bool isSuperset = w.supersetExists(widget.workoutsInDay!);
     bool isAlt = w.altExists(widget.workoutsInDay!);
 
-    return isWorkoutToUpdate && !isSuperset && !isAlt && getOtherAlternatives().isEmpty && getOtherSupersets().isEmpty;
+    return isWorkoutToUpdate &&
+        !isSuperset &&
+        !isAlt &&
+        getOtherAlternatives().isEmpty &&
+        getOtherSupersets().isEmpty;
   }
 
   ///                               ELEMENTS                                 ///
@@ -168,13 +174,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
           value: '',
           child: Text('Alternative For', style: TextStyle(color: Colors.grey)))
     ];
-    dropdownList.addAll(widget.workoutsInDay!
-        .where((w) {
-          bool valid = isValidSupersetOrAlt(w);
-          return valid;
-    })
-        .map((workout) =>
-            DropdownMenuItem(child: Text(workout.name), value: workout.id)));
+    dropdownList.addAll(widget.workoutsInDay!.where((w) {
+      bool valid = isValidSupersetOrAlt(w);
+      return valid;
+    }).map((workout) =>
+        DropdownMenuItem(child: Text(workout.name), value: workout.id)));
     return dropdownList;
   }
 
@@ -290,7 +294,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         ));
   }
 
-  Widget buildAlternatives() {
+  Widget buildAlternatives(bool isSupersetsEnabled) {
     if (widget.workoutsInDay != null && widget.workoutsInDay!.isNotEmpty) {
       bool alternativeExists = altExists();
       if (widget.workout?.altParentId != null &&
@@ -307,8 +311,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
           ? Expanded(
               key: _altDropdownKey,
               child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 12, bottom: 18, left: 32, right: 12),
+                  padding: EdgeInsets.only(
+                      top: 12,
+                      bottom: 18,
+                      left: 32,
+                      right: isSupersetsEnabled ? 12 : 32),
                   child: Column(children: [
                     possibleAlternatives.length > 1
                         ? DropdownButton(
@@ -342,8 +349,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     return Container();
   }
 
-  // TODO: Why is this throwing a duplicate global key when opening the dropdown?
-  Widget buildSupersets() {
+  Widget buildSupersets(bool isAltsEnabled) {
     if (widget.workoutsInDay != null && widget.workoutsInDay!.isNotEmpty) {
       if (widget.workout?.supersetParentId != null &&
           _supersetId == null &&
@@ -358,8 +364,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
           ? Expanded(
               key: _supersetDropdownKey,
               child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 12, bottom: 18, left: 12, right: 32),
+                  padding: EdgeInsets.only(
+                      top: 12,
+                      bottom: 18,
+                      left: isAltsEnabled ? 12 : 32,
+                      right: 32),
                   child: Column(children: [
                     possibleSupersets.length > 1
                         ? DropdownButton(
@@ -421,33 +430,52 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-        key: _formKey,
-        child: ListView(
-          controller: _scrollController,
-          children: <Widget>[
-            Row(
-              children: [
-                buildNameField(),
-              ],
-            ),
-            Row(
-              children: [
-                buildWeightField(),
-                buildSetsField(),
-                buildRepsField(),
-              ],
-            ),
-            Row(
-              children: [
-                Toggles.alternativeWorkouts ? buildAlternatives() : Container(),
-                Toggles.supersets ? buildSupersets() : Container(),
-              ],
-            ),
-            buildNotesField(),
-            buildConfirmCancel(),
-            SizedBox(height: MediaQuery.of(context).size.height * .34)
-          ],
-        ));
+    return FutureBuilder(
+        future: Future.wait([
+          PreferenceService.svc.isToggleEnabled(Toggles.alternativeWorkoutsKey),
+          PreferenceService.svc.isToggleEnabled(Toggles.supersetsKey)
+        ]),
+        builder: (BuildContext context, AsyncSnapshot<List<bool>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.data == null ||
+              snapshot.data?.first == null) {
+            return const Center(child: Text('Loading...'));
+          } else {
+            bool isAlternativesEnabled = snapshot.requireData[0];
+            bool isSupersetsEnabled = snapshot.requireData[1];
+            return Form(
+                key: _formKey,
+                child: ListView(
+                  controller: _scrollController,
+                  children: <Widget>[
+                    Row(
+                      children: [
+                        buildNameField(),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        buildWeightField(),
+                        buildSetsField(),
+                        buildRepsField(),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        isAlternativesEnabled
+                            ? buildAlternatives(isSupersetsEnabled)
+                            : Container(),
+                        isSupersetsEnabled
+                            ? buildSupersets(isAlternativesEnabled)
+                            : Container(),
+                      ],
+                    ),
+                    buildNotesField(),
+                    buildConfirmCancel(),
+                    SizedBox(height: MediaQuery.of(context).size.height * .34)
+                  ],
+                ));
+          }
+        });
   }
 }

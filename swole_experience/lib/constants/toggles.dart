@@ -1,10 +1,21 @@
-// TODO: Convert to props file that's different for debug vs prod builds
 class Toggles {
-  static const macros = false;
+  static const bool macros = false;
+  static const String macrosKey = 'macros';
 
-  static const alternativeWorkouts = true;
+  static const bool alternativeWorkouts = true;
+  static const String alternativeWorkoutsKey = 'alternativeWorkouts';
 
-  static const supersets = true;
+  static const bool supersets = true;
+  static const String supersetsKey = 'supersets';
 
-  static const workoutTrends = false;
+  static const bool workoutTrends = false;
+  static const String workoutTrendsKey = 'workoutTrends';
+
+
+  static Map<String, bool> toggleMap = {
+    macrosKey: Toggles.macros,
+    alternativeWorkoutsKey: Toggles.alternativeWorkouts,
+    supersetsKey: Toggles.supersets,
+    workoutTrendsKey: Toggles.workoutTrends,
+  };
 }
