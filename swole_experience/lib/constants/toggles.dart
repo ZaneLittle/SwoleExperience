@@ -13,7 +13,7 @@ class Toggles {
 
 
   static Map<String, bool> toggleMap = {
-    macrosKey: Toggles.macros,
+    // macrosKey: Toggles.macros,
     alternativeWorkoutsKey: Toggles.alternativeWorkouts,
     supersetsKey: Toggles.supersets,
     workoutTrendsKey: Toggles.workoutTrends,
