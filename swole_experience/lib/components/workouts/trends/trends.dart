@@ -8,6 +8,7 @@ import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/service/favourite_workout_service.dart';
 
 import 'package:swole_experience/service/workout_history_service.dart';
+import 'package:swole_experience/util/workout_history_mock.dart';
 
 class Trends extends StatefulWidget {
   const Trends({Key? key}) : super(key: key);
@@ -105,7 +106,7 @@ class _TrendsState extends State<Trends> {
                 if (initSnapshot.data?.first != null) {
                   _favourites = initSnapshot.requireData[1];
                   _workoutMap = initSnapshot.requireData[0];
-                  _selectedWorkout ??= _favourites.isNotEmpty
+                  _selectedWorkout ??= _favourites.isNotEmpty && _workoutMap.keys.contains(_favourites.first)
                       ? _favourites.first
                       : _workoutMap.keys.first;
 

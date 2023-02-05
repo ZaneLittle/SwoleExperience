@@ -157,7 +157,7 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
   @override
   Widget build(BuildContext context) {
     init();
-    return (chartData.keys.length > 2)
+    return (chartData.keys.length > 1)
         ? Column(children: <Widget>[
             SizedBox(
                 key: _workoutHistoryChartKey,
