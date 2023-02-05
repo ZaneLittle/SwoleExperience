@@ -72,7 +72,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     for (String note in notes) {
       if (note.trim().length > 60 || note.trim().contains('\n')) {
         return 62;
-      } else if (note.trim().isNotEmpty){
+      } else if (note.trim().isNotEmpty) {
         maxNoteHeight = 38;
       }
     }
@@ -111,12 +111,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
     }
   }
 
-  void onDismissed(DismissDirection direction, WorkoutDay w) {
-    if (direction == DismissDirection.startToEnd && widget.allowDelete) {
-      // TODO: do we just set to day 0 instead of deleting?
-      WorkoutService.svc.removeWorkout(widget.workout.id);
-      widget.rebuildCallback(workout: w, delete: true);
-    } else if (direction == DismissDirection.endToStart) {
+  void showUpdateModal(Workout w) {
+    if (w is WorkoutDay) {
       showModalBottomSheet(
           context: context,
           builder: (BuildContext ctx) {
@@ -135,15 +131,25 @@ class _WorkoutCardState extends State<WorkoutCard> {
               workoutsInDay: widget.workoutsInDay,
             ));
           });
+    }
+  }
+
+  void onDismissed(DismissDirection direction, WorkoutDay w) {
+    if (direction == DismissDirection.startToEnd && widget.allowDelete) {
+      // TODO: do we just set to day 0 instead of deleting?
+      WorkoutService.svc.removeWorkout(widget.workout.id);
+      widget.rebuildCallback(workout: w, delete: true);
+    } else if (direction == DismissDirection.endToStart) {
+      showUpdateModal(w);
     } else {
       widget.rebuildCallback(workout: w);
-      //TODO: Mark as done?
     }
   }
 
   List<Widget> buildCardList(Workout w) {
     List<Widget> cards = [
-      buildCard(w, hasNext: widget.alternatives?.isNotEmpty ?? false, isMain: true)
+      buildCard(w,
+          hasNext: widget.alternatives?.isNotEmpty ?? false, isMain: true)
     ];
     int len = widget.alternatives?.length ?? 0;
     for (int i = 0; i < len; i++) {
@@ -214,57 +220,62 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   Widget buildInfoSection(Workout w, bool hasPrevious, bool hasNext) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(children: [
-          Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child:
-                  buildNameRow(w, hasPrevious: hasPrevious, hasNext: hasNext)),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Row(
-              children: [
-                const Text('Weight: '),
-                Text(w.weight.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold))
-              ],
-            ),
-            Row(
-              children: [
-                const Text('Sets: '),
-                Text(w.sets.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold))
-              ],
-            ),
-            Row(
-              children: [
-                const Text('Reps: '),
-                Text(w.reps.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold))
-              ],
-            ),
-          ]),
-        ]));
+    return GestureDetector(
+        onLongPress: () => showUpdateModal(w),
+        child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(children: [
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: buildNameRow(w,
+                      hasPrevious: hasPrevious, hasNext: hasNext)),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Row(
+                  children: [
+                    const Text('Weight: '),
+                    Text(w.weight.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Sets: '),
+                    Text(w.sets.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Reps: '),
+                    Text(w.reps.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
+              ]),
+            ])));
   }
 
-  Widget buildCard(Workout w,
-      {bool hasPrevious = false, bool hasNext = false, bool isMain = false,}) {
+  Widget buildCard(
+    Workout w, {
+    bool hasPrevious = false,
+    bool hasNext = false,
+    bool isMain = false,
+  }) {
     List<Widget> cardBody = [];
     cardBody.add(buildInfoSection(w, hasPrevious, hasNext));
     (isMain) ? cardBody.addAll(buildSupersets()) : null;
     cardBody.add(buildNotes(w));
 
-      return SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Card(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                child: Column(children: cardBody),
-              )));
+    return SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Card(
+            child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          child: Column(children: cardBody),
+        )));
   }
 
-  Widget buildList(WorkoutDay? workout) {
-    Workout w = workout ?? widget.workout;
+  Widget buildList(Workout w) {
     DismissDirection dismissDirection = getDismissDirection();
 
     return Dismissible(
@@ -311,10 +322,11 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   @override
   Widget build(BuildContext context, {WorkoutDay? rebuildWorkout}) {
+    Workout workout = rebuildWorkout ?? widget.workout;
     return SizedBox(
         key: _workoutListKey,
         height: getHeight(),
         width: MediaQuery.of(context).size.width,
-        child: buildList(rebuildWorkout));
+        child: buildList(workout));
   }
 }
