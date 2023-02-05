@@ -5,6 +5,7 @@ import 'package:swole_experience/components/workouts/trends/workout_history_char
 import 'package:swole_experience/components/workouts/trends/workout_history_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_history.dart';
+import 'package:swole_experience/service/favourite_workout_service.dart';
 
 import 'package:swole_experience/service/workout_history_service.dart';
 
@@ -17,27 +18,62 @@ class Trends extends StatefulWidget {
 
 class _TrendsState extends State<Trends> {
   Map<String, List<WorkoutHistory>> _workoutMap = {};
+  List<String> _favourites = [];
   String? _selectedWorkout;
 
-  bool hasWorkouts() => _workoutMap[_selectedWorkout]?.isNotEmpty ?? false;
+  bool get hasWorkouts => _workoutMap[_selectedWorkout]?.isNotEmpty ?? false;
 
-  Widget buildDropdown() {
+  bool get selectedIsFavourite => _favourites.contains(_selectedWorkout);
+
+  void setFavourite(String workoutId) {
+    FavouriteWorkoutService.svc.addFavourite(workoutId);
+    setState(() {
+      _favourites.add(workoutId);
+    });
+  }
+
+  void removeFavourite(String workoutId) {
+    FavouriteWorkoutService.svc.removeFavourite(workoutId);
+    setState(() {
+      _favourites.remove(workoutId);
+    });
+  }
+
+  // TODO: move this down to separate element / force it to not rebuild
+  Widget buildSelectionRow() {
     List<String> workoutIds = _workoutMap.keys.toList();
 
-    return Center(
-        child: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: DropdownButton(
-                value: _selectedWorkout,
-                items: workoutIds
-                    .map((id) => DropdownMenuItem(
-                        child: Text(_workoutMap[id]!.first.name), value: id))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedWorkout = value.toString();
-                  });
-                })));
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Padding(
+        padding: const EdgeInsets.only(right: 12, top: 12),
+        child: IconButton(
+          icon: selectedIsFavourite
+              ? const Icon(Icons.star, color: Colors.amberAccent)
+              : const Icon(Icons.star_outline),
+          onPressed: () => {
+            if (_selectedWorkout != null)
+              {
+                selectedIsFavourite
+                    ? removeFavourite(_selectedWorkout!)
+                    : setFavourite(_selectedWorkout!)
+              }
+          },
+        ),
+      ),
+      Padding(
+          padding: const EdgeInsets.only(left: 12, top: 12),
+          child: DropdownButton(
+              value: _selectedWorkout,
+              items: workoutIds
+                  .map((id) => DropdownMenuItem(
+                      child: Text(_workoutMap[id]!.first.name), value: id))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedWorkout = value.toString();
+                });
+              })),
+    ]);
   }
 
   ///                           Build                                        ///
@@ -59,6 +95,7 @@ class _TrendsState extends State<Trends> {
         body: FutureBuilder<List<dynamic>>(
             future: Future.wait([
               WorkoutHistoryService.svc.getWorkoutHistoryMap(),
+              FavouriteWorkoutService.svc.getFavourites(),
             ]),
             builder: (BuildContext context,
                 AsyncSnapshot<List<dynamic>> initSnapshot) {
@@ -66,16 +103,24 @@ class _TrendsState extends State<Trends> {
                 return const Center(child: Text('Loading...'));
               } else {
                 if (initSnapshot.data?.first != null) {
-                  _workoutMap = initSnapshot.data!.first;
-                  _selectedWorkout ??= _workoutMap.keys.first;
+                  _favourites = initSnapshot.requireData[1];
+                  _workoutMap = initSnapshot.requireData[0];
+                  _selectedWorkout ??= _favourites.isNotEmpty
+                      ? _favourites.first
+                      : _workoutMap.keys.first;
 
                   return Column(
                     children: [
-                      buildDropdown(),
-                      hasWorkouts() ? WorkoutHistoryChart(workouts: _workoutMap[_selectedWorkout]!) : Container(),
-                      hasWorkouts() ? WorkoutHistoryList(
-                          context: context,
-                          workouts: _workoutMap[_selectedWorkout]!) : Container(),
+                      buildSelectionRow(),
+                      hasWorkouts
+                          ? WorkoutHistoryChart(
+                              workouts: _workoutMap[_selectedWorkout]!)
+                          : Container(),
+                      hasWorkouts
+                          ? WorkoutHistoryList(
+                              context: context,
+                              workouts: _workoutMap[_selectedWorkout]!)
+                          : Container(),
                     ],
                   );
                 } else {
