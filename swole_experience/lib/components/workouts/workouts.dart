@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -11,11 +10,9 @@ import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/model/workout_day.dart';
-import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/service/workout_history_service.dart';
 import 'package:swole_experience/service/workout_service.dart';
-import 'package:swole_experience/util/converter.dart';
 
 class Workouts extends StatefulWidget {
   const Workouts({Key? key, this.context}) : super(key: key);
