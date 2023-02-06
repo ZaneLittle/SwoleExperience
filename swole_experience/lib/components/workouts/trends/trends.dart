@@ -43,6 +43,9 @@ class _TrendsState extends State<Trends> {
   // TODO: move this down to separate element / force it to not rebuild
   Widget buildSelectionRow() {
     List<String> workoutIds = _workoutMap.keys.toList();
+    workoutIds.sort((a,b) {
+      return _workoutMap[a]!.first.name.compareTo(_workoutMap[b]!.first.name);
+    });
 
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       Padding(
