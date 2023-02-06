@@ -7,7 +7,9 @@ import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/workout_day.dart';
+import 'package:swole_experience/service/preference_service.dart';
 import 'package:swole_experience/service/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
@@ -28,11 +30,11 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   final GlobalKey<_WorkoutsConfigureState> _workoutsConfigureKey =
       GlobalKey<_WorkoutsConfigureState>();
   final ScrollController _scrollController = ScrollController();
-
   final Logger logger = Logger();
 
   bool shouldFetch = false;
-
+  bool isSupersetsEnabled = Toggles.supersets;
+  bool isAlternativesEnabled = Toggles.alternativeWorkouts;
   Map<int, List<WorkoutDay>> workoutMap = {
     1: [],
   };
@@ -90,6 +92,8 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             defaultOrder: defaultOrder,
             rebuildCallback: rebuild,
             workoutsInDay: workouts,
+            isAlternativesEnabled: isAlternativesEnabled,
+            isSupersetsEnabled: isSupersetsEnabled,
           ));
         });
   }
@@ -266,6 +270,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   Widget build(BuildContext context) {
     if (shouldFetch) {
       return Scaffold(
+          key: _workoutsConfigureKey,
           appBar: AppBar(
             backgroundColor: CommonStyles.primaryDark,
             leading: IconButton(
@@ -280,15 +285,20 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             ),
             title: const Text('Configure workouts'),
           ),
-          body: FutureBuilder<List<List<dynamic>>>(
+          body: FutureBuilder<List<dynamic>>(
               future: Future.wait([
                 WorkoutService.svc.getWorkouts(),
+                PreferenceService.svc
+                    .isToggleEnabled(Toggles.alternativeWorkoutsKey),
+                PreferenceService.svc.isToggleEnabled(Toggles.supersetsKey),
               ]),
               builder: (BuildContext context,
-                  AsyncSnapshot<List<List<dynamic>>> snapshot) {
+                  AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('Loading...'));
                 } else {
+                  isAlternativesEnabled = snapshot.requireData[1];
+                  isSupersetsEnabled = snapshot.requireData[2];
                   List<WorkoutDay> workouts =
                       snapshot.requireData[0] as List<WorkoutDay>;
                   initWorkoutMap(workouts);
@@ -304,6 +314,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
               }));
     } else {
       return Scaffold(
+          key: _workoutsConfigureKey,
           appBar: AppBar(
             backgroundColor: CommonStyles.primaryDark,
             leading: IconButton(

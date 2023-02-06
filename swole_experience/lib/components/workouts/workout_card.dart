@@ -4,22 +4,25 @@ import 'package:flutter/material.dart';
 
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/workout_service.dart';
 
 class WorkoutCard extends StatefulWidget {
-  const WorkoutCard(
-      {Key? key,
-      this.context,
-      this.allowDelete = false,
-      this.allowUpdate = false,
-      required this.workout,
-      required this.rebuildCallback,
-      this.workoutsInDay,
-      this.alternatives,
-      this.supersets})
-      : super(key: key);
+  const WorkoutCard({
+    Key? key,
+    this.context,
+    this.allowDelete = false,
+    this.allowUpdate = false,
+    required this.workout,
+    required this.rebuildCallback,
+    this.workoutsInDay,
+    this.alternatives,
+    this.supersets,
+    this.isSupersetsEnabled = Toggles.supersets,
+    this.isAlternativesEnabled = Toggles.alternativeWorkouts,
+  }) : super(key: key);
 
   final bool allowDelete;
   final bool allowUpdate;
@@ -29,6 +32,8 @@ class WorkoutCard extends StatefulWidget {
   final List<WorkoutDay>? workoutsInDay;
   final List<Workout>? alternatives;
   final List<Workout>? supersets;
+  final bool isSupersetsEnabled;
+  final bool isAlternativesEnabled;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -129,6 +134,8 @@ class _WorkoutCardState extends State<WorkoutCard> {
                     workout: workout, delete: delete, update: update);
               },
               workoutsInDay: widget.workoutsInDay,
+              isAlternativesEnabled: widget.isAlternativesEnabled,
+              isSupersetsEnabled: widget.isSupersetsEnabled,
             ));
           });
     }

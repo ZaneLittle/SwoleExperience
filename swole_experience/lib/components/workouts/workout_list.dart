@@ -5,23 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/model/workout_history.dart';
 
 class WorkoutList extends StatefulWidget {
-  const WorkoutList(
-      {Key? key,
-      this.context,
-      required this.dataSnapshot,
-      required this.rebuildCallback,
-      required this.history})
-      : super(key: key);
+  const WorkoutList({
+    Key? key,
+    this.context,
+    required this.dataSnapshot,
+    required this.rebuildCallback,
+    required this.history,
+    this.isSupersetsEnabled = Toggles.supersets,
+    this.isAlternativesEnabled = Toggles.alternativeWorkouts,
+  }) : super(key: key);
 
   final BuildContext? context;
   final AsyncSnapshot<List<List<dynamic>>> dataSnapshot;
   final Function rebuildCallback;
   final bool history;
+  final bool isSupersetsEnabled;
+  final bool isAlternativesEnabled;
 
   @override
   State<WorkoutList> createState() => _WorkoutListState();
@@ -133,7 +138,10 @@ class _WorkoutListState extends State<WorkoutList> {
                   workoutsInDay = data as List<WorkoutDay>;
                 }
                 if (data.first is WorkoutDay || data.first is WorkoutHistory) {
-                  cards.addAll(data.where((w) => !w.altExists(data) && !w.supersetExists(data)).map((w) {
+                  cards.addAll(data
+                      .where(
+                          (w) => !w.altExists(data) && !w.supersetExists(data))
+                      .map((w) {
                     return WorkoutCard(
                       workout: w,
                       allowDelete: false,
@@ -141,7 +149,9 @@ class _WorkoutListState extends State<WorkoutList> {
                       rebuildCallback: rebuild,
                       workoutsInDay: workoutsInDay,
                       alternatives: w.getAlternatives(data as List<Workout>),
-                      supersets: w.getSupersets(data)
+                      supersets: w.getSupersets(data),
+                      isSupersetsEnabled: widget.isSupersetsEnabled,
+                      isAlternativesEnabled: widget.isAlternativesEnabled,
                     );
                   }));
                 }

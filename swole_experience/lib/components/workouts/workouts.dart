@@ -8,6 +8,7 @@ import 'package:swole_experience/components/workouts/timer.dart';
 import 'package:swole_experience/components/workouts/workout_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
+import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/preference_service.dart';
@@ -32,6 +33,8 @@ class _WorkoutsState extends State<Workouts> {
   int day = 1;
   String dayText = 'Today';
   bool checkHistory = false;
+  bool isSupersetsEnabled = Toggles.supersets;
+  bool isAlternativesEnabled = Toggles.alternativeWorkouts;
 
   FutureOr rebuild(WorkoutDay? value, {bool save = true}) {
     setState(() {});
@@ -201,15 +204,19 @@ class _WorkoutsState extends State<Workouts> {
   }
 
   Widget buildList(int? dayOffset) {
-    return FutureBuilder<List<List<dynamic>>>(
+    return FutureBuilder<List<dynamic>>(
         future: Future.wait([
           PreferenceService.svc.getPreference(PreferenceConstant.workoutDayKey),
+          PreferenceService.svc.isToggleEnabled(Toggles.supersetsKey),
+          PreferenceService.svc.isToggleEnabled(Toggles.alternativeWorkoutsKey),
         ]),
         builder: (BuildContext context,
-            AsyncSnapshot<List<List<dynamic>>> initSnapshot) {
+            AsyncSnapshot<List<dynamic>> initSnapshot) {
           if (initSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: Text('Loading...'));
           } else {
+            isSupersetsEnabled = initSnapshot.requireData[1];
+            isAlternativesEnabled = initSnapshot.requireData[2];
             setupDay(
                 dayPref: initSnapshot.data?[0] as List<Preference>?,
                 offset: dayOffset ?? 0);
@@ -227,6 +234,8 @@ class _WorkoutsState extends State<Workouts> {
                         dataSnapshot: finalSnapshot,
                         rebuildCallback: rebuild,
                         history: checkHistory,
+                        isSupersetsEnabled: isSupersetsEnabled,
+                        isAlternativesEnabled: isAlternativesEnabled,
                       ),
                       buildCompleteDayButton(finalSnapshot),
                       const WorkoutTimer(),
