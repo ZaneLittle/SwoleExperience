@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:swole_experience/components/workouts/progression_helper.dart';
 
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
@@ -21,6 +22,7 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
     this.workoutsInDay,
     this.isSupersetsEnabled = Toggles.supersets,
     this.isAlternativesEnabled = Toggles.alternativeWorkouts,
+    this.isProgressionHelperEnabled = Toggles.progressionHelper,
   }) : super(key: key);
 
   final WorkoutDay? workout;
@@ -30,6 +32,7 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
   final List<WorkoutDay>? workoutsInDay;
   final bool isSupersetsEnabled;
   final bool isAlternativesEnabled;
+  final bool isProgressionHelperEnabled;
 
   @override
   State<WorkoutCreateUpdateForm> createState() =>
@@ -39,13 +42,13 @@ class WorkoutCreateUpdateForm extends StatefulWidget {
 class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _notesFieldKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _nameFieldKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _altDropdownKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final GlobalKey<_WorkoutCreateUpdateFormState> _supersetDropdownKey =
-  GlobalKey<_WorkoutCreateUpdateFormState>();
+      GlobalKey<_WorkoutCreateUpdateFormState>();
   final Logger logger = Logger();
   final ScrollController _scrollController = ScrollController();
   final ScrollController _altScrollController = ScrollController();
@@ -58,6 +61,13 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   TextEditingController _notesController = TextEditingController();
   String? _alternativeId;
   String? _supersetId;
+
+  void progressionCallback({required WorkoutDay workout, bool update = false}) {
+    if (update) {
+      widget.rebuildCallback(workout: workout, update: true);
+    }
+    Navigator.of(context).pop();
+  }
 
   void createWorkout() {
     WorkoutDay workout = WorkoutDay(
@@ -76,10 +86,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
       return handleSaveError('create', error, stackTrace);
     }).then(
-            (res) =>
-        res != 0
-            ? widget.rebuildCallback(workout: workout)
-            : null);
+        (res) => res != 0 ? widget.rebuildCallback(workout: workout) : null);
   }
 
   void updateWorkout() {
@@ -196,7 +203,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     dropdownList.addAll(widget.workoutsInDay!
         .where((w) => isValidSupersetOrAlt(w))
         .map((workout) =>
-        DropdownMenuItem(child: Text(workout.name), value: workout.id)));
+            DropdownMenuItem(child: Text(workout.name), value: workout.id)));
 
     return dropdownList;
   }
@@ -223,12 +230,11 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         key: _nameFieldKey,
         child: Padding(
           padding:
-          const EdgeInsets.only(top: 12, bottom: 18, left: 32, right: 32),
+              const EdgeInsets.only(top: 12, bottom: 18, left: 32, right: 32),
           child: TextFormField(
               controller: _nameController,
-              validator: (String? value) =>
-                  Validator.stringValidator(value,
-                      defaultValue: widget.workout?.name),
+              validator: (String? value) => Validator.stringValidator(value,
+                  defaultValue: widget.workout?.name),
               decoration: const InputDecoration(hintText: 'Name')),
         ));
   }
@@ -236,55 +242,46 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
   Widget buildWeightField() {
     return Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(
-              top: 0, bottom: 12, left: 32, right: 12),
-          child: TextFormField(
-              controller: _weightController,
-              validator: (String? value) =>
-                  Validator.doubleValidator(value,
-                      defaultValue: widget.workout?.weight),
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true),
-              decoration: InputDecoration(
-                  hintText: widget.workout?.weight.toString() ?? 'Weight',
-                  helperText: 'Weight')),
-        ));
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 32, right: 12),
+      child: TextFormField(
+          controller: _weightController,
+          validator: (String? value) => Validator.doubleValidator(value,
+              defaultValue: widget.workout?.weight),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+              hintText: widget.workout?.weight.toString() ?? 'Weight',
+              helperText: 'Weight')),
+    ));
   }
 
   Widget buildSetsField() {
     return Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(
-              top: 0, bottom: 12, left: 12, right: 12),
-          child: TextFormField(
-              controller: _setsController,
-              validator: (String? value) =>
-                  Validator.intValidator(
-                      value, defaultValue: widget.workout?.sets),
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: false),
-              decoration: InputDecoration(
-                  hintText: widget.workout?.sets.toString() ?? 'Sets',
-                  helperText: 'Sets')),
-        ));
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 12, right: 12),
+      child: TextFormField(
+          controller: _setsController,
+          validator: (String? value) =>
+              Validator.intValidator(value, defaultValue: widget.workout?.sets),
+          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+          decoration: InputDecoration(
+              hintText: widget.workout?.sets.toString() ?? 'Sets',
+              helperText: 'Sets')),
+    ));
   }
 
   Widget buildRepsField() {
     return Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(
-              top: 0, bottom: 12, left: 12, right: 32),
-          child: TextFormField(
-              controller: _repsController,
-              validator: (String? value) =>
-                  Validator.intValidator(
-                      value, defaultValue: widget.workout?.reps),
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: false),
-              decoration: InputDecoration(
-                  hintText: widget.workout?.reps.toString() ?? 'Reps',
-                  helperText: 'Reps')),
-        ));
+      padding: const EdgeInsets.only(top: 0, bottom: 12, left: 12, right: 32),
+      child: TextFormField(
+          controller: _repsController,
+          validator: (String? value) =>
+              Validator.intValidator(value, defaultValue: widget.workout?.reps),
+          keyboardType: const TextInputType.numberWithOptions(decimal: false),
+          decoration: InputDecoration(
+              hintText: widget.workout?.reps.toString() ?? 'Reps',
+              helperText: 'Reps')),
+    ));
   }
 
   Widget buildNotesField() {
@@ -297,7 +294,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         // height: 240,
         child: Padding(
           padding:
-          const EdgeInsets.only(top: 24, bottom: 24, left: 32, right: 32),
+              const EdgeInsets.only(top: 24, bottom: 24, left: 32, right: 32),
           child: TextFormField(
             controller: _notesController,
             keyboardType: TextInputType.multiline,
@@ -319,50 +316,46 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       }
 
       List<DropdownMenuItem<String>> possibleAlternatives =
-      getPossibleAlternatives();
+          getPossibleAlternatives();
       List<Widget> otherAlternatives = getOtherAlternatives();
 
       return (possibleAlternatives.length > 1 || otherAlternatives.isNotEmpty)
           ? Expanded(
-          key: _altDropdownKey,
-          child: Padding(
-              padding: EdgeInsets.only(
-                  top: 12,
-                  bottom: 18,
-                  left: 32,
-                  right: isSupersetsEnabled ? 12 : 32),
-              child: Column(children: [
-                possibleAlternatives.length > 1
-                    ? DropdownButton(
-                    value: _alternativeId,
-                    hint: const Text('Alternative For'),
-                    isExpanded: true,
-                    items: possibleAlternatives,
-                    onChanged: (value) =>
-                        setState(() {
-                          _alternativeId = value as String;
-                        }))
-                    : Container(),
-                otherAlternatives.isNotEmpty
-                    ? ExpansionTile(
-                  title: const Text('Alternatives',
-                      style: TextStyle(
-                          fontSize: 14, color: Colors.grey)),
-                  children: [
-                    SizedBox(
-                      height:
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .height * .25,
-                      child: ListView(
-                          controller: _altScrollController,
-                          children: otherAlternatives),
-                    )
-                  ],
-                )
-                    : Container(),
-              ])))
+              key: _altDropdownKey,
+              child: Padding(
+                  padding: EdgeInsets.only(
+                      top: 12,
+                      bottom: 18,
+                      left: 32,
+                      right: isSupersetsEnabled ? 12 : 32),
+                  child: Column(children: [
+                    possibleAlternatives.length > 1
+                        ? DropdownButton(
+                            value: _alternativeId,
+                            hint: const Text('Alternative For'),
+                            isExpanded: true,
+                            items: possibleAlternatives,
+                            onChanged: (value) => setState(() {
+                                  _alternativeId = value as String;
+                                }))
+                        : Container(),
+                    otherAlternatives.isNotEmpty
+                        ? ExpansionTile(
+                            title: const Text('Alternatives',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey)),
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .25,
+                                child: ListView(
+                                    controller: _altScrollController,
+                                    children: otherAlternatives),
+                              )
+                            ],
+                          )
+                        : Container(),
+                  ])))
           : Container();
     }
     return Container();
@@ -381,45 +374,41 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
 
       return (possibleSupersets.length > 1 || otherSupersets.isNotEmpty)
           ? Expanded(
-          key: _supersetDropdownKey,
-          child: Padding(
-              padding: EdgeInsets.only(
-                  top: 12,
-                  bottom: 18,
-                  left: isAltsEnabled ? 12 : 32,
-                  right: 32),
-              child: Column(children: [
-                possibleSupersets.length > 1
-                    ? DropdownButton(
-                    value: _supersetId,
-                    hint: const Text('Superset For'),
-                    isExpanded: true,
-                    items: possibleSupersets,
-                    onChanged: (value) =>
-                        setState(() {
-                          _supersetId = value as String;
-                        }))
-                    : Container(),
-                otherSupersets.isNotEmpty
-                    ? ExpansionTile(
-                  title: const Text('Supersets',
-                      style: TextStyle(
-                          fontSize: 14, color: Colors.grey)),
-                  children: [
-                    SizedBox(
-                      height:
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .height * .25,
-                      child: ListView(
-                          controller: _supersetScrollController,
-                          children: otherSupersets),
-                    )
-                  ],
-                )
-                    : Container(),
-              ])))
+              key: _supersetDropdownKey,
+              child: Padding(
+                  padding: EdgeInsets.only(
+                      top: 12,
+                      bottom: 18,
+                      left: isAltsEnabled ? 12 : 32,
+                      right: 32),
+                  child: Column(children: [
+                    possibleSupersets.length > 1
+                        ? DropdownButton(
+                            value: _supersetId,
+                            hint: const Text('Superset For'),
+                            isExpanded: true,
+                            items: possibleSupersets,
+                            onChanged: (value) => setState(() {
+                                  _supersetId = value as String;
+                                }))
+                        : Container(),
+                    otherSupersets.isNotEmpty
+                        ? ExpansionTile(
+                            title: const Text('Supersets',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey)),
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * .25,
+                                child: ListView(
+                                    controller: _supersetScrollController,
+                                    children: otherSupersets),
+                              )
+                            ],
+                          )
+                        : Container(),
+                  ])))
           : Container();
     }
     return Container();
@@ -436,6 +425,22 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
               workout: widget.workout, update: widget.workout != null);
         },
       ),
+      widget.isProgressionHelperEnabled && (widget.workout != null)
+          ? IconButton(
+              iconSize: 32,
+              icon: const Icon(Icons.trending_up_outlined,
+                  color: CommonStyles.secondaryColour),
+              onPressed: () {
+                // TODO: if anything has changed, should we warn that that data won't persist?
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProgressionHelper(
+                              workout: widget.workout!,
+                              rebuildCallback: progressionCallback,
+                            )));
+              })
+          : Container(),
       IconButton(
         iconSize: 32,
         icon: Icon(
@@ -482,10 +487,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
             ),
             buildNotesField(),
             buildConfirmCancel(),
-            SizedBox(height: MediaQuery
-                .of(context)
-                .size
-                .height * .34)
+            SizedBox(height: MediaQuery.of(context).size.height * .34)
           ],
         ));
   }

@@ -22,6 +22,7 @@ class WorkoutCard extends StatefulWidget {
     this.supersets,
     this.isSupersetsEnabled = Toggles.supersets,
     this.isAlternativesEnabled = Toggles.alternativeWorkouts,
+    this.isProgressionHelperEnabled = Toggles.progressionHelper,
   }) : super(key: key);
 
   final bool allowDelete;
@@ -34,6 +35,7 @@ class WorkoutCard extends StatefulWidget {
   final List<Workout>? supersets;
   final bool isSupersetsEnabled;
   final bool isAlternativesEnabled;
+  final bool isProgressionHelperEnabled;
 
   @override
   State<WorkoutCard> createState() => _WorkoutCardState();
@@ -136,6 +138,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
               workoutsInDay: widget.workoutsInDay,
               isAlternativesEnabled: widget.isAlternativesEnabled,
               isSupersetsEnabled: widget.isSupersetsEnabled,
+              isProgressionHelperEnabled: widget.isProgressionHelperEnabled,
             ));
           });
     }

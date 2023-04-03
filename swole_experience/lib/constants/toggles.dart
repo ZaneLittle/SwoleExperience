@@ -8,8 +8,11 @@ class Toggles {
   static const bool supersets = true;
   static const String supersetsKey = 'supersets';
 
-  static const bool workoutTrends = false;
+  static const bool workoutTrends = true;
   static const String workoutTrendsKey = 'workoutTrends';
+
+  static const bool progressionHelper = false;
+  static const String progressionHelperKey = 'progressionHelper';
 
 
   static Map<String, bool> toggleMap = {
@@ -17,5 +20,6 @@ class Toggles {
     alternativeWorkoutsKey: Toggles.alternativeWorkouts,
     supersetsKey: Toggles.supersets,
     workoutTrendsKey: Toggles.workoutTrends,
+    progressionHelperKey: Toggles.progressionHelper,
   };
 }

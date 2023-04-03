@@ -19,6 +19,7 @@ class WorkoutList extends StatefulWidget {
     required this.history,
     this.isSupersetsEnabled = Toggles.supersets,
     this.isAlternativesEnabled = Toggles.alternativeWorkouts,
+    this.isProgressionHelperEnabled = Toggles.progressionHelper,
   }) : super(key: key);
 
   final BuildContext? context;
@@ -27,6 +28,7 @@ class WorkoutList extends StatefulWidget {
   final bool history;
   final bool isSupersetsEnabled;
   final bool isAlternativesEnabled;
+  final bool isProgressionHelperEnabled;
 
   @override
   State<WorkoutList> createState() => _WorkoutListState();
@@ -152,6 +154,7 @@ class _WorkoutListState extends State<WorkoutList> {
                       supersets: w.getSupersets(data),
                       isSupersetsEnabled: widget.isSupersetsEnabled,
                       isAlternativesEnabled: widget.isAlternativesEnabled,
+                      isProgressionHelperEnabled: widget.isProgressionHelperEnabled,
                     );
                   }));
                 }

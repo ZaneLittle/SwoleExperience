@@ -35,6 +35,7 @@ class _WorkoutsState extends State<Workouts> {
   bool checkHistory = false;
   bool isSupersetsEnabled = Toggles.supersets;
   bool isAlternativesEnabled = Toggles.alternativeWorkouts;
+  bool isProgressionHelperEnabled = Toggles.progressionHelper;
 
   FutureOr rebuild(WorkoutDay? value, {bool save = true}) {
     setState(() {});
@@ -209,6 +210,7 @@ class _WorkoutsState extends State<Workouts> {
           PreferenceService.svc.getPreference(PreferenceConstant.workoutDayKey),
           PreferenceService.svc.isToggleEnabled(Toggles.supersetsKey),
           PreferenceService.svc.isToggleEnabled(Toggles.alternativeWorkoutsKey),
+          PreferenceService.svc.isToggleEnabled(Toggles.progressionHelperKey),
         ]),
         builder: (BuildContext context,
             AsyncSnapshot<List<dynamic>> initSnapshot) {
@@ -217,6 +219,7 @@ class _WorkoutsState extends State<Workouts> {
           } else {
             isSupersetsEnabled = initSnapshot.requireData[1];
             isAlternativesEnabled = initSnapshot.requireData[2];
+            isProgressionHelperEnabled = initSnapshot.requireData[3];
             setupDay(
                 dayPref: initSnapshot.data?[0] as List<Preference>?,
                 offset: dayOffset ?? 0);
@@ -236,6 +239,7 @@ class _WorkoutsState extends State<Workouts> {
                         history: checkHistory,
                         isSupersetsEnabled: isSupersetsEnabled,
                         isAlternativesEnabled: isAlternativesEnabled,
+                        isProgressionHelperEnabled: isProgressionHelperEnabled,
                       ),
                       buildCompleteDayButton(finalSnapshot),
                       const WorkoutTimer(),

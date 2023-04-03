@@ -8,7 +8,6 @@ import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/service/favourite_workout_service.dart';
 
 import 'package:swole_experience/service/workout_history_service.dart';
-import 'package:swole_experience/util/workout_history_mock.dart';
 
 class Trends extends StatefulWidget {
   const Trends({Key? key}) : super(key: key);

@@ -35,6 +35,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
   bool shouldFetch = false;
   bool isSupersetsEnabled = Toggles.supersets;
   bool isAlternativesEnabled = Toggles.alternativeWorkouts;
+  bool isProgressionHelperEnabled = Toggles.progressionHelper;
   Map<int, List<WorkoutDay>> workoutMap = {
     1: [],
   };
@@ -94,6 +95,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
             workoutsInDay: workouts,
             isAlternativesEnabled: isAlternativesEnabled,
             isSupersetsEnabled: isSupersetsEnabled,
+            isProgressionHelperEnabled: isProgressionHelperEnabled,
           ));
         });
   }
@@ -222,6 +224,9 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
         workout: w,
         rebuildCallback: rebuild,
         workoutsInDay: workouts,
+        isAlternativesEnabled: isAlternativesEnabled,
+        isSupersetsEnabled: isSupersetsEnabled,
+        isProgressionHelperEnabled: isProgressionHelperEnabled,
       ) as Widget;
     }).toList();
     workoutList.add(buildAddExercise(day, workouts.length, workouts));
@@ -291,6 +296,8 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                 PreferenceService.svc
                     .isToggleEnabled(Toggles.alternativeWorkoutsKey),
                 PreferenceService.svc.isToggleEnabled(Toggles.supersetsKey),
+                PreferenceService.svc
+                    .isToggleEnabled(Toggles.progressionHelperKey),
               ]),
               builder: (BuildContext context,
                   AsyncSnapshot<List<dynamic>> snapshot) {
@@ -299,6 +306,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
                 } else {
                   isAlternativesEnabled = snapshot.requireData[1];
                   isSupersetsEnabled = snapshot.requireData[2];
+                  isProgressionHelperEnabled = snapshot.requireData[3];
                   List<WorkoutDay> workouts =
                       snapshot.requireData[0] as List<WorkoutDay>;
                   initWorkoutMap(workouts);
