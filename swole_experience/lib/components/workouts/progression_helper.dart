@@ -81,9 +81,13 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
       ).alert(context);
       return 0;
     }).then((res) {
-      res != 0
-          ? widget.rebuildCallback(workout: updatedWorkout, update: true)
-          : null;
+      if(res != 0) {
+        Navigator.of(context).pop();
+        widget.rebuildCallback(
+          workout: updatedWorkout,
+          update: true,
+        );
+      }
     });
     return updatedWorkout;
   }
@@ -225,12 +229,7 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
         icon: const Icon(Icons.check_circle, color: CommonStyles.primaryColour),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            WorkoutDay updatedWorkout = updateWorkout();
-            Navigator.of(context).pop();
-            widget.rebuildCallback(
-              workout: updatedWorkout,
-              update: true,
-            );
+            updateWorkout();
           }
         },
       ),
