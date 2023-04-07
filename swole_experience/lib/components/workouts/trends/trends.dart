@@ -39,10 +39,26 @@ class _TrendsState extends State<Trends> {
     });
   }
 
+  Widget buildWorkoutItem(String name, String id) {
+    bool showStar = _favourites.contains(id);
+
+    return SizedBox(width: 258, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(name),
+            showStar
+                ? const Icon(Icons.star, color: Colors.amberAccent, size: 12)
+                : Container(),
+          ]));
+  }
+
   // TODO: move this down to separate element / force it to not rebuild
   Widget buildSelectionRow() {
     List<String> workoutIds = _workoutMap.keys.toList();
-    workoutIds.sort((a,b) {
+    workoutIds.sort((a, b) {
+      if (_favourites.contains(a) && !_favourites.contains(b)) {
+        return -1;
+      } else if (!_favourites.contains(a) && _favourites.contains(b)) {
+        return 1;
+      }
       return _workoutMap[a]!.first.name.compareTo(_workoutMap[b]!.first.name);
     });
 
@@ -69,7 +85,8 @@ class _TrendsState extends State<Trends> {
               value: _selectedWorkout,
               items: workoutIds
                   .map((id) => DropdownMenuItem(
-                      child: Text(_workoutMap[id]!.first.name), value: id))
+                      child: buildWorkoutItem(_workoutMap[id]!.first.name, id),
+                      value: id))
                   .toList(),
               onChanged: (value) {
                 setState(() {
@@ -108,7 +125,8 @@ class _TrendsState extends State<Trends> {
                 if (initSnapshot.data?.first != null) {
                   _favourites = initSnapshot.requireData[1];
                   _workoutMap = initSnapshot.requireData[0];
-                  _selectedWorkout ??= _favourites.isNotEmpty && _workoutMap.keys.contains(_favourites.first)
+                  _selectedWorkout ??= _favourites.isNotEmpty &&
+                          _workoutMap.keys.contains(_favourites.first)
                       ? _favourites.first
                       : _workoutMap.keys.first;
 
