@@ -7,8 +7,8 @@ import 'package:swole_experience/components/workouts/progression_helper.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/service/workout_service.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/model/workout_day.dart';
+import 'package:swole_experience/util/error_handler.dart';
 import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/util/validator.dart';
 
@@ -83,10 +83,12 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       supersetParentId: _supersetId,
     );
 
-    WorkoutService.svc.createWorkout(workout).onError((error, stackTrace) {
-      return handleSaveError('create', error, stackTrace);
-    }).then(
-        (res) => res != 0 ? widget.rebuildCallback(workout: workout) : null);
+    WorkoutService.svc
+        .createWorkout(workout)
+        .onError((error, trace) =>
+            ErrorHandler().handleSaveError('create', error, trace, context))
+        .then((res) =>
+            res != 0 ? widget.rebuildCallback(workout: workout) : null);
   }
 
   void updateWorkout() {
@@ -113,7 +115,8 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
       );
 
       WorkoutService.svc.updateWorkout(workout).onError((error, stackTrace) {
-        return handleSaveError('update', error, stackTrace);
+        return ErrorHandler()
+            .handleSaveError('update', error, stackTrace, context);
       }).then((res) {
         res != 0
             ? widget.rebuildCallback(workout: workout, update: true)
@@ -122,7 +125,7 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
     } else {
       logger.e(
           'Error: updating but no workout on stack - should not be possible');
-      handleSaveError('update', null, null);
+      ErrorHandler().showAlert('Something went wrong :(', context);
     }
   }
 
@@ -132,15 +135,6 @@ class _WorkoutCreateUpdateFormState extends State<WorkoutCreateUpdateForm> {
         _setsController.value.text.isNotEmpty ||
         _repsController.value.text.isNotEmpty ||
         _notesController.value.text.isNotEmpty;
-  }
-
-  int handleSaveError(String operation, Object? error, StackTrace? stackTrace) {
-    logger.e("Error ${operation}ing workout: $error", error, stackTrace);
-    const AlertSnackBar(
-      message: "Unable to update or create the workout.",
-      state: SnackBarState.failure,
-    ).alert(context);
-    return 0;
   }
 
   void save() {

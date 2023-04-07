@@ -21,6 +21,13 @@ class Workout {
   final String? supersetParentId;
   final String? altParentId;
 
+  /// Restriction constants
+  static const int _nameLengthLimit = 22;
+  static const int _notesLengthLimit = 256;
+  static const int _weightLimit = 9999;
+  static const int _setsLimit = 9999;
+  static const int _repsLimit = 9999;
+
   Workout.fromMap(Map<String, dynamic> map)
       : id = map['id'] as String,
         name = map['name'] as String,
@@ -81,6 +88,30 @@ class Workout {
 
   bool hasNote() {
     return notes != null && notes != '';
+  }
+
+  /// Enforces model restrictions:
+  ///  - name   = cannot exceed 22 characters
+  ///  - notes  = cannot exceed 256 characters
+  ///  - Weight = cannot exceed 9999
+  ///  - reps   = cannot exceed 9999
+  ///  - sets   = cannot exceed 9999
+  void validate() {
+    if (name.length > _nameLengthLimit) {
+      throw const FormatException('Name cannot exceed $_nameLengthLimit characters.');
+    }
+    if (notes != null && notes!.length > _notesLengthLimit) {
+      throw const FormatException('Notes cannot exceed $_notesLengthLimit characters.');
+    }
+    if (weight > _weightLimit) {
+      throw const FormatException('Weight cannot exceed $_weightLimit.');
+    }
+    if (reps > _repsLimit) {
+      throw const FormatException('Reps cannot exceed $_repsLimit.');
+    }
+    if (sets > _setsLimit) {
+      throw const FormatException('Sets cannot exceed $_setsLimit.');
+    }
   }
 
   /// Returns a subset of @param workoutList that are alternatives for `this`

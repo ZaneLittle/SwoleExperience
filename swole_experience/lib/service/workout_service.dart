@@ -123,6 +123,7 @@ class WorkoutService {
   }
 
   Future<int> createWorkout(WorkoutDay workout, {int retries = 2}) async {
+    workout.validate();
     Database db = await svc.db;
     try {
       return await db.insert(_dbName, workout.toMap());
@@ -138,6 +139,7 @@ class WorkoutService {
   }
 
   Future<int> updateWorkout(WorkoutDay workout, {int retries = 2}) async {
+    workout.validate();
     Database db = await svc.db;
     try {
       return await db.update(_dbName, workout.toMap(),

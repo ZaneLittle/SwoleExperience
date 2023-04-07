@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/util/error_handler.dart';
 import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/util/validator.dart';
 
@@ -31,17 +31,14 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
   int newReps = 0;
   double calculatedWeight = 0;
   double calculatedRoundedWeight = 0;
-  
+
   double incrementField(TextEditingController field, double increment) {
     double? fieldValue = double.tryParse(field.value.text);
     if (fieldValue == null) {
-      const AlertSnackBar(
-        message: "Unable to increment field since it is empty.",
-        state: SnackBarState.failure,
-      ).alert(context);
+      ErrorHandler().showAlert('Unable to increment field since it is empty.', context);
       return 0;
     } else {
-      return ((fieldValue + increment)/2.5).roundToDouble()*2.5;
+      return ((fieldValue + increment) / 2.5).roundToDouble() * 2.5;
     }
   }
 
@@ -49,17 +46,15 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
     int? repsInput = int.tryParse(_repsController.value.text);
 
     if (repsInput == null && explicitAction) {
-      const AlertSnackBar(
-        message: "Invalid value for reps field.",
-        state: SnackBarState.failure,
-      ).alert(context);
+      ErrorHandler().showAlert('Invalid value for reps field.,', context);
     } else if (repsInput != null) {
       double oneRepMax = Util.calculateExactOneRepMax(widget.workout);
       setState(() {
         newReps = repsInput;
         calculatedWeight = Util.calculateWeightForReps(repsInput, oneRepMax);
         if (explicitAction) {
-          calculatedRoundedWeight = (calculatedWeight / 2.5).ceilToDouble()*2.5;
+          calculatedRoundedWeight =
+              (calculatedWeight / 2.5).ceilToDouble() * 2.5;
         }
       });
     }
@@ -73,15 +68,10 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
 
     WorkoutService.svc
         .updateWorkout(updatedWorkout)
-        .onError((error, stackTrace) {
-      logger.e("Error updating workout: $error", error, stackTrace);
-      const AlertSnackBar(
-        message: "Unable to update or create the workout.",
-        state: SnackBarState.failure,
-      ).alert(context);
-      return 0;
-    }).then((res) {
-      if(res != 0) {
+        .onError((error, trace) =>
+            ErrorHandler().handleSaveError('update', error, trace, context))
+        .then((res) {
+      if (res != 0) {
         Navigator.of(context).pop();
         widget.rebuildCallback(
           workout: updatedWorkout,
@@ -96,8 +86,7 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
 
   Widget buildRepsRow() {
     int reps = (newReps > 0) ? newReps : widget.workout.reps;
-    _repsController =
-        TextEditingController(text: reps.toString());
+    _repsController = TextEditingController(text: reps.toString());
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -118,32 +107,31 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
             onChanged: (_) => calculateWeight(),
           ),
         ),
-        Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: () {
-                    setState(() {
-                      newReps = (int.tryParse(_repsController.value.text) ?? 0) + 1;
-                    });
-                  }),
-              IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: () {
-                    setState(() {
-                      newReps = (int.tryParse(_repsController.value.text) ?? 0) - 1;
-                    });
-                  }),
-            ]),
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () {
+                setState(() {
+                  newReps = (int.tryParse(_repsController.value.text) ?? 0) + 1;
+                });
+              }),
+          IconButton(
+              icon: const Icon(Icons.remove_circle_outline),
+              onPressed: () {
+                setState(() {
+                  newReps = (int.tryParse(_repsController.value.text) ?? 0) - 1;
+                });
+              }),
+        ]),
       ],
     );
   }
 
   Widget buildWeightRow() {
-    double weight = (calculatedRoundedWeight > 0) ? calculatedRoundedWeight : widget.workout.weight;
-    _weightController =
-        TextEditingController(text: weight.toStringAsFixed(1));
+    double weight = (calculatedRoundedWeight > 0)
+        ? calculatedRoundedWeight
+        : widget.workout.weight;
+    _weightController = TextEditingController(text: weight.toStringAsFixed(1));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +143,9 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
         (calculatedWeight > 0)
             ? Padding(
                 padding: const EdgeInsets.only(right: 24),
-                child: SizedBox(width: 48, child:Text('(${calculatedWeight.toStringAsFixed(1)})')))
+                child: SizedBox(
+                    width: 48,
+                    child: Text('(${calculatedWeight.toStringAsFixed(1)})')))
             : Container(),
         SizedBox(
             width: MediaQuery.of(context).size.width * .40,
@@ -180,14 +170,16 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
                         icon: const Icon(Icons.add_circle_outline),
                         onPressed: () {
                           setState(() {
-                            calculatedRoundedWeight = incrementField(_weightController, 2.5);
+                            calculatedRoundedWeight =
+                                incrementField(_weightController, 2.5);
                           });
                         }),
                     IconButton(
                         icon: const Icon(Icons.remove_circle_outline),
                         onPressed: () {
                           setState(() {
-                            calculatedRoundedWeight = incrementField(_weightController, -2.5);
+                            calculatedRoundedWeight =
+                                incrementField(_weightController, -2.5);
                           });
                         }),
                   ]),
