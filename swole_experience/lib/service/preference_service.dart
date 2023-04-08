@@ -8,7 +8,7 @@ import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
 
 /// PreferenceService stores a key value string pair with a last updated date
-/// Weight = {
+/// Preference = {
 ///   TEXT preference  = the name of the preference - unique primary key
 ///   TEXT value       = the value of the preference
 ///   TEXT lastUpdated = String representation of the DateTime the preference was last updated
