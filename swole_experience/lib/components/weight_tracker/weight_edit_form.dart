@@ -4,8 +4,8 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:logger/logger.dart';
 
 import 'package:swole_experience/model/weight.dart';
-import 'package:swole_experience/service/average_service.dart';
-import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/service/db/average_service.dart';
+import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/validator.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';

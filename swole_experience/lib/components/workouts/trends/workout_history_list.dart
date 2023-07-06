@@ -5,11 +5,12 @@ import 'package:logger/logger.dart';
 import 'package:swole_experience/components/weight_tracker/weight_edit_form.dart';
 import 'package:swole_experience/model/weight.dart';
 import 'package:swole_experience/model/workout_history.dart';
-import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
-import 'package:swole_experience/service/average_service.dart';
+import 'package:swole_experience/service/db/average_service.dart';
+import 'package:swole_experience/util/weight_util.dart';
 
 class WorkoutHistoryList extends StatefulWidget {
   const WorkoutHistoryList(
@@ -41,7 +42,7 @@ class _WorkoutHistoryListState extends State<WorkoutHistoryList> {
   }
 
   Row buildRow(WorkoutHistory workout) {
-    int oneRM = Util.calculateOneRepMax(workout);
+    int oneRM = WeightUtil.calculateOneRepMax(workout);
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
     return Row(

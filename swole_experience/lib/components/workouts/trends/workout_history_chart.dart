@@ -5,6 +5,7 @@ import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/util.dart';
+import 'package:swole_experience/util/weight_util.dart';
 
 class WorkoutHistoryChart extends StatefulWidget {
   const WorkoutHistoryChart({Key? key, required this.workouts})
@@ -30,9 +31,9 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
       double date =
           Converter.toDayScale(DateTime.parse(workout.date), starting: 180);
       if (chartData.containsKey(date)) {
-        chartData[date]?.add(Util.calculateOneRepMax(workout).toDouble());
+        chartData[date]?.add(WeightUtil.calculateOneRepMax(workout).toDouble());
       } else {
-        chartData[date] = [Util.calculateOneRepMax(workout).toDouble()];
+        chartData[date] = [WeightUtil.calculateOneRepMax(workout).toDouble()];
       }
     }
 
@@ -140,7 +141,7 @@ class _WorkoutHistoryChartState extends State<WorkoutHistoryChart> {
                   Converter.toDayScale(DateTime.parse(workout.date),
                           starting: 180)
                       .truncateToDouble(),
-                  Util.calculateOneRepMax(workout).toDouble()))
+                  WeightUtil.calculateOneRepMax(workout).toDouble()))
               .toList(),
         ),
       ];

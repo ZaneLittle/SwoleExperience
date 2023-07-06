@@ -6,7 +6,7 @@ import 'package:swole_experience/components/workouts/progression_helper.dart';
 
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
-import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/service/db/workout_service.dart';
 import 'package:swole_experience/model/workout_day.dart';
 import 'package:swole_experience/util/error_handler.dart';
 import 'package:swole_experience/util/util.dart';

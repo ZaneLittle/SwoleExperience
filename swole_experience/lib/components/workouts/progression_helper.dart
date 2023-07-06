@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_day.dart';
-import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/service/db/workout_service.dart';
 import 'package:swole_experience/util/error_handler.dart';
-import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/util/validator.dart';
+import 'package:swole_experience/util/weight_util.dart';
 
 class ProgressionHelper extends StatefulWidget {
   const ProgressionHelper(
@@ -48,10 +48,10 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
     if (repsInput == null && explicitAction) {
       ErrorHandler().showAlert('Invalid value for reps field.,', context);
     } else if (repsInput != null) {
-      double oneRepMax = Util.calculateExactOneRepMax(widget.workout);
+      double oneRepMax = WeightUtil.calculateExactOneRepMax(widget.workout);
       setState(() {
         newReps = repsInput;
-        calculatedWeight = Util.calculateWeightForReps(repsInput, oneRepMax);
+        calculatedWeight = WeightUtil.calculateWeightForReps(repsInput, oneRepMax);
         if (explicitAction) {
           calculatedRoundedWeight =
               (calculatedWeight / 2.5).ceilToDouble() * 2.5;

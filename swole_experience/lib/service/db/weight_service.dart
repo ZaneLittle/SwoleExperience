@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
 import 'package:swole_experience/constants/weight_constant.dart';
 import 'package:swole_experience/model/weight.dart';
 import 'package:swole_experience/model/preference.dart';

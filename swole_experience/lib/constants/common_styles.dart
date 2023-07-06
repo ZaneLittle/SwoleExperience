@@ -10,4 +10,6 @@ class CommonStyles {
 
   static const Color primaryDark = Color(0xff333333);
 
+  static const Color cardBackground = Color(0x33ffffff);
+
 }

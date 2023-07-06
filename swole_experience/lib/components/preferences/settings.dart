@@ -9,7 +9,7 @@ import 'package:swole_experience/components/workouts/workouts_configure.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
-import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
 import 'package:swole_experience/constants/weight_constant.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/util/util.dart';

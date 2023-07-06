@@ -7,8 +7,8 @@ import 'package:swole_experience/constants/weight_constant.dart';
 import 'package:swole_experience/model/average.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/model/weight.dart';
-import 'package:swole_experience/service/preference_service.dart';
-import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
+import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 

@@ -3,13 +3,16 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swole_experience/model/food.dart';
 
-class FoodService {
+
+/// Stores and surfaces the collection of foods the user has used / created
+class FoodCatalogService {
   static const String _dbName = 'food';
 
-  FoodService._privateConstructor();
+  FoodCatalogService._privateConstructor();
 
-  static final FoodService svc = FoodService._privateConstructor();
+  static final FoodCatalogService svc = FoodCatalogService._privateConstructor();
 
   static Database? _db;
 
@@ -31,14 +34,27 @@ class FoodService {
       CREATE TABLE $_dbName(
         id TEXT PRIMARY KEY,
         fdcId INTEGER,
+        barcode INTEGER,
         lastUpdated TEXT,
         name TEXT,
         brand TEXT,
         calories FLOAT,
         protein FLOAT,
         fat FLOAT,
-        carbohydrates FLOAT
+        carbs FLOAT
         )
     ''');
+  }
+
+  Future<List<Food>> search({String? query}) {
+    return Future.value([Food(
+        id: '123',
+        name: query ?? 'Steak',
+        calories: 250,
+        protein: 30,
+        carbs: 0,
+        fat: 20,
+        lastUpdated: DateTime.now(),
+    )]);
   }
 }

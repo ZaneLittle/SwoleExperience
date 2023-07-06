@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swole_experience/components/preferences/features.dart';
 import 'package:swole_experience/constants/common_styles.dart';
-import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
 
 class FeatureToggles extends StatefulWidget {
   const FeatureToggles({

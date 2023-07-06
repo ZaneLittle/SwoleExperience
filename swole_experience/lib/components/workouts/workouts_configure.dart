@@ -9,8 +9,8 @@ import 'package:swole_experience/components/workouts/workout_create_update_form.
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/workout_day.dart';
-import 'package:swole_experience/service/preference_service.dart';
-import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
+import 'package:swole_experience/service/db/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
@@ -231,7 +231,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     }).toList();
     workoutList.add(buildAddExercise(day, workouts.length, workouts));
     return ExpansionTile(
-        title: Text('Day ' + day.toString()),
+        title: Text('Day ' + day.toString()), // Row(children: [Text('Day ' + day.toString())]),
         initiallyExpanded: true,
         children: [
           SizedBox(

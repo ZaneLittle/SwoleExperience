@@ -4,11 +4,11 @@ import 'package:logger/logger.dart';
 
 import 'package:swole_experience/components/weight_tracker/weight_edit_form.dart';
 import 'package:swole_experience/model/weight.dart';
-import 'package:swole_experience/service/weight_service.dart';
+import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/components/AlertSnackBar.dart';
-import 'package:swole_experience/service/average_service.dart';
+import 'package:swole_experience/service/db/average_service.dart';
 
 class HistoricWeightView extends StatefulWidget {
   const HistoricWeightView(

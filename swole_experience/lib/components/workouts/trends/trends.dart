@@ -5,9 +5,9 @@ import 'package:swole_experience/components/workouts/trends/workout_history_char
 import 'package:swole_experience/components/workouts/trends/workout_history_list.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_history.dart';
-import 'package:swole_experience/service/favourite_workout_service.dart';
+import 'package:swole_experience/service/db/favourite_workout_service.dart';
 
-import 'package:swole_experience/service/workout_history_service.dart';
+import 'package:swole_experience/service/db/workout_history_service.dart';
 
 class Trends extends StatefulWidget {
   const Trends({Key? key}) : super(key: key);

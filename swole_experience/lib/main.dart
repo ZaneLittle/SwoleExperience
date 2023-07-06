@@ -5,7 +5,7 @@ import 'package:swole_experience/components/weight_tracker/weight_tracker.dart';
 import 'package:swole_experience/constants/pages.dart';
 import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/model/preference.dart';
-import 'package:swole_experience/service/preference_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
 import 'package:swole_experience/service/timer_service.dart';
 
 void main() {

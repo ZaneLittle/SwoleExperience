@@ -7,7 +7,7 @@ import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:swole_experience/model/workout_day.dart';
-import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/service/db/workout_service.dart';
 
 class WorkoutCard extends StatefulWidget {
   const WorkoutCard({
@@ -204,7 +204,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
       return Container();
     } else {
       return Card(
-          color: const Color(0x33ffffff),
+          color: CommonStyles.cardBackground,
           child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
               height: getNoteHeight(w.notes!) - 7,

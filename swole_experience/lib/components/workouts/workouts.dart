@@ -11,9 +11,9 @@ import 'package:swole_experience/constants/preference_constants.dart';
 import 'package:swole_experience/constants/toggles.dart';
 import 'package:swole_experience/model/preference.dart';
 import 'package:swole_experience/model/workout_day.dart';
-import 'package:swole_experience/service/preference_service.dart';
-import 'package:swole_experience/service/workout_history_service.dart';
-import 'package:swole_experience/service/workout_service.dart';
+import 'package:swole_experience/service/db/preference_service.dart';
+import 'package:swole_experience/service/db/workout_history_service.dart';
+import 'package:swole_experience/service/db/workout_service.dart';
 
 class Workouts extends StatefulWidget {
   const Workouts({Key? key, this.context}) : super(key: key);
