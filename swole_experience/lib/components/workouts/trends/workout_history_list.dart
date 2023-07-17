@@ -8,7 +8,7 @@ import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/util.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 import 'package:swole_experience/service/db/average_service.dart';
 import 'package:swole_experience/util/weight_util.dart';
 

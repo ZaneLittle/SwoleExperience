@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/macros/food_catalog.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/food_history.dart';
-
-import 'food-catalog.dart';
 
 class Meal extends StatefulWidget {
   const Meal({Key? key, required this.mealNum, required this.foods})
@@ -25,10 +24,23 @@ class _MealState extends State<Meal> {
     setState(() {});
   }
 
+  double getHeight() {
+    if (widget.foods.isEmpty) {
+      return 64;
+    }
+    return 64 + ((widget.foods.length) * 92);
+  }
+
+  void addCallback(FoodHistory food) {
+    // TODO: Add to meal
+  }
+
   void add() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const FoodCatalog()))
-        .then(rebuild);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => FoodCatalog(
+                callback: addCallback, mealNum: widget.mealNum))).then(rebuild);
   }
 
   Widget buildFoodItem(FoodHistory food) {
@@ -38,26 +50,30 @@ class _MealState extends State<Meal> {
             color: CommonStyles.cardBackground,
             child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.9,
-                height: 100, // TODO: Size this properly
+                height: 72,
                 child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(food.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              Text('${food.amount}${food.unit}'),
-                              Text(food.calories.toString()),
-                            ]),
+                        Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(food.name,
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold)),
+                                  Text('${food.amount} ${food.unit.name}'),
+                                  Text('cal: ${food.calories.toString()}'),
+                                ])),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(food.carbs.toString()),
-                            Text(food.protein.toString()),
-                            Text(food.fat.toString()),
+                            Text('carbs: ${food.carbs.toString()}'),
+                            Text('protein: ${food.protein.toString()}'),
+                            Text('fat: ${food.fat.toString()}'),
                           ],
                         )
                       ],
@@ -96,15 +112,20 @@ class _MealState extends State<Meal> {
     List<Widget> meal = buildMeal();
     meal.add(buildAdd());
 
-    return ExpansionTile(
-        key: widget.key,
-        title: Text('Meal ${widget.mealNum}'),
-        initiallyExpanded: expanded,
-        children: [
-          ListView(
-            controller: _scrollController,
-            children: meal,
-          )
-        ]);
+    // TODO: dynamic sizing based off number of meals and number of foods in a meal?
+    return SizedBox(
+        height: getHeight() + 60,
+        child: ExpansionTile(
+            key: widget.key,
+            title: Text('Meal ${widget.mealNum}'),
+            initiallyExpanded: expanded,
+            children: [
+              SizedBox(
+                  height: getHeight(),
+                  child: ListView(
+                    controller: _scrollController,
+                    children: meal,
+                  ))
+            ]));
   }
 }

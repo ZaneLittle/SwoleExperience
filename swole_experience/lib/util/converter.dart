@@ -1,3 +1,5 @@
+import 'package:swole_experience/model/unit.dart';
+
 class Converter {
 
   /// Converts DateTime to double representing the number of days past the
@@ -24,4 +26,22 @@ class Converter {
   static DateTime roundToNextDay(DateTime dateTime)  {
     return DateTime(dateTime.year, dateTime.month, dateTime.day + 1);
   }
+
+  // Uses water for volumetric conversions
+  static Map<Unit, double> gramMap = {
+    Unit.oz: 0.03527396,
+    Unit.ml: 1,
+    Unit.tsp: 0.20288413535352,
+    Unit.tbsp: 0.067628045117839,
+    Unit.cup: 0.00423,
+  };
+
+  // uses Water for weight
+  static Map<Unit, double> mlMap = {
+    Unit.oz: 0.03519508,
+    Unit.g: 1,
+    Unit.tsp: 0.1689364,
+    Unit.tbsp: 0.06762804,
+    Unit.cup: 0.004226753,
+  };
 }

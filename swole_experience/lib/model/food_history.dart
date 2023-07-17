@@ -1,5 +1,3 @@
-import 'package:swole_experience/model/unit.dart';
-
 import 'food.dart';
 
 class FoodHistory extends Food {
@@ -14,9 +12,9 @@ class FoodHistory extends Food {
     required protein,
     required fat,
     required carbs,
+    required amount,
+    required unit,
 
-    required this.amount,
-    required this.unit,
     required this.foodId,
     required this.mealNumber,
     required this.date,
@@ -32,27 +30,27 @@ class FoodHistory extends Food {
     protein: protein,
     fat: fat,
     carbs: carbs,
+    amount: amount,
+    unit: unit,
   );
 
   final String foodId;
   final int mealNumber;
   final DateTime date;
   final DateTime? exactTime;
-  final double amount;
-  final Unit unit;
 
   FoodHistory.fromMap(Map<String, dynamic> map)
       : foodId = map['foodId'] as String,
         mealNumber = map['mealNumber'] as int,
         date = DateTime.parse(map['date'] as String),
         exactTime = DateTime.tryParse(map['exactTime'] as String),
-        amount = double.parse(map['amount']),
-        unit = unitFromString(map['unit']) ?? Unit.g,
         super.fromMap(map);
 
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> fMap = super.toMap();
     fMap.addAll({
+      'foodId': foodId,
       'mealNumber': mealNumber,
       'date': date,
       'exactTime': exactTime,

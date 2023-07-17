@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 
 class ErrorHandler {
   static final Logger logger = Logger();

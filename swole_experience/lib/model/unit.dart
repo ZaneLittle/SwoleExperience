@@ -2,8 +2,9 @@ enum Unit {
   g,
   oz,
   ml,
-
-
+  tsp,
+  tbsp,
+  cup,
 }
 
 Unit? unitFromString(String value) {

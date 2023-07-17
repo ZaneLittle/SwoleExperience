@@ -79,7 +79,8 @@ class _MacrosState extends State<Macros> {
             IconButton(
                 onPressed: () => updateView(1),
                 icon: const Icon(Icons.keyboard_arrow_right,
-                    color: CommonStyles.primaryColour))
+                    color: CommonStyles.primaryColour)),
+            const SizedBox(width: 64),
           ],
         ));
   }
@@ -88,7 +89,7 @@ class _MacrosState extends State<Macros> {
     Map<int, List<FoodHistory>> foodMap = FoodMap.buildFoodMap(foods);
 
     List<Widget> meals = [];
-    for (int mealKey in foodMap.keys) {
+    for (int mealKey = 1; mealKey <= mealsNum; mealKey++) {
       meals.add(Meal(mealNum: mealKey, foods: foodMap[mealKey] ?? []));
     }
 
@@ -112,21 +113,24 @@ class _MacrosState extends State<Macros> {
           } else if (snapshot.data == null || snapshot.data!.isEmpty) {
             return const Center(child: Text('Something Went Wrong.'));
           } else {
-            if (snapshot.data!.length <= 2 || snapshot.data![1].isNotEmpty) {
+            if (snapshot.data!.length <= 2 && snapshot.data![1].isNotEmpty) {
               mealsNum = int.tryParse(snapshot.data![1][0]) ??
                   PreferenceConstant.defaultNumMeals;
             }
 
-            return Expanded(
-                child: Column(
-              children: [
-                buildDaySelect(snapshot),
-                ListView(
-                  controller: _scrollController,
-                  children: buildMeals(snapshot.data![0] as List<FoodHistory>),
-                )
-              ],
-            ));
+            return SizedBox(
+                    child: Column(
+                      children: [
+                        buildDaySelect(snapshot),
+                        Expanded(
+                        child: ListView(
+                          controller: _scrollController,
+                          children: buildMeals(
+                              snapshot.data![0] as List<FoodHistory>
+                          ),
+                        ))
+                      ],
+                    ));
           }
         });
   }

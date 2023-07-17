@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/macros/macros.dart';
 
 import 'package:swole_experience/components/workouts/workouts.dart';
 import 'package:swole_experience/components/weight_tracker/weight_tracker.dart';
@@ -35,7 +36,7 @@ class StatefulApp extends StatefulWidget {
 class _AppState extends State<StatefulApp> {
   int _selectedIndex = 0; // Default to weight tracker open
   static final List<Widget> _pages = <Widget>[
-    // Toggles.macros ? const Text('Macros Coming soon',) : Container(),
+    const Macros(),
     const WeightTracker(),
     const Workouts(),
   ];
@@ -74,10 +75,10 @@ class _AppState extends State<StatefulApp> {
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.restaurant),
-            //   label: 'Macros',
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant),
+              label: 'Macros',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.timeline),
               label: 'Weight',

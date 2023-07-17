@@ -1,3 +1,5 @@
+import 'package:swole_experience/model/unit.dart';
+
 class Food {
   Food({
     required this.id,
@@ -10,6 +12,8 @@ class Food {
     required this.protein,
     required this.fat,
     required this.carbs,
+    required this.amount,
+    required this.unit,
   });
 
   final String id;
@@ -22,6 +26,8 @@ class Food {
   final double protein;
   final double fat;
   final double carbs;
+  final double amount;
+  final Unit unit;
 
   Food.fromMap(Map<String, dynamic> map)
       : id = map['id'] as String,
@@ -33,7 +39,9 @@ class Food {
         calories = double.parse(map['calories']),
         protein = double.parse(map['protein']),
         fat = double.parse(map['fat']),
-        carbs = double.parse(map['carbs']);
+        carbs = double.parse(map['carbs']),
+        amount = double.parse(map['amount']),
+        unit = unitFromString(map['unit']) ?? Unit.g;
 
   Map<String, dynamic> toMap() {
     return {
@@ -47,11 +55,8 @@ class Food {
       'protein': protein,
       'fat': fat,
       'carbs': carbs,
+      'amount': amount,
+      'unit': unit,
     };
-  }
-
-  @override
-  String toString() {
-    return 'Food:\n\tID:$id\n\tFDC (USDA) ID:$fdcId\n\tBarcode:$barcode\n\tLast Updated:$lastUpdated\n\tName:$name\n\Brand:$brand\n\tCalories:$calories\n\tProtein:$protein\n\tFat:$fat\n\carbs:$carbs';
   }
 }

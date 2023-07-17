@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:swole_experience/model/workout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 import 'package:swole_experience/model/workout_day.dart';
 
 /// General utility functions

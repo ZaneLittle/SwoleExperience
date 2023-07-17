@@ -7,9 +7,9 @@ class Pages {
   static const String workout = 'workout';
 
   static const Map<String, int> pageMap = {
-    'macros': -1, // TODO: Increment each when macros page is implemented
-    'weight': 0,
-    'workout': 1
+    'macros': 0,
+    'weight': 1,
+    'workout': 2
   };
 
   static String? getPage(int index) {

@@ -8,7 +8,7 @@ import 'package:swole_experience/service/db/average_service.dart';
 import 'package:swole_experience/service/db/weight_service.dart';
 import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/validator.dart';
-import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 
 class WeightEditForm extends StatefulWidget {
   const WeightEditForm({

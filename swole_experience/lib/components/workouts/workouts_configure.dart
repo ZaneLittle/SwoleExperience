@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
-import 'package:swole_experience/components/AlertSnackBar.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 import 'package:swole_experience/components/workouts/workout_card.dart';
 import 'package:swole_experience/components/workouts/workout_create_update_form.dart';
 import 'package:swole_experience/constants/common_styles.dart';
