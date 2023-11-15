@@ -50,7 +50,7 @@ class FoodCatalogService {
     return Future.value([
       Food(
         id: '123',
-        name: query ?? 'Steak',
+        name: 'Steak',
         calories: 250,
         protein: 30,
         carbs: 0,
@@ -61,7 +61,7 @@ class FoodCatalogService {
       ),
       Food(
         id: '1234',
-        name: query ?? 'Potatoes',
+        name: 'Potatoes',
         brand: 'Chiffon',
         calories: 250,
         protein: 30,
@@ -73,7 +73,7 @@ class FoodCatalogService {
       ),
       Food(
         id: '12345',
-        name: query ?? 'Salad',
+        name: 'Salad',
         calories: 250,
         protein: 30,
         carbs: 0,

@@ -1,9 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:swole_experience/components/macros/food_catalog.dart';
+import 'package:swole_experience/constants/MacroStyles.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/food_history.dart';
+import 'package:swole_experience/service/db/food_history_service.dart';
 
 class Meal extends StatefulWidget {
   const Meal({Key? key, required this.mealNum, required this.foods})
@@ -19,20 +19,24 @@ class Meal extends StatefulWidget {
 class _MealState extends State<Meal> {
   final ScrollController _scrollController = ScrollController();
   bool expanded = true;
+  List<FoodHistory>? foods;
 
-  FutureOr rebuild(dynamic val) {
-    setState(() {});
+  @override
+  void initState() {
+    super.initState();
+    foods = widget.foods;
   }
 
   double getHeight() {
-    if (widget.foods.isEmpty) {
+    if (foods!.isEmpty) {
       return 64;
     }
-    return 64 + ((widget.foods.length) * 92);
+    return 64 + ((foods!.length) * 92);
   }
 
   void addCallback(FoodHistory food) {
-    // TODO: Add to meal
+    FoodHistoryService.svc.create(food);
+    setState(() => foods!.add(food));
   }
 
   void add() {
@@ -40,12 +44,13 @@ class _MealState extends State<Meal> {
         context,
         MaterialPageRoute(
             builder: (context) => FoodCatalog(
-                callback: addCallback, mealNum: widget.mealNum))).then(rebuild);
+                addFood: addCallback, mealNum: widget.mealNum)));
   }
 
   Widget buildFoodItem(FoodHistory food) {
     return Card(
         key: Key('${food.id}-card'),
+        // TODO: Make dismissable : left for delete and right for update
         child: Card(
             color: CommonStyles.cardBackground,
             child: SizedBox(
@@ -71,9 +76,9 @@ class _MealState extends State<Meal> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('carbs: ${food.carbs.toString()}'),
-                            Text('protein: ${food.protein.toString()}'),
-                            Text('fat: ${food.fat.toString()}'),
+                            Text('carbs: ${food.carbs.toStringAsFixed(1)}', style: const TextStyle(color: MacroStyles.carbColour)),
+                            Text('protein: ${food.protein.toStringAsFixed(1)}', style: const TextStyle(color: MacroStyles.proteinColour)),
+                            Text('fat: ${food.fat.toStringAsFixed(1)}', style: const TextStyle(color: MacroStyles.fatColour)),
                           ],
                         )
                       ],
@@ -102,7 +107,7 @@ class _MealState extends State<Meal> {
   }
 
   List<Widget> buildMeal() {
-    return widget.foods.map((food) {
+    return foods!.map((food) {
       return buildFoodItem(food);
     }).toList();
   }

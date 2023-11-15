@@ -1,24 +1,46 @@
+import 'package:swole_experience/model/unit.dart';
+import 'package:swole_experience/util/converter.dart';
+
 import 'food.dart';
+
+/// Model:
+///    @id: unique ID of this history item
+///    @fdcId: ID from the FDC API
+///    @foodId: ID of the parent Food item
+///
+///    @name: Name of the food
+///    @brand: Brand of the food
+///
+///    @calories, @protein, @fat, @carbs: macro information
+///    @amount: value in the @unit that was consumed
+///    @date: date (without time information) the item was added
+///       NOTE: the reason we store date separate from exactTime is to make querying easier and more efficient
+///
+///    @barcode: barcode from scanner for product -- TODO: V2
+///    @lastUpdated: DateTime when the item was update -- TODO: Not used but might be useful for display down the line
+///    @exactTime: Exact time the item was added -- TODO: V2 or V3 - this could be used to display in a calendar view
 
 class FoodHistory extends Food {
   FoodHistory({
-    required id,
-    fdcId,
-    barcode,
-    lastUpdated,
-    required name,
-    brand,
-    required calories,
-    required protein,
-    required fat,
-    required carbs,
-    required amount,
-    required unit,
-
+    required String id,
+    int? fdcId,
     required this.foodId,
+
+    required String name,
+    String? brand,
+
+    required double calories,
+    required double protein,
+    required double fat,
+    required double carbs,
+    required double amount,
+    required Unit unit,
     required this.mealNumber,
     required this.date,
-    this.exactTime, // TODO: This may be implemented in the future to display the food on a calendar view. For now it will sit empty in the model.
+
+    String? barcode,
+    required DateTime lastUpdated,
+    this.exactTime,
   }) : super(
     id: id,
     fdcId: fdcId,
@@ -43,7 +65,7 @@ class FoodHistory extends Food {
       : foodId = map['foodId'] as String,
         mealNumber = map['mealNumber'] as int,
         date = DateTime.parse(map['date'] as String),
-        exactTime = DateTime.tryParse(map['exactTime'] as String),
+        exactTime = DateTime.tryParse(map['exactTime'] as String? ?? ''),
         super.fromMap(map);
 
   @override
@@ -52,8 +74,8 @@ class FoodHistory extends Food {
     fMap.addAll({
       'foodId': foodId,
       'mealNumber': mealNumber,
-      'date': date,
-      'exactTime': exactTime,
+      'date': Converter.truncateToDay(date).toString(),
+      'exactTime': exactTime.toString(),
     });
     return fMap;
   }

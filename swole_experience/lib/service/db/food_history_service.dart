@@ -1,18 +1,22 @@
 import 'dart:io';
 
+import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swole_experience/model/food_history.dart';
-import 'package:swole_experience/model/unit.dart';
+import 'package:swole_experience/util/converter.dart';
 
 /// Stores and surfaces the collection of foods the user has used / created
 class FoodHistoryService {
+  final Logger logger = Logger();
+
   static const String _dbName = 'foodhistory';
 
   FoodHistoryService._privateConstructor();
 
-  static final FoodHistoryService svc = FoodHistoryService._privateConstructor();
+  static final FoodHistoryService svc =
+      FoodHistoryService._privateConstructor();
 
   static Database? _db;
 
@@ -33,112 +37,57 @@ class FoodHistoryService {
     await db.execute('''
       CREATE TABLE $_dbName(
         id TEXT PRIMARY KEY,
+        fdcId TEXT,
         foodId TEXT,
-        mealNumber INTEGER,
-        date TEXT,
-        exactTime TEXT,
         name TEXT,
+        brand TEXT,
         calories FLOAT,
         protein FLOAT,
         fat FLOAT,
         carbs FLOAT,
         amount FLOAT,
         unit STRING,
+        mealNumber INTEGER,
+        date TEXT,
+        barcode TEXT,
+        exactTime TEXT,
+        lastUpdated TEXT
         )
     ''');
   }
 
-  Future<List<FoodHistory>> get({DateTime? date}) {
-    return Future.value([FoodHistory(
-      id: '123',
-      name: 'Steak',
-      calories: 250.0,
-      protein: 30.0,
-      carbs: 0.0,
-      fat: 20.0,
+  Future<List<FoodHistory>> get(
+      {String? id, String? name, DateTime? date}) async {
+    Database db = await svc.db;
+    List<String> where = [];
+    List<Object?>? whereArgs = [];
 
-      amount: 100.0,
-      unit: Unit.g,
-      foodId: '123',
-      mealNumber: 1,
-      lastUpdated: DateTime.now(),
-      date: DateTime.now(),
-    ),
-      FoodHistory(
-        id: '1234',
-        name: 'Potatos',
-        calories: 250.0,
-        protein: 30.0,
-        carbs: 0.0,
-        fat: 20.0,
+    if (id != null) {
+      where.add('"id" = ?');
+      whereArgs.add(id);
+    }
+    if (name != null) {
+      where.add('"name" = ?');
+      whereArgs.add(name);
+    }
+    if (date != null) {
+      where.add('"date" = ?');
+      whereArgs.add(Converter.truncateToDay(date).toString());
+    }
 
-        amount: 100.0,
-        unit: Unit.g,
-        foodId: '1234',
-        mealNumber: 1,
-        lastUpdated: DateTime.now(),
-        date: DateTime.now(),
-      ),
-      FoodHistory(
-        id: '12345',
-        name: 'Salad',
-        calories: 250.0,
-        protein: 30.0,
-        carbs: 0.0,
-        fat: 20.0,
+    var foodHistory = await db.query(
+      _dbName,
+      where: where.join(' AND '),
+      whereArgs: whereArgs,
+    );
 
-        amount: 100.0,
-        unit: Unit.g,
-        foodId: '12345',
-        mealNumber: 1,
-        lastUpdated: DateTime.now(),
-        date: DateTime.now(),
-      ),
-      FoodHistory(
-        id: '1234',
-        name: 'Potatos',
-        calories: 250.0,
-        protein: 30.0,
-        carbs: 0.0,
-        fat: 20.0,
+    return foodHistory.isNotEmpty
+        ? foodHistory.map((f) => FoodHistory.fromMap(f)).toList()
+        : [];
+  }
 
-        amount: 100.0,
-        unit: Unit.g,
-        foodId: '1234',
-        mealNumber: 2,
-        lastUpdated: DateTime.now(),
-        date: DateTime.now(),
-      ),
-      FoodHistory(
-        id: '12345',
-        name: 'Salad',
-        calories: 250.0,
-        protein: 30.0,
-        carbs: 0.0,
-        fat: 20.0,
-
-        amount: 100.0,
-        unit: Unit.g,
-        foodId: '12345',
-        mealNumber: 2,
-        lastUpdated: DateTime.now(),
-        date: DateTime.now(),
-      ),
-      FoodHistory(
-        id: '12345',
-        name: 'Salad',
-        calories: 250.0,
-        protein: 30.0,
-        carbs: 0.0,
-        fat: 20.0,
-
-        amount: 100.0,
-        unit: Unit.g,
-        foodId: '12345',
-        mealNumber: 3,
-        lastUpdated: DateTime.now(),
-        date: DateTime.now(),
-      )
-    ]);
+  Future<int> create(FoodHistory food) async {
+    Database db = await svc.db;
+    return await db.insert(_dbName, food.toMap());
   }
 }

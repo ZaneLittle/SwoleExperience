@@ -2,6 +2,17 @@ import 'package:swole_experience/model/unit.dart';
 
 class Converter {
 
+  // Uses water for volumetric conversions
+  static final Map<Unit, double> _gramMap = {
+    Unit.g: 1,
+    Unit.ml: 1,
+    Unit.oz: 0.03527396,
+    Unit.tsp: 0.20288413535352,
+    Unit.tbsp: 0.067628045117839,
+    Unit.cup: 0.00423,
+  };
+
+
   /// Converts DateTime to double representing the number of days past the
   /// starting interval
   /// For example a date that was 30 days ago, and the starting param is 60,
@@ -27,21 +38,12 @@ class Converter {
     return DateTime(dateTime.year, dateTime.month, dateTime.day + 1);
   }
 
-  // Uses water for volumetric conversions
-  static Map<Unit, double> gramMap = {
-    Unit.oz: 0.03527396,
-    Unit.ml: 1,
-    Unit.tsp: 0.20288413535352,
-    Unit.tbsp: 0.067628045117839,
-    Unit.cup: 0.00423,
-  };
 
-  // uses Water for weight
-  static Map<Unit, double> mlMap = {
-    Unit.oz: 0.03519508,
-    Unit.g: 1,
-    Unit.tsp: 0.1689364,
-    Unit.tbsp: 0.06762804,
-    Unit.cup: 0.004226753,
-  };
+  /// Converts @amount from @inputUnit to @outputUnit
+  static double convertUnit(double amount, Unit inputUnit, Unit outputUnit) {
+    double amountInG = (inputUnit != Unit.g || inputUnit != Unit.ml)
+        ? amount * _gramMap[inputUnit]!
+        : amount;
+    return amountInG / _gramMap[outputUnit]!;
+  }
 }
