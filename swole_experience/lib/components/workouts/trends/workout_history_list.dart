@@ -2,14 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
-import 'package:swole_experience/components/weight_tracker/weight_edit_form.dart';
-import 'package:swole_experience/model/weight.dart';
 import 'package:swole_experience/model/workout_history.dart';
-import 'package:swole_experience/service/db/weight_service.dart';
-import 'package:swole_experience/util/converter.dart';
 import 'package:swole_experience/util/util.dart';
-import 'package:swole_experience/components/alert_snack_bar.dart';
-import 'package:swole_experience/service/db/average_service.dart';
 import 'package:swole_experience/util/weight_util.dart';
 
 class WorkoutHistoryList extends StatefulWidget {

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/workout_history.dart';
 import 'package:swole_experience/util/converter.dart';
-import 'package:swole_experience/util/util.dart';
 import 'package:swole_experience/util/weight_util.dart';
 
 class WorkoutHistoryChart extends StatefulWidget {

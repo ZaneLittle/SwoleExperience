@@ -37,7 +37,7 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
   void deleteWeight(String? id, DateTime date) {
     if (id != null) {
       WeightService.svc.removeWeight(id).onError((error, stackTrace) {
-        logger.e("Error deleting weight $error", stackTrace);
+        logger.e("Error deleting weight $error", stackTrace: stackTrace);
         const AlertSnackBar(
           message: 'Unable to delete weight.',
           state: SnackBarState.failure,

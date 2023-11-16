@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
-import 'package:swole_experience/model/workout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:swole_experience/components/alert_snack_bar.dart';

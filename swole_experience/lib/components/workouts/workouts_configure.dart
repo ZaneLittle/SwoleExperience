@@ -14,8 +14,7 @@ import 'package:swole_experience/service/db/workout_service.dart';
 import 'package:swole_experience/util/util.dart';
 
 class WorkoutsConfigure extends StatefulWidget {
-  const WorkoutsConfigure({Key? key, this.context, this.freshBuild = false})
-      : super(key: key);
+  const WorkoutsConfigure({super.key, this.context, this.freshBuild = false});
 
   final BuildContext? context;
   final bool freshBuild;
@@ -53,9 +52,9 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
       workoutMap[key] = [];
     }
 
-    Map<int, List<WorkoutDay>> _workoutMap = Util().getWorkoutDays(workouts);
-    for (int day = 1; day <= _workoutMap.keys.length; day++) {
-      workoutMap[day] = _workoutMap[day]!;
+    Map<int, List<WorkoutDay>> newWorkoutMap = Util().getWorkoutDays(workouts);
+    for (int day = 1; day <= newWorkoutMap.keys.length; day++) {
+      workoutMap[day] = newWorkoutMap[day]!;
     }
   }
 
@@ -172,11 +171,11 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
         onPressed: () {
           addDay();
         },
-        child: Padding(
-            padding: const EdgeInsets.all(8),
+        child: const Padding(
+            padding: EdgeInsets.all(8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.add_circle, color: CommonStyles.primaryColour),
                 Padding(
                     padding: EdgeInsets.only(left: 24),
@@ -196,11 +195,11 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
         onPressed: () {
           addExercise(day, defaultOrder, workouts);
         },
-        child: Padding(
-            padding: const EdgeInsets.all(8),
+        child: const Padding(
+            padding: EdgeInsets.all(8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.add_circle, color: CommonStyles.primaryColour),
                 Padding(
                     padding: EdgeInsets.only(left: 24),
@@ -231,7 +230,7 @@ class _WorkoutsConfigureState extends State<WorkoutsConfigure> {
     }).toList();
     workoutList.add(buildAddExercise(day, workouts.length, workouts));
     return ExpansionTile(
-        title: Text('Day ' + day.toString()), // Row(children: [Text('Day ' + day.toString())]),
+        title: Text('Day $day'),
         initiallyExpanded: true,
         children: [
           SizedBox(

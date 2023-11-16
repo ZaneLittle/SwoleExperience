@@ -2,9 +2,7 @@ import 'dart:collection';
 
 import 'package:swole_experience/model/food_history.dart';
 
-/**
- * Rationale behind map vs list: meal numbers might change to named meals
- */
+/// Rationale behind map vs list: meal numbers might change to named meals
 
 class FoodMap {
   static HashMap<int, List<FoodHistory>> buildFoodMap(List<FoodHistory> foods) {

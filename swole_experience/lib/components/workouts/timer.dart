@@ -78,7 +78,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
           animation: svc, // listen to ChangeNotifier
           builder: (context, child) {
             return SizedBox(
-              height: 48,
+              height: 46,
               child: Align(
                   alignment: Alignment.bottomCenter, child: buildTimer(buttonText)),
             );

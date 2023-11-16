@@ -49,7 +49,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
   final ScrollController _horizontalScrollController = ScrollController();
 
   double getHeight() {
-    double baseHeight = 96;
+    double baseHeight = 105;
     double maxNoteHeight = getMaxNoteHeight();
     double supersetHeight = getSupersetHeight();
 
@@ -61,7 +61,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
       return 0;
     }
 
-    return widget.supersets!.length * 62;
+    return widget.supersets!.length * 74;
   }
 
   double getMaxNoteHeight() {
@@ -78,9 +78,9 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
     for (String note in notes) {
       if (note.trim().length > 60 || note.trim().contains('\n')) {
-        return 62;
+        return 64;
       } else if (note.trim().isNotEmpty) {
-        maxNoteHeight = 38;
+        maxNoteHeight = 40;
       }
     }
     return maxNoteHeight;
@@ -298,26 +298,26 @@ class _WorkoutCardState extends State<WorkoutCard> {
         background: widget.allowDelete
             ? Container(
                 color: Colors.red,
-                child: Align(
+                child: const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                        padding: const EdgeInsets.only(left: 18),
+                        padding: EdgeInsets.only(left: 18),
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(Icons.close),
                               Text('Delete'),
                             ]))))
             : Container(),
         secondaryBackground: Container(
             color: CommonStyles.primaryColour,
-            child: Align(
+            child: const Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
-                    padding: const EdgeInsets.only(right: 18),
+                    padding: EdgeInsets.only(right: 18),
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.mode_edit),
                           Text('Update'),
                         ])))),

@@ -24,7 +24,7 @@ class ErrorHandler {
 
   void handleGenericSaveError(
       String operation, Exception ex, StackTrace trace, BuildContext context) {
-    logger.e('Error ${operation}ing workout', ex, trace);
+    logger.e('Error ${operation}ing workout', error: ex, stackTrace: trace);
     showAlert('Unable to update or create the workout.', context);
   }
 

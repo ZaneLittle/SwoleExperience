@@ -74,11 +74,11 @@ class _WorkoutListState extends State<WorkoutList> {
                       builder: (context) => const WorkoutsConfigure()))
               .then(rebuildDynamic);
         },
-        child: Align(
+        child: const Align(
             alignment: Alignment.center,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.add_circle, color: CommonStyles.primaryColour),
                 Padding(
                     padding: EdgeInsets.only(left: 24),
@@ -95,12 +95,12 @@ class _WorkoutListState extends State<WorkoutList> {
         onPressed: () {
           rebuild();
         },
-        child: Align(
+        child: const Align(
             alignment: Alignment.center,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Padding(
                     padding: EdgeInsets.only(bottom: 24),
                     child: Text(

@@ -55,7 +55,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
             ).alert(context);
           }
         }).onError((error, stackTrace) {
-          logger.e("Error calculating averages $error", stackTrace);
+          logger.e("Error calculating averages $error", stackTrace: stackTrace);
           const AlertSnackBar(
             message: 'Unable to calculate averages.',
             state: SnackBarState.failure,
@@ -63,7 +63,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
         }).then((res) => res != 0 ? widget.rebuildCallback(context) : null);
       }
     }).onError((error, stackTrace) {
-      logger.e("Error adding weight $error", stackTrace);
+      logger.e("Error adding weight $error", stackTrace: stackTrace);
       const AlertSnackBar(
         message: 'Unable to add weight.',
         state: SnackBarState.failure,

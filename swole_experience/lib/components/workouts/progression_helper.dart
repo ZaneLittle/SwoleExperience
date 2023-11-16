@@ -198,7 +198,7 @@ class _ProgressionHelperState extends State<ProgressionHelper> {
             right: horizontalPadding),
         child: OutlinedButton(
             onPressed: () => calculateWeight(explicitAction: true),
-            child: Row(children: const [
+            child: const Row(children: [
               Icon(Icons.calculate, color: CommonStyles.secondaryColour),
               Padding(
                   padding: EdgeInsets.only(left: 12),

@@ -90,11 +90,11 @@ class _MealState extends State<Meal> {
         onPressed: () {
           add();
         },
-        child: Padding(
-            padding: const EdgeInsets.all(8),
+        child: const Padding(
+            padding: EdgeInsets.all(8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.add_circle, color: CommonStyles.primaryColour),
                 Padding(
                     padding: EdgeInsets.only(left: 24),

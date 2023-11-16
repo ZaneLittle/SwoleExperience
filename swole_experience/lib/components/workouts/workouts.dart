@@ -16,7 +16,7 @@ import 'package:swole_experience/service/db/workout_history_service.dart';
 import 'package:swole_experience/service/db/workout_service.dart';
 
 class Workouts extends StatefulWidget {
-  const Workouts({Key? key, this.context}) : super(key: key);
+  const Workouts({super.key, this.context});
 
   final BuildContext? context;
 
@@ -199,8 +199,8 @@ class _WorkoutsState extends State<Workouts> {
                 setState(() {});
                 build(context);
               }),
-          child: const Text('Complete Day'),
-          style: ElevatedButton.styleFrom(primary: CommonStyles.primaryColour));
+          style: ElevatedButton.styleFrom(backgroundColor: CommonStyles.primaryColour),
+          child: const Text('Complete Day'),);
     }
   }
 

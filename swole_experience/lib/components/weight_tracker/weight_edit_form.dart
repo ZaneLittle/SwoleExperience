@@ -58,7 +58,7 @@ class _WeightEditFormState extends State<WeightEditForm> {
           }
         }
       }).onError((error, stackTrace) {
-        logger.e("Error updating weight $error", stackTrace);
+        logger.e("Error updating weight $error", stackTrace: stackTrace);
         const AlertSnackBar(
           message: 'Unable to update weight.',
           state: SnackBarState.failure,
