@@ -44,22 +44,22 @@ class _WorkoutTimerState extends State<WorkoutTimer> {
     return Row(
       children: [
         SizedBox(
-            width: MediaQuery.of(context).size.width * .3,
+            width: MediaQuery.of(context).size.width * .25,
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               buildResetButton(),
             ])),
         SizedBox(
-            width: MediaQuery.of(context).size.width * .4,
+            width: MediaQuery.of(context).size.width * .5,
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(
                   '${twoDigits(svc.currentDuration.inMinutes.remainder(60))} : '
                       '${twoDigits(svc.currentDuration.inSeconds.remainder(60))} : '
-                      '${twoDigits((svc.currentDuration.inMilliseconds.remainder(1000) / 10).round())}',
+                      '${twoDigits((svc.currentDuration.inMilliseconds.remainder(1000) ~/ 10))}',
                   style: const TextStyle(
                       fontSize: 28, fontWeight: FontWeight.bold)),
             ])),
         SizedBox(
-            width: MediaQuery.of(context).size.width * .3,
+            width: MediaQuery.of(context).size.width * .25,
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               IconButton(
                 icon: getStartStopIcon(),
