@@ -5,8 +5,7 @@ import 'package:swole_experience/components/macros/food_catalog_search_results.d
 import 'package:swole_experience/constants/common_styles.dart';
 
 class FoodCatalog extends StatefulWidget {
-  const FoodCatalog({Key? key, required this.addFood, required this.mealNum})
-      : super(key: key);
+  const FoodCatalog({super.key, required this.addFood, required this.mealNum});
 
   final int mealNum;
   final Function addFood;

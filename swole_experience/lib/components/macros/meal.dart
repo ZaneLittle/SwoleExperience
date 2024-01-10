@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/alert_snack_bar.dart';
 import 'package:swole_experience/components/macros/food_catalog.dart';
-import 'package:swole_experience/constants/MacroStyles.dart';
+import 'package:swole_experience/constants/macro_styles.dart';
 import 'package:swole_experience/constants/common_styles.dart';
+import 'package:swole_experience/model/food.dart';
 import 'package:swole_experience/model/food_history.dart';
+import 'package:swole_experience/service/db/food_catalog_service.dart';
 import 'package:swole_experience/service/db/food_history_service.dart';
 
 class Meal extends StatefulWidget {
-  const Meal({Key? key, required this.mealNum, required this.foods})
-      : super(key: key);
+  const Meal({super.key, required this.mealNum, required this.foods});
 
   final int mealNum;
   final List<FoodHistory> foods;
@@ -34,9 +36,26 @@ class _MealState extends State<Meal> {
     return 64 + ((foods!.length) * 92);
   }
 
-  void addCallback(FoodHistory food) {
-    FoodHistoryService.svc.create(food);
-    setState(() => foods!.add(food));
+  void addCallback(FoodHistory food) async {
+    String? historyError = await FoodHistoryService.svc.create(food);
+    if (historyError != null) {
+      // TODO: rewrite to not use BuildContext
+      AlertSnackBar(
+        message: historyError,
+        state: SnackBarState.failure
+      ).alert(context);
+    } else {
+      String? catalogError = await FoodCatalogService.svc.createOrUpdate(
+          Food.fromFoodHistory(food));
+      if (catalogError != null) {
+        // TODO: rewrite to not use BuildContext
+        AlertSnackBar(
+            message: catalogError,
+            state: SnackBarState.warning
+        ).alert(context);
+      }
+      setState(() => foods!.add(food));
+    }
   }
 
   void add() {

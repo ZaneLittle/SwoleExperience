@@ -1,7 +1,5 @@
-import 'package:swole_experience/model/unit.dart';
+import 'package:swole_experience/model/food.dart';
 import 'package:swole_experience/util/converter.dart';
-
-import 'food.dart';
 
 /// Model:
 ///    @id: unique ID of this history item
@@ -12,7 +10,9 @@ import 'food.dart';
 ///    @brand: Brand of the food
 ///
 ///    @calories, @protein, @fat, @carbs: macro information
-///    @amount: value in the @unit that was consumed
+///    @amount: value in the @unit (or @customUnitName if present) that was consumed
+///    @customUnitName: A string value representing a custom unit type (ex per 'cookie') the user has entered
+///    @gramConversion: The multiplier used to convert 1 @customUnit name to 1 gram
 ///    @date: date (without time information) the item was added
 ///       NOTE: the reason we store date separate from exactTime is to make querying easier and more efficient
 ///
@@ -22,51 +22,40 @@ import 'food.dart';
 
 class FoodHistory extends Food {
   FoodHistory({
-    required String id,
-    int? fdcId,
+    required super.id,
+    super.fdcId,
     required this.foodId,
 
-    required String name,
-    String? brand,
+    required super.name,
+    super.brand,
 
-    required double calories,
-    required double protein,
-    required double fat,
-    required double carbs,
-    required double amount,
-    required Unit unit,
+    required super.calories,
+    required super.protein,
+    required super.fat,
+    required super.carbs,
+    required super.amount,
+    required super.unit,
+    super.customUnit,
+    super.gramConversion,
     required this.mealNumber,
     required this.date,
 
-    String? barcode,
-    required DateTime lastUpdated,
+    super.barcode,
+    required super.lastUpdated,
     this.exactTime,
-  }) : super(
-    id: id,
-    fdcId: fdcId,
-    barcode: barcode,
-    lastUpdated: lastUpdated,
-    name: name,
-    brand: brand,
-    calories: calories,
-    protein: protein,
-    fat: fat,
-    carbs: carbs,
-    amount: amount,
-    unit: unit,
-  );
+  });
 
   final String foodId;
   final int mealNumber;
   final DateTime date;
   final DateTime? exactTime;
 
-  FoodHistory.fromMap(Map<String, dynamic> map)
+  FoodHistory.fromMap(super.map)
       : foodId = map['foodId'] as String,
         mealNumber = map['mealNumber'] as int,
         date = DateTime.parse(map['date'] as String),
         exactTime = DateTime.tryParse(map['exactTime'] as String? ?? ''),
-        super.fromMap(map);
+        super.fromMap();
 
   @override
   Map<String, dynamic> toMap() {

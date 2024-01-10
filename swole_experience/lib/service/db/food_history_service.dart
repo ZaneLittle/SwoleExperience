@@ -46,12 +46,14 @@ class FoodHistoryService {
         fat FLOAT,
         carbs FLOAT,
         amount FLOAT,
-        unit STRING,
+        unit TEXT,
+        customUnit TEXT,
+        gramConversion FLOAT,
         mealNumber INTEGER,
         date TEXT,
         barcode TEXT,
-        exactTime TEXT,
-        lastUpdated TEXT
+        lastUpdated TEXT,
+        exactTime TEXT
         )
     ''');
   }
@@ -86,8 +88,14 @@ class FoodHistoryService {
         : [];
   }
 
-  Future<int> create(FoodHistory food) async {
+  Future<String?> create(FoodHistory food) async {
     Database db = await svc.db;
-    return await db.insert(_dbName, food.toMap());
+    String? e;
+    await db.insert(_dbName, food.toMap()).onError((err, st) {
+      logger.e('Error creating a food history item: $err');
+      e = '$err';
+      return 0;
+    });
+    return e;
   }
 }

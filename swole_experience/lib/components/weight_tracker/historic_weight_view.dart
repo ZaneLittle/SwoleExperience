@@ -119,11 +119,6 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
     return ExpansionTile(
       key: _historicWeightViewKey,
       title: const Text('Historic Weight Data'),
-      children: <Widget>[
-        SizedBox(
-            height: MediaQuery.of(context).size.height * .25,
-            child: buildList()),
-      ],
       initiallyExpanded: _historicWeightViewExpanded,
       onExpansionChanged: (bool expanded) {
         setState(() => _historicWeightViewExpanded = expanded);
@@ -131,6 +126,11 @@ class _HistoricWeightViewState extends State<HistoricWeightView> {
           Util().scrollToSelectedContext(_historicWeightViewKey);
         }
       },
+      children: <Widget>[
+        SizedBox(
+            height: MediaQuery.of(context).size.height * .25,
+            child: buildList()),
+      ],
     );
   }
 }

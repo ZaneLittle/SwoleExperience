@@ -42,7 +42,7 @@ class _WeightEntryFormState extends State<WeightEntryForm> {
 
     WeightService.svc
         .addWeight(Weight(
-            id: const Uuid().v1(), weight: weightVal, dateTime: dateTime))
+            id: const Uuid().v4(), weight: weightVal, dateTime: dateTime))
         .then((int r) {
       if (r != 0) {
         AverageService.svc

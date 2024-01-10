@@ -1,15 +1,19 @@
+import 'package:logger/logger.dart';
 import 'package:swole_experience/model/unit.dart';
 
 class Converter {
+  static final Logger logger = Logger();
 
   // Uses water for volumetric conversions
   static final Map<Unit, double> _gramMap = {
     Unit.g: 1,
+    Unit.mg: 1000,
     Unit.ml: 1,
     Unit.oz: 0.03527396,
     Unit.tsp: 0.20288413535352,
     Unit.tbsp: 0.067628045117839,
     Unit.cup: 0.00423,
+    Unit.custom: 0,
   };
 
 
@@ -41,6 +45,9 @@ class Converter {
 
   /// Converts @amount from @inputUnit to @outputUnit
   static double convertUnit(double amount, Unit inputUnit, Unit outputUnit) {
+    if (inputUnit == Unit.custom) {
+      logger.i("Cannot convert amount $amount to $outputUnit from custom unit");
+    }
     double amountInG = (inputUnit != Unit.g || inputUnit != Unit.ml)
         ? amount * _gramMap[inputUnit]!
         : amount;

@@ -1,82 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:swole_experience/components/macros/food_card.dart';
 import 'package:swole_experience/components/macros/food_summary.dart';
-import 'package:swole_experience/constants/MacroStyles.dart';
+import 'package:swole_experience/constants/macro_styles.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/food.dart';
+import 'package:swole_experience/model/response/food_response.dart';
 import 'package:swole_experience/service/db/food_catalog_service.dart';
+import 'package:swole_experience/service/rest/fdc.dart';
 
 class FoodCatalogSearchResults extends StatefulWidget {
-  const FoodCatalogSearchResults({Key? key, required this.addFood, required this.mealNum, required this.query})
-      : super(key: key);
+  const FoodCatalogSearchResults(
+      {super.key,
+      required this.addFood,
+      required this.mealNum,
+      required this.query});
 
   final int mealNum;
   final Function addFood;
   final String query;
 
   @override
-  State<FoodCatalogSearchResults> createState() => _FoodCatalogSearchResultsState();
+  State<FoodCatalogSearchResults> createState() =>
+      _FoodCatalogSearchResultsState();
 }
 
 class _FoodCatalogSearchResultsState extends State<FoodCatalogSearchResults> {
   final ScrollController _scrollController = ScrollController();
+  final FdcService fdc = FdcService();
 
-  List<Widget> buildFoodCards(List<Food> foods) {
-    return foods.map((food) {
-      return Card(
-          key: Key('${food.id}-card'),
-          child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FoodSummary(
-                            addFood: widget.addFood,
-                            food: food,
-                            mealNum: widget.mealNum)));
-              },
-              key: Key('${food.id}-card'),
-              child: Card(
-                  color: CommonStyles.cardBackground,
-                  child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      height: 62,
-                      child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(
-                            children: [
-                              Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(food.name,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold)),
-                                        Text('${food.calories} cal'),
-                                      ])),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  food.brand != null ? Text(
-                                      '${food.brand}, ${food.amount} ${food.unit.name}')
-                                      : Text('${food.amount} ${food.unit.name}'),
-                                  Row(children: [
-                                    Text('C: ${food.carbs.toString()}', style: const TextStyle(color: MacroStyles.carbColour)),
-                                    Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: Text(
-                                            'P: ${food.protein.toString()}' , style: const TextStyle(color: MacroStyles.proteinColour))),
-                                    Text('F: ${food.fat.toString()}' , style: const TextStyle(color: MacroStyles.fatColour)),
-                                  ]),
-                                ],
-                              )
-                            ],
-                          ))))));
-    }).toList();
+  void refresh() => setState(() {});
+
+  List<Widget> buildFoodCards(FoodResponse fdcFoods, List<Food> userFoods) {
+    if (fdcFoods.data.isEmpty && fdcFoods.error == null && userFoods.isEmpty) {
+      return [buildNoResults()];
+    }
+
+    List<Widget> userFoodList = [];
+    userFoodList.add(const Center(
+        child: Text('My Food Results',
+            style: TextStyle(color: CommonStyles.primaryColour))));
+    userFoodList.addAll(userFoods
+        .map((food) => FoodCard(
+            mealNum: widget.mealNum, food: food, addFood: widget.addFood, refresh: refresh, isDeletable: true))
+        .toList());
+
+    List<Widget> fdcFoodList = [];
+    fdcFoodList.add(const Center(
+        child: Text('FDC Results',
+            style: TextStyle(color: CommonStyles.primaryColour))));
+    fdcFoodList.addAll(fdcFoods.data
+        .map((food) => FoodCard(
+            mealNum: widget.mealNum, food: food, addFood: widget.addFood, refresh: refresh, isDeletable: false))
+        .toList());
+    if (fdcFoods.error != null) {
+      fdcFoodList.add(Center(
+          child: Text(
+              'There was a problem retrieving results from the FDC: \n${fdcFoods.error?.message}',
+              style: const TextStyle(fontStyle: FontStyle.italic))));
+    }
+
+    if (userFoods.isEmpty) {
+      return fdcFoodList;
+    } else if (fdcFoods.data.isEmpty && fdcFoods.error == null) {
+      return userFoodList;
+    } else {
+      userFoodList.addAll(fdcFoodList);
+      return userFoodList;
+    }
   }
 
   Widget buildNoResults() {
@@ -87,28 +77,28 @@ class _FoodCatalogSearchResultsState extends State<FoodCatalogSearchResults> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          fdc.search(widget.query),
+          FoodCatalogService.svc.search(query: widget.query),
+        ]),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: Text('Loading...'));
+          } else {
+            List<Widget> searchResults = [];
+            if (snapshot.data == null ||
+                snapshot.data!.isEmpty ||
+                (snapshot.data![0].data.isEmpty && snapshot.data![1].isEmpty)) {
+              searchResults.add(const Center(child: Text('No Results Found')));
+            } else {
+              searchResults
+                  .addAll(buildFoodCards(snapshot.data![0], snapshot.data![1]));
+            }
 
-    return FutureBuilder<List<List<dynamic>>>(
-            future: Future.wait([FoodCatalogService.svc.search(query: widget.query)]),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: Text('Loading...'));
-              } else {
-                List<Widget> searchResults = [];
-                if (snapshot.data != null &&
-                    snapshot.data!.isNotEmpty &&
-                    snapshot.data?[0].isNotEmpty) {
-                  searchResults.addAll(buildFoodCards(snapshot.data![0]));
-                } else {
-                  searchResults.add(const Text('No Results Found'));
-                }
-
-                return
-                    ListView(
-                          controller: _scrollController,
-                          children: searchResults);
-              }
-            });
+            return ListView(
+                controller: _scrollController, children: searchResults);
+          }
+        });
   }
 }

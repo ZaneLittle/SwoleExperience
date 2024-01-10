@@ -11,7 +11,7 @@ import 'package:swole_experience/service/db/preference_service.dart';
 import 'package:swole_experience/util/food_map.dart';
 
 class Macros extends StatefulWidget {
-  const Macros({Key? key}) : super(key: key);
+  const Macros({super.key});
 
   @override
   State<Macros> createState() => _MacrosState();

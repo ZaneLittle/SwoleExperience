@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swole_experience/constants/MacroStyles.dart';
+import 'package:swole_experience/constants/macro_styles.dart';
 import 'package:swole_experience/constants/common_styles.dart';
 import 'package:swole_experience/model/food.dart';
 import 'package:swole_experience/model/unit.dart';
@@ -8,11 +8,10 @@ import 'package:swole_experience/util/validator.dart';
 
 class FoodSummary extends StatefulWidget {
   const FoodSummary(
-      {Key? key,
+      {super.key,
       required this.mealNum,
       required this.food,
-      required this.addFood})
-      : super(key: key);
+      required this.addFood});
 
   final int mealNum;
   final Food food;
@@ -70,8 +69,8 @@ class _FoodSummaryState extends State<FoodSummary> {
         padding: const EdgeInsets.all(24),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           SizedBox(
-              width: 72,
-              height: 38,
+              width: 67,
+              height: 64,
               child: TextFormField(
                 controller: _inputController,
                 onChanged: setAmount,
@@ -80,26 +79,30 @@ class _FoodSummaryState extends State<FoodSummary> {
                 validator: (String? value) {
                   return Validator.doubleValidator(value);
                 },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
               )),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SizedBox(
-                  width: 64,
+                  width: 78.6,
                   height: 50,
                   child: DropdownButton(
                     value: unit,
                     items: Unit.values
                         .map((unitConst) => DropdownMenuItem(
-                            child: Text(unitConst.name), value: unitConst))
+                            value: unitConst,
+                            child: Text(unitConst.name)))
                         .toList(),
                     onChanged: (value) => setState(() => unit = value as Unit),
                   ))),
           ElevatedButton(
               onPressed: addItem,
-              child: const Text('Add'),
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                      CommonStyles.primaryColour)))
+                      CommonStyles.primaryColour)),
+              child: const Text('Add'))
         ]));
   }
 
