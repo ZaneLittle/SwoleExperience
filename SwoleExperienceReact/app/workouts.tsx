@@ -1,18 +1,7 @@
-import { Text, View, StyleSheet } from 'react-native';
+import WorkoutsScreen from '../components/workouts/WorkoutsScreen';
 
-export default function WorkoutsScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Workouts</Text>
-      <Text style={styles.subtitle}>Coming soon</Text>
-    </View>
-  );
+export default function WorkoutsPage() {
+  return <WorkoutsScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 22, fontWeight: '600' },
-  subtitle: { marginTop: 8, color: '#666' },
-});
 
 
