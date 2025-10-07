@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, View, StyleSheet, Text, Platform } from 'react-native';
-import { WeightEntryForm } from '../components/WeightEntryForm';
-import { WeightChart } from '../components/WeightChart';
-import { WeightHistory } from '../components/WeightHistory';
+import { WeightEntryForm } from '../components/weight/WeightEntryForm';
+import { WeightChart } from '../components/weight/WeightChart';
+import { WeightHistory } from '../components/weight/WeightHistory';
 import { Weight } from '../lib/models/Weight';
 import { Average } from '../lib/models/Average';
 import { weightService } from '../lib/services/WeightService';
@@ -51,15 +51,13 @@ export default function WeightScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Weight Tracker</Text>
-      
       <WeightEntryForm onWeightAdded={handleWeightAdded} />
       
       <WeightChart weights={weights} averages={averages} />
       
-      <WeightHistory 
-        weights={weights} 
-        onWeightsChanged={handleWeightsChanged}
+      <WeightHistory
+        weights={weights}
+        onWeightDeleted={handleWeightsChanged}
       />
     </ScrollView>
   );
@@ -72,14 +70,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: Platform.OS === 'ios' ? 100 : 90,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-    color: '#333',
   },
   loadingText: {
     fontSize: 18,

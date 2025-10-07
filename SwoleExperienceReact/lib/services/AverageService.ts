@@ -51,13 +51,15 @@ class AverageService {
         }
         weightsByDate.get(dateKey)!.push(weight);
       });
-
+      
       // Calculate averages for each day
       const sortedDates = Array.from(weightsByDate.keys()).sort();
       
       for (const dateKey of sortedDates) {
         const dayWeights = weightsByDate.get(dateKey)!;
-        const date = new Date(dateKey);
+        // Create date in local timezone to match useDailyStats
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
         
         // Calculate daily average
         const dailyAverage = dayWeights.reduce((sum, w) => sum + w.weight, 0) / dayWeights.length;
@@ -85,28 +87,32 @@ class AverageService {
     }
   }
 
-  private calculateRollingAverage(weightsByDate: Map<string, Weight[]>, currentDate: string, days: number): number {
+  private calculateRollingAverage(weightsByDate: Map<string, Weight[]>, currentDate: string, days: number): number | null {
     const currentDateObj = new Date(currentDate);
     const weights: number[] = [];
-    let foundWeights = 0;
+    const datesUsed: string[] = [];
 
-    // Only calculate average if we have enough days with data
-    for (let i = 0; i < days && foundWeights < days; i++) {
+    // Look for weights within the specified range of days (including current day)
+    for (let i = 0; i < days; i++) {
       const checkDate = new Date(currentDateObj.getTime() - i * 24 * 60 * 60 * 1000);
       const dateKey = checkDate.toISOString().split('T')[0];
       const dayWeights = weightsByDate.get(dateKey);
-      
+            
       if (dayWeights && dayWeights.length > 0) {
         const dayAverage = dayWeights.reduce((sum, w) => sum + w.weight, 0) / dayWeights.length;
         weights.push(dayAverage);
-        foundWeights++;
+        datesUsed.push(dateKey);
       }
     }
 
-    // Only return average if we found enough days of data
-    return foundWeights === days
+    // Return average if we have at least 2 days of data (minimum for meaningful average)
+    // For 3-day average, require at least 2 days; for 7-day average, require at least 3 days
+    const minRequiredDays = days === 3 ? 2 : Math.max(3, Math.floor(days * 0.6));
+    const result = weights.length >= minRequiredDays
       ? weights.reduce((sum, w) => sum + w, 0) / weights.length 
-      : 0;
+      : null;
+
+    return result;
   }
 
   private truncateToDay(date: Date): Date {

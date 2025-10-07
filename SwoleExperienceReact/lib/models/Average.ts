@@ -1,15 +1,15 @@
 export interface Average {
   date: Date;
   average: number;
-  threeDayAverage: number;
-  sevenDayAverage: number;
+  threeDayAverage: number | null;
+  sevenDayAverage: number | null;
 }
 
 export interface AverageData {
   dateTime: string;
   average: number;
-  threeDayAverage: number;
-  sevenDayAverage: number;
+  threeDayAverage: number | null;
+  sevenDayAverage: number | null;
 }
 
 export const AverageConverter = {

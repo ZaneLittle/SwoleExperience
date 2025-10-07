@@ -63,12 +63,12 @@ class WeightService {
     try {
       const existingWeights = await this.getWeights();
       const filteredWeights = existingWeights.filter(weight => weight.id !== id);
-      
       const weightsData = filteredWeights.map(WeightConverter.toData);
+      
       await AsyncStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightsData));
+      
       return true;
     } catch (error) {
-      console.error('Error removing weight:', error);
       return false;
     }
   }
