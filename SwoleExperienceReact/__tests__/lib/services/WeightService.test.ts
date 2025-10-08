@@ -489,7 +489,8 @@ describe('WeightService', () => {
 
     it('handles concurrent operations gracefully', async () => {
       mockGetItem.mockResolvedValueOnce(null);
-      mockSetItem.mockResolvedValue(undefined);
+      mockSetItem.mockResolvedValueOnce(undefined);
+      mockSetItem.mockResolvedValueOnce(undefined);
 
       const weights = [
         { dateTime: new Date('2024-01-15T10:00:00Z'), weight: 180.0 },
