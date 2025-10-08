@@ -65,22 +65,24 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     flex: 1,
   },
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
   },
   titleButton: {
     padding: SPACING.xs,
-    marginHorizontal: SPACING.sm,
+    marginHorizontal: SPACING.xs,
   },
   workoutName: {
     fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: TYPOGRAPHY.weights.bold,
     textAlign: 'center',
     marginHorizontal: SPACING.sm,
+    flex: 1,
+    flexShrink: 1,
   },
   chevron: {
     fontSize: TYPOGRAPHY.sizes.lg,

@@ -153,23 +153,22 @@ WorkoutCard.displayName = 'WorkoutCard';
 
 const styles = StyleSheet.create({
   container: {
-    width: screenWidth - 32,
     marginVertical: SPACING.sm,
   },
   horizontalScroll: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 0,
-    paddingRight: 0,
+    paddingHorizontal: SPACING.sm,
+    paddingRight: SPACING.sm,
   },
   card: {
     backgroundColor: COLORS.surface,
-    marginHorizontal: 0,
+    marginHorizontal: SPACING.xs,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,
     ...SHADOWS.md,
-    width: screenWidth - 32,
+    width: screenWidth - 48, // Account for scroll padding (16px) + margins (8px) + extra buffer (24px)
   },
   infoSection: {
     paddingVertical: SPACING.sm,
