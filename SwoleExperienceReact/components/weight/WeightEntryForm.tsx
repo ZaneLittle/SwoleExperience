@@ -14,6 +14,8 @@ import { averageService } from '../../lib/services/AverageService';
 import { DatePickerModal } from '../DatePickerModal';
 import { TimePickerModal } from '../TimePickerModal';
 import { DateTimeButtons } from '../DateTimeButtons';
+import { handleError, ErrorCodes } from '../../lib/utils/errorHandler';
+import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../lib/constants/ui';
 
 interface WeightEntryFormProps {
   onWeightAdded: () => void;
@@ -52,8 +54,7 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
         Alert.alert('Error', 'Failed to add weight');
       }
     } catch (error) {
-      console.error('Error adding weight:', error);
-      Alert.alert('Error', 'Failed to add weight');
+      handleError(error, { component: 'WeightEntryForm', action: 'handleSubmit' });
     }
   };
 
@@ -285,15 +286,15 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    margin: 8,
+    padding: SPACING.sm,
+    backgroundColor: COLORS.background,
+    borderRadius: BORDER_RADIUS.md,
+    margin: SPACING.sm,
   },
   formRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
+    gap: SPACING.sm,
     width: '100%',
   },
   weightContainer: {
@@ -301,32 +302,32 @@ const styles = StyleSheet.create({
     minWidth: 150,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 4,
-    color: '#333',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.xs,
+    color: COLORS.text.primary,
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: SPACING.sm,
     minWidth: 0,
     flex: 1, 
   },
   weightInput: {
     flex: 1,
-    fontSize: 16,
-    paddingHorizontal: 8,
-    backgroundColor: '#fff',
-    borderRadius: 4,
+    fontSize: TYPOGRAPHY.sizes.md,
+    paddingHorizontal: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.border,
     height: 40,
     minWidth: 90,
     flexShrink: 1,
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: COLORS.primary,
     borderRadius: 20,
     width: 40,
     height: 40,
@@ -334,8 +335,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: COLORS.surface,
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
 });

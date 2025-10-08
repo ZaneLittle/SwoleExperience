@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { Weight, WeightData, WeightConverter } from '../models/Weight';
+import { AppError, ErrorCodes, withErrorHandling } from '../utils/errorHandler';
 
 const WEIGHT_STORAGE_KEY = 'weights';
 
@@ -33,8 +34,11 @@ class WeightService {
         .filter(weight => weight.dateTime >= cutoffDate)
         .sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime());
     } catch (error) {
-      console.error('Error getting weights:', error);
-      return [];
+      throw new AppError(
+        'Failed to retrieve weight data',
+        ErrorCodes.STORAGE_ERROR,
+        { component: 'WeightService', action: 'getWeights' }
+      );
     }
   }
 
@@ -54,8 +58,11 @@ class WeightService {
       await AsyncStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightsData));
       return true;
     } catch (error) {
-      console.error('Error adding weight:', error);
-      return false;
+      throw new AppError(
+        'Failed to add weight entry',
+        ErrorCodes.STORAGE_ERROR,
+        { component: 'WeightService', action: 'addWeight' }
+      );
     }
   }
 
@@ -69,7 +76,11 @@ class WeightService {
       
       return true;
     } catch (error) {
-      return false;
+      throw new AppError(
+        'Failed to remove weight entry',
+        ErrorCodes.STORAGE_ERROR,
+        { component: 'WeightService', action: 'removeWeight' }
+      );
     }
   }
 
@@ -84,8 +95,11 @@ class WeightService {
       await AsyncStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightsData));
       return true;
     } catch (error) {
-      console.error('Error updating weight:', error);
-      return false;
+      throw new AppError(
+        'Failed to update weight entry',
+        ErrorCodes.STORAGE_ERROR,
+        { component: 'WeightService', action: 'updateWeight' }
+      );
     }
   }
 }

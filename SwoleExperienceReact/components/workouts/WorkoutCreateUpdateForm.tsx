@@ -27,7 +27,7 @@ interface WorkoutCreateUpdateFormProps {
   isProgressionHelperEnabled?: boolean;
 }
 
-export default function WorkoutCreateUpdateForm({
+export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = ({
   workout,
   day,
   defaultOrder,
@@ -36,7 +36,7 @@ export default function WorkoutCreateUpdateForm({
   workoutsInDay = [],
   isSupersetsEnabled = false,
   isAlternativesEnabled = false,
-}: WorkoutCreateUpdateFormProps) {
+}) => {
   const [name, setName] = useState(workout?.name || '');
   const [weight, setWeight] = useState(workout?.weight?.toString() || '');
   const [sets, setSets] = useState(workout?.sets?.toString() || '');
@@ -350,7 +350,7 @@ export default function WorkoutCreateUpdateForm({
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

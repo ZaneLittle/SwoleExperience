@@ -1,10 +1,12 @@
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { COLORS } from '../lib/constants/ui';
 
 export default function RootLayout() {
   return (
-    <>
+    <ErrorBoundary>
       <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
       <Tabs 
         screenOptions={{
@@ -15,8 +17,8 @@ export default function RootLayout() {
             left: 0,
             right: 0,
             elevation: 0,
-            backgroundColor: '#ffffff',
-            borderTopColor: '#e0e0e0',
+            backgroundColor: COLORS.surface,
+            borderTopColor: COLORS.border,
             height: 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
@@ -27,7 +29,7 @@ export default function RootLayout() {
         <Tabs.Screen name="workouts" options={{ title: 'Workouts' }} />
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
-    </>
+    </ErrorBoundary>
   );
 }
 

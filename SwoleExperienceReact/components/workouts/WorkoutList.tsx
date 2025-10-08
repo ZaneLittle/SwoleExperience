@@ -11,7 +11,7 @@ import { WorkoutDay } from '../../lib/models/WorkoutDay';
 import { WorkoutHistory } from '../../lib/models/WorkoutHistory';
 import { Workout } from '../../lib/models/Workout';
 import { workoutService } from '../../lib/services/WorkoutService';
-import WorkoutCard from './WorkoutCard';
+import { WorkoutCard } from './WorkoutCard';
 
 interface WorkoutListProps {
   workouts: WorkoutDay[];
@@ -27,7 +27,7 @@ interface WorkoutListProps {
   isProgressionHelperEnabled?: boolean;
 }
 
-export default function WorkoutList({
+export const WorkoutList: React.FC<WorkoutListProps> = ({
   workouts,
   history,
   isLoading = false,
@@ -39,7 +39,7 @@ export default function WorkoutList({
   isSupersetsEnabled = false,
   isAlternativesEnabled = false,
   isProgressionHelperEnabled = false,
-}: WorkoutListProps) {
+}) => {
   const dataIsEmpty = (): boolean => {
     return workouts.length === 0 && history.length === 0;
   };

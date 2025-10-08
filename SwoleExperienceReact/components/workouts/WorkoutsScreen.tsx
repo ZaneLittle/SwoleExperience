@@ -13,10 +13,10 @@ import { WorkoutDay } from '../../lib/models/WorkoutDay';
 import { WorkoutHistory } from '../../lib/models/WorkoutHistory';
 import { workoutService } from '../../lib/services/WorkoutService';
 import { workoutHistoryService, WorkoutHistoryService } from '../../lib/services/WorkoutHistoryService';
-import WorkoutList from './WorkoutList';
-import WorkoutCreateUpdateForm from './WorkoutCreateUpdateForm';
+import { WorkoutList } from './WorkoutList';
+import { WorkoutCreateUpdateForm } from './WorkoutCreateUpdateForm';
 
-export default function WorkoutsScreen() {
+export const WorkoutsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [workouts, setWorkouts] = useState<WorkoutDay[]>([]);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
@@ -293,7 +293,7 @@ export default function WorkoutsScreen() {
       {renderFormModal()}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
