@@ -34,29 +34,6 @@ export default function SettingsScreen() {
         </View>
 
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Export Data</Text>
-              <Text style={styles.settingDescription}>
-                Export your workout and weight data
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Backup & Restore</Text>
-              <Text style={styles.settingDescription}>
-                Backup your data to the cloud
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Support</Text>
