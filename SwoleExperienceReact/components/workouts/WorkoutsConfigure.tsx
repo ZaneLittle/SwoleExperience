@@ -10,13 +10,15 @@ import {
 } from 'react-native';
 import { WorkoutDay } from '../../lib/models/WorkoutDay';
 import { workoutService } from '../../lib/services/WorkoutService';
-import WorkoutCreateUpdateForm from './WorkoutCreateUpdateForm';
+import { WorkoutCreateUpdateForm } from './WorkoutCreateUpdateForm';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WorkoutsConfigureProps {
   onBack: () => void;
 }
 
 export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
+  const colors = useThemeColors();
   const [workouts, setWorkouts] = useState<WorkoutDay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingWorkout, setEditingWorkout] = useState<WorkoutDay | undefined>();
@@ -148,18 +150,19 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
         onPress={() => setSelectedDay(Math.max(1, selectedDay - 1))}
         disabled={selectedDay <= 1}
       >
-        <Text style={styles.dayButtonText}>PREV</Text>
+        <View style={[styles.navButtonLeft, { borderRightColor: colors.primary }]} />
       </TouchableOpacity>
       
       <View style={styles.dayInfo}>
         <Text style={[
           styles.dayText, 
-          selectedDay > (totalDays || 0) && styles.newDayTextStyle
+          selectedDay > (totalDays || 0) && styles.newDayTextStyle,
+          { color: colors.text.primary }
         ]}>
           Day {selectedDay}
         </Text>
         {selectedDay > (totalDays || 0) && (
-          <Text style={styles.newDayLabel}>New Day</Text>
+          <Text style={[styles.newDayLabel, { color: colors.text.secondary }]}>New Day</Text>
         )}
       </View>
       
@@ -167,39 +170,41 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
         style={styles.dayButton}
         onPress={handleNextDay}
       >
-        <Text style={styles.dayButtonText}>NEXT</Text>
+        <View style={[styles.navButtonRight, { borderLeftColor: colors.primary }]} />
       </TouchableOpacity>
     </View>
   );
 
   const renderWorkoutItem = (workout: WorkoutDay, index: number, totalItems: number) => (
-    <View style={styles.workoutItem}>
+    <View style={[styles.workoutItem, { backgroundColor: colors.surface }]}>
       <View style={styles.reorderControls}>
-        <TouchableOpacity 
-          style={[styles.reorderButton, index === 0 && styles.disabledButton]}
-          onPress={() => handleMoveWorkout(workout, 'up')}
-          disabled={index === 0}
-        >
-          <Text style={[styles.reorderButtonText, index === 0 && styles.disabledButtonText]}>↑</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.reorderButton, index === totalItems - 1 && styles.disabledButton]}
-          onPress={() => handleMoveWorkout(workout, 'down')}
-          disabled={index === totalItems - 1}
-        >
-          <Text style={[styles.reorderButtonText, index === totalItems - 1 && styles.disabledButtonText]}>↓</Text>
-        </TouchableOpacity>
+        {index > 0 && (
+          <TouchableOpacity 
+            style={[styles.reorderButton, { backgroundColor: '#666666' }]}
+            onPress={() => handleMoveWorkout(workout, 'up')}
+          >
+            <Text style={[styles.reorderButtonText, { color: '#FFFFFF' }]}>↑</Text>
+          </TouchableOpacity>
+        )}
+        {index < totalItems - 1 && (
+          <TouchableOpacity 
+            style={[styles.reorderButton, { backgroundColor: '#666666' }]}
+            onPress={() => handleMoveWorkout(workout, 'down')}
+          >
+            <Text style={[styles.reorderButtonText, { color: '#FFFFFF' }]}>↓</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
       <View style={styles.workoutContent}>
         <View style={styles.workoutHeader}>
-          <Text style={styles.workoutName}>{workout.name}</Text>
+          <Text style={[styles.workoutName, { color: colors.text.primary }]}>{workout.name}</Text>
           <View style={styles.workoutActions}>
             <TouchableOpacity 
               style={styles.actionButton}
               onPress={() => handleEditWorkout(workout)}
             >
-              <Text style={styles.editButtonText}>✎</Text>
+              <Text style={[styles.editButtonText, { color: colors.primary }]}>✎</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButton}
@@ -208,20 +213,21 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
             >
               <Text style={[
                 styles.deleteButtonText,
-                !canDelete(workout) && styles.disabledButtonText
+                !canDelete(workout) && styles.disabledButtonText,
+                { color: colors.error }
               ]}>×</Text>
             </TouchableOpacity>
           </View>
         </View>
         
         <View style={styles.workoutDetails}>
-          <Text style={styles.workoutDetail}>Weight: {workout.weight || 'N/A'}</Text>
-          <Text style={styles.workoutDetail}>Sets: {workout.sets || 'N/A'}</Text>
-          <Text style={styles.workoutDetail}>Reps: {workout.reps || 'N/A'}</Text>
+          <Text style={[styles.workoutDetail, { color: colors.text.secondary }]}>Weight: {workout.weight || 'N/A'}</Text>
+          <Text style={[styles.workoutDetail, { color: colors.text.secondary }]}>Sets: {workout.sets || 'N/A'}</Text>
+          <Text style={[styles.workoutDetail, { color: colors.text.secondary }]}>Reps: {workout.reps || 'N/A'}</Text>
         </View>
         
         {workout.notes && (
-          <Text style={styles.workoutNotes}>{workout.notes}</Text>
+          <Text style={[styles.workoutNotes, { color: colors.text.secondary }]}>{workout.notes}</Text>
         )}
       </View>
     </View>
@@ -233,27 +239,27 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
     if (dayWorkouts.length === 0) {
       const isNewDay = selectedDay > (totalDays || 0);
       return (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyStateText}>
+        <View style={[styles.emptyState, { backgroundColor: colors.background }]}>
+          <Text style={[styles.emptyStateText, { color: colors.text.secondary }]}>
             {isNewDay ? `Create workouts for Day ${selectedDay}` : `No workouts for Day ${selectedDay}`}
           </Text>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddWorkout}>
-            <Text style={styles.addButtonText}>+ Add Workout</Text>
+          <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]} onPress={handleAddWorkout}>
+            <Text style={[styles.addButtonText, { color: '#fff' }]}>+ Add Workout</Text>
           </TouchableOpacity>
         </View>
       );
     }
 
     return (
-      <View style={styles.workoutListContainer}>
+      <View style={[styles.workoutListContainer, { backgroundColor: colors.background }]}>
         <ScrollView style={styles.workoutList}>
           {dayWorkouts.map((workout, index) => 
             renderWorkoutItem(workout, index, dayWorkouts.length)
           )}
         </ScrollView>
         
-        <TouchableOpacity style={styles.addButton} onPress={handleAddWorkout}>
-          <Text style={styles.addButtonText}>+ Add Workout</Text>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]} onPress={handleAddWorkout}>
+          <Text style={[styles.addButtonText, { color: '#fff' }]}>+ Add Workout</Text>
         </TouchableOpacity>
       </View>
     );
@@ -261,16 +267,16 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
 
   const renderFormModal = () => (
     <View style={styles.modalOverlay}>
-      <View style={styles.modalContent}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>
+      <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+        <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+          <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
             {editingWorkout ? 'Edit Workout' : 'Add Workout'}
           </Text>
           <TouchableOpacity 
             style={styles.closeButton}
             onPress={() => setShowForm(false)}
           >
-            <Text style={styles.closeButtonText}>✕</Text>
+            <Text style={[styles.closeButtonText, { color: colors.text.secondary }]}>✕</Text>
           </TouchableOpacity>
         </View>
         
@@ -291,24 +297,24 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading workouts...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Loading workouts...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>‹ Back</Text>
+          <Text style={[styles.backButtonText, { color: colors.primary }]}>‹ Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Configure Workouts</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Configure Workouts</Text>
         <View style={styles.spacer} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.content, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
         {renderDaySelector()}
         {renderWorkoutList()}
       </ScrollView>
@@ -378,13 +384,30 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontWeight: 'bold',
   },
+  navButtonLeft: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderBottomWidth: 10,
+    borderRightWidth: 15,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+  },
+  navButtonRight: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderBottomWidth: 10,
+    borderLeftWidth: 15,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+  },
   dayInfo: {
     alignItems: 'center',
   },
   dayText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   newDayTextStyle: {
     color: '#007AFF',
@@ -438,7 +461,6 @@ const styles = StyleSheet.create({
   },
   reorderButtonText: {
     fontSize: 16,
-    color: '#007AFF',
     fontWeight: 'bold',
   },
   workoutContent: {
@@ -499,7 +521,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   disabledButtonText: {
-    color: '#999',
     opacity: 0.5,
   },
   addButton: {
@@ -540,18 +561,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   closeButton: {
     padding: 8,
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#666',
   },
 });

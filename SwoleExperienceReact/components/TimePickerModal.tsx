@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface TimePickerModalProps {
   visible: boolean;
@@ -20,6 +21,7 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
   onClose,
   onTimeSelected,
 }) => {
+  const colors = useThemeColors();
   const [tempTime, setTempTime] = useState(currentDate);
 
   const formatTime = (date: Date) => {
@@ -47,8 +49,8 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Select Time</Text>
+        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Select Time</Text>
           
           <View style={styles.timePickerContainer}>
             <View style={styles.timeDisplay}>

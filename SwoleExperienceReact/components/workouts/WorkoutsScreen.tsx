@@ -15,9 +15,11 @@ import { workoutService } from '../../lib/services/WorkoutService';
 import { workoutHistoryService, WorkoutHistoryService } from '../../lib/services/WorkoutHistoryService';
 import { WorkoutList } from './WorkoutList';
 import { WorkoutCreateUpdateForm } from './WorkoutCreateUpdateForm';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 export const WorkoutsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
   const [workouts, setWorkouts] = useState<WorkoutDay[]>([]);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -192,7 +194,7 @@ export const WorkoutsScreen: React.FC = () => {
   }, [dayOffset]);
 
   const renderHeader = () => (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
       {(workoutHistory.length > 0 || workouts.length > 0) ? (
         <>
           <View style={styles.spacer} />
@@ -201,16 +203,16 @@ export const WorkoutsScreen: React.FC = () => {
               style={styles.navButton}
               onPress={() => handleDayNavigation(-1)}
             >
-              <View style={styles.navButtonLeft} />
+              <View style={[styles.navButtonLeft, { borderRightColor: colors.primary }]} />
             </TouchableOpacity>
             
-            <Text style={styles.dayText}>{dayText}</Text>
+            <Text style={[styles.dayText, { color: colors.text.primary }]}>{dayText}</Text>
             
             <TouchableOpacity 
               style={styles.navButton}
               onPress={() => handleDayNavigation(1)}
             >
-              <View style={styles.navButtonRight} />
+              <View style={[styles.navButtonRight, { borderLeftColor: colors.primary }]} />
             </TouchableOpacity>
           </View>
           <View style={styles.spacer} />
@@ -237,16 +239,16 @@ export const WorkoutsScreen: React.FC = () => {
       animationType="slide"
       presentationStyle="pageSheet"
     >
-      <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>
+      <View style={[styles.modalContainer, { paddingTop: insets.top, backgroundColor: colors.background }]}>
+        <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
             {editingWorkout ? 'Edit Workout' : 'Add Workout'}
           </Text>
           <TouchableOpacity 
             style={styles.closeButton}
             onPress={() => setShowForm(false)}
           >
-            <Text style={styles.closeButtonText}>✕</Text>
+            <Text style={[styles.closeButtonText, { color: colors.text.secondary }]}>✕</Text>
           </TouchableOpacity>
         </View>
         
@@ -266,13 +268,13 @@ export const WorkoutsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderHeader()}
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Loading...</Text>
         </View>
       ) : (
         <WorkoutList
@@ -298,7 +300,6 @@ export const WorkoutsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
@@ -306,9 +307,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
   dayNavigation: {
     flexDirection: 'row',
@@ -328,7 +327,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 15,
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    borderRightColor: '#007AFF',
   },
   navButtonRight: {
     width: 0,
@@ -338,12 +336,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 15,
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    borderLeftColor: '#007AFF',
   },
   dayText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   spacer: {
     width: 36,
@@ -356,7 +352,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
   },
   completeButton: {
     margin: 16,
@@ -373,7 +368,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -381,20 +375,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   closeButton: {
     padding: 8,
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#666',
   },
 });

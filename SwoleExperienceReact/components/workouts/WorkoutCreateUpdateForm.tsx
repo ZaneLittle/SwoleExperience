@@ -14,6 +14,7 @@ import {
 import { WorkoutDay } from '../../lib/models/WorkoutDay';
 import { WorkoutValidator } from '../../lib/models/Workout';
 import { workoutService } from '../../lib/services/WorkoutService';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WorkoutCreateUpdateFormProps {
   workout?: WorkoutDay;
@@ -37,6 +38,7 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
   isSupersetsEnabled = false,
   isAlternativesEnabled = false,
 }) => {
+  const colors = useThemeColors();
   const [name, setName] = useState(workout?.name || '');
   const [weight, setWeight] = useState(workout?.weight?.toString() || '');
   const [sets, setSets] = useState(workout?.sets?.toString() || '');
@@ -172,12 +174,21 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
     multiline: boolean = false
   ) => (
     <View style={styles.inputContainer}>
-      <Text style={styles.inputLabel}>{label}</Text>
+      <Text style={[styles.inputLabel, { color: colors.text.primary }]}>{label}</Text>
       <TextInput
-        style={[styles.input, multiline && styles.multilineInput]}
+        style={[
+          styles.input, 
+          multiline && styles.multilineInput,
+          { 
+            backgroundColor: colors.surface, 
+            color: colors.text.primary,
+            borderColor: colors.border 
+          }
+        ]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
+        placeholderTextColor={colors.text.tertiary}
         keyboardType={keyboardType}
         multiline={multiline}
         numberOfLines={multiline ? 4 : 1}
@@ -199,13 +210,13 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
 
     return (
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>{label}</Text>
+        <Text style={[styles.inputLabel, { color: colors.text.primary }]}>{label}</Text>
         <TouchableOpacity
-          style={styles.dropdownButton}
+          style={[styles.dropdownButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
           onPress={() => setShowModal(true)}
         >
-          <Text style={styles.dropdownButtonText}>{displayText}</Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
+          <Text style={[styles.dropdownButtonText, { color: colors.text.primary }]}>{displayText}</Text>
+          <Text style={[styles.dropdownArrow, { color: colors.text.secondary }]}>▼</Text>
         </TouchableOpacity>
         
         <Modal
@@ -219,7 +230,7 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
             activeOpacity={1}
             onPress={() => setShowModal(false)}
           >
-            <View style={styles.dropdownModal}>
+            <View style={[styles.dropdownModal, { backgroundColor: colors.surface }]}>
               <TouchableOpacity
                 style={styles.dropdownModalOption}
                 onPress={() => {
@@ -227,7 +238,7 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
                   setShowModal(false);
                 }}
               >
-                <Text style={styles.dropdownModalText}>{emptyOption}</Text>
+                <Text style={[styles.dropdownModalText, { color: colors.text.primary }]}>{emptyOption}</Text>
               </TouchableOpacity>
               {options.map((option, index) => (
                 <TouchableOpacity
@@ -241,7 +252,7 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
                     setShowModal(false);
                   }}
                 >
-                  <Text style={styles.dropdownModalText}>{option.name}</Text>
+                  <Text style={[styles.dropdownModalText, { color: colors.text.primary }]}>{option.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -315,11 +326,11 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.form}>
+        <View style={[styles.form, { backgroundColor: colors.background }]}>
           {renderInputField('Name', name, setName, 'Exercise name')}
           
           <View style={styles.row}>
@@ -336,12 +347,18 @@ export const WorkoutCreateUpdateForm: React.FC<WorkoutCreateUpdateFormProps> = (
           {renderInputField('Notes', notes, setNotes, 'Add notes...', 'default', true)}
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+            <TouchableOpacity 
+              style={[styles.cancelButton, { backgroundColor: colors.background, borderColor: colors.border }]} 
+              onPress={onCancel}
+            >
+              <Text style={[styles.cancelButtonText, { color: colors.text.primary }]}>Cancel</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>
+            <TouchableOpacity 
+              style={[styles.saveButton, { backgroundColor: colors.primary }]} 
+              onPress={handleSave}
+            >
+              <Text style={[styles.saveButtonText, { color: '#fff' }]}>
                 {workout ? 'Update' : 'Create'}
               </Text>
             </TouchableOpacity>

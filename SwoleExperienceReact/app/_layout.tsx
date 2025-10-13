@@ -28,24 +28,31 @@ function AppContent() {
         }}
       >
         <Tabs.Screen 
+          name="index" 
+          options={{ 
+            href: null, // Hide from tab bar
+            title: 'Home'
+          }} 
+        />
+        <Tabs.Screen 
           name="weight" 
           options={{ 
             title: 'Weight',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>▲</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>▲</Text>
           }} 
         />
         <Tabs.Screen 
           name="workouts" 
           options={{ 
             title: 'Workouts',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>■</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>■</Text>
           }} 
         />
         <Tabs.Screen 
           name="settings" 
           options={{ 
             title: 'Settings',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>○</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>○</Text>
           }} 
         />
       </Tabs>

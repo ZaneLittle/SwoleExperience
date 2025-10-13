@@ -15,6 +15,7 @@ import { TimePickerModal } from '../TimePickerModal';
 import { Weight } from '../../lib/models/Weight';
 import { weightService } from '../../lib/services/WeightService';
 import { averageService } from '../../lib/services/AverageService';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WeightHistoryProps {
   onWeightDeleted: () => void;
@@ -22,6 +23,7 @@ interface WeightHistoryProps {
 }
 
 export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, weights }) => {
+  const colors = useThemeColors();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedWeight, setEditedWeight] = useState('');
   const [editWeight, setEditWeight] = useState<Weight | null>(null);
@@ -105,12 +107,12 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
   };
 
   const renderItem = ({ item }: { item: Weight }) => (
-    <View style={styles.weightItem}>
+    <View style={[styles.weightItem, { backgroundColor: colors.surface }]}>
       <View style={styles.dateTimeInfo}>
-        <Text style={styles.dateText}>
+        <Text style={[styles.dateText, { color: colors.text.primary }]}>
           {new Date(item.dateTime).toLocaleDateString()}
         </Text>
-        <Text style={styles.timeText}>
+        <Text style={[styles.timeText, { color: colors.text.secondary }]}>
           {new Date(item.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Text>
       </View>
@@ -119,7 +121,11 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
         {editingId === item.id ? (
           <View style={styles.editContainer}>
             <TextInput
-              style={styles.weightInputSmall}
+              style={[styles.weightInputSmall, { 
+                backgroundColor: colors.surface, 
+                color: colors.text.primary,
+                borderColor: colors.border 
+              }]}
               value={editedWeight}
               onChangeText={setEditedWeight}
               keyboardType="numeric"
@@ -131,7 +137,7 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
           </View>
         ) : (
           <View style={styles.weightContainer}>
-            <Text style={styles.weightText}>{item.weight}</Text>
+            <Text style={[styles.weightText, { color: colors.text.primary }]}>{item.weight}</Text>
           </View>
         )}
       </View>
@@ -141,13 +147,13 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
           style={styles.editButton}
           onPress={() => handleEdit(item)}
         >
-          <Text style={styles.editButtonText}>✎</Text>
+          <Text style={[styles.editButtonText, { color: colors.primary }]}>✎</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDelete(item.id)}
         >
-          <Text style={styles.deleteButtonText}>×</Text>
+          <Text style={[styles.deleteButtonText, { color: colors.error }]}>×</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -155,14 +161,14 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
 
   if (!weights || weights.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No weight entries yet</Text>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}>
+        <Text style={[styles.emptyText, { color: colors.text.secondary }]}>No weight entries yet</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={weights}
         renderItem={renderItem}
@@ -179,49 +185,54 @@ export const WeightHistory: React.FC<WeightHistoryProps> = ({ onWeightDeleted, w
           animationType="fade"
         >
           <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Edit Weight Entry</Text>
+            <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Edit Weight Entry</Text>
 
               <View style={styles.modalForm}>
                 <TouchableOpacity
-                  style={styles.dateTimeButton}
+                  style={[styles.dateTimeButton, { backgroundColor: colors.background, borderColor: colors.border }]}
                   onPress={() => setShowDateModal(true)}
                 >
-                  <Text style={styles.dateTimeButtonText}>
+                  <Text style={[styles.dateTimeButtonText, { color: colors.text.primary }]}>
                     {editedDate.toLocaleDateString()}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.dateTimeButton}
+                  style={[styles.dateTimeButton, { backgroundColor: colors.background, borderColor: colors.border }]}
                   onPress={() => setShowTimeModal(true)}
                 >
-                  <Text style={styles.dateTimeButtonText}>
+                  <Text style={[styles.dateTimeButtonText, { color: colors.text.primary }]}>
                     {editedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Text>
                 </TouchableOpacity>
 
                 <TextInput
-                  style={styles.weightInput}
+                  style={[styles.weightInput, { 
+                    backgroundColor: colors.background, 
+                    color: colors.text.primary,
+                    borderColor: colors.border 
+                  }]}
                   value={editedWeight}
                   onChangeText={setEditedWeight}
                   keyboardType="numeric"
                   placeholder="Enter weight"
+                  placeholderTextColor={colors.text.tertiary}
                   returnKeyType="done"
                 />
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity
-                    style={[styles.modalButton, styles.cancelButton]}
+                    style={[styles.modalButton, styles.cancelButton, { backgroundColor: colors.background, borderColor: colors.border }]}
                     onPress={() => setEditWeight(null)}
                   >
-                    <Text style={styles.buttonText}>Cancel</Text>
+                    <Text style={[styles.buttonText, { color: colors.text.primary }]}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.modalButton, styles.saveButton]}
+                    style={[styles.modalButton, styles.saveButton, { backgroundColor: colors.primary }]}
                     onPress={() => editWeight && handleEditSubmit(editWeight)}
                   >
-                    <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
+                    <Text style={[styles.buttonText, styles.saveButtonText, { color: '#fff' }]}>Save</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -265,21 +276,18 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   weightInputSmall: {
-    backgroundColor: '#f5f5f5',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
     fontSize: 16,
     width: 80,
     borderWidth: 1,
-    borderColor: '#ddd',
   },
   editButton: {
     paddingHorizontal: 8,
   },
   editButtonText: {
     fontSize: 16,
-    color: '#007AFF',
   },
   modalContainer: {
     position: 'absolute',
@@ -317,15 +325,12 @@ const styles = StyleSheet.create({
   dateTimeButtonText: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#333',
   },
   weightInput: {
-    backgroundColor: '#f5f5f5',
     padding: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -340,19 +345,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
     borderWidth: 1,
-    borderColor: '#ddd',
   },
   saveButton: {
-    backgroundColor: '#007AFF',
   },
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
   },
   saveButtonText: {
-    color: '#fff',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -393,25 +394,21 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 2,
     fontWeight: '500',
   },
   timeText: {
     fontSize: 12,
-    color: '#999',
   },
   weightText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
   },
   deleteButton: {
     padding: 8,
   },
   deleteButtonText: {
     fontSize: 24,
-    color: '#ff3b30',
     fontWeight: 'bold',
   },
   emptyContainer: {
@@ -422,6 +419,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
   },
 });

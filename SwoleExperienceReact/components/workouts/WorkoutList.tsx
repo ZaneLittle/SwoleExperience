@@ -12,6 +12,7 @@ import { WorkoutHistory } from '../../lib/models/WorkoutHistory';
 import { Workout } from '../../lib/models/Workout';
 import { workoutService } from '../../lib/services/WorkoutService';
 import { WorkoutCard } from './WorkoutCard';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WorkoutListProps {
   workouts: WorkoutDay[];
@@ -40,6 +41,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   isAlternativesEnabled = false,
   isProgressionHelperEnabled = false,
 }) => {
+  const colors = useThemeColors();
   const dataIsEmpty = (): boolean => {
     return workouts.length === 0 && history.length === 0;
   };
@@ -151,8 +153,8 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Loading...</Text>
       </View>
     );
   }
@@ -166,7 +168,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
       {!isHistory && renderWorkoutCards(workouts, false)}
       {renderWorkoutCards(history, true)}
       {isHistory && renderWorkoutCards(workouts, false)}
@@ -188,7 +190,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
   },
   historyHeader: {
     paddingVertical: 24,

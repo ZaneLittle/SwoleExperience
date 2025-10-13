@@ -23,16 +23,16 @@ export const DARK_COLORS = {
   success: '#30D158',
   warning: '#FF9F0A',
   error: '#FF453A',
-  background: '#000000',
-  surface: '#1C1C1E',
+  background: '#1A1A1A',
+  surface: '#2C2C2E',
   text: {
     primary: '#FFFFFF',
-    secondary: '#EBEBF5',
-    tertiary: '#EBEBF599',
-    quaternary: '#EBEBF566',
+    secondary: '#E5E5E7',
+    tertiary: '#E5E5E799',
+    quaternary: '#E5E5E766',
   },
-  border: '#38383A',
-  separator: '#38383A',
+  border: '#48484A',
+  separator: '#48484A',
 } as const;
 
 export const COLORS = LIGHT_COLORS; // Default fallback
