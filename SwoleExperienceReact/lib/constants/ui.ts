@@ -1,5 +1,5 @@
 // UI Constants for consistent styling across the app
-export const COLORS = {
+export const LIGHT_COLORS = {
   primary: '#007AFF',
   secondary: '#5856D6',
   success: '#34C759',
@@ -16,6 +16,26 @@ export const COLORS = {
   border: '#C6C6C8',
   separator: '#C6C6C8',
 } as const;
+
+export const DARK_COLORS = {
+  primary: '#0A84FF',
+  secondary: '#5E5CE6',
+  success: '#30D158',
+  warning: '#FF9F0A',
+  error: '#FF453A',
+  background: '#1A1A1A',
+  surface: '#2C2C2E',
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#E5E5E7',
+    tertiary: '#E5E5E799',
+    quaternary: '#E5E5E766',
+  },
+  border: '#48484A',
+  separator: '#48484A',
+} as const;
+
+export const COLORS = LIGHT_COLORS; // Default fallback
 
 export const SPACING = {
   xs: 4,

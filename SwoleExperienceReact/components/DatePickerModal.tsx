@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
   onClose,
   onDateSelected,
 }) => {
+  const colors = useThemeColors();
   const [tempDate, setTempDate] = useState(currentDate);
   const [customDateInput, setCustomDateInput] = useState('');
   const [showCustomDateInput, setShowCustomDateInput] = useState(false);
@@ -69,8 +71,8 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Select Date</Text>
+        <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Select Date</Text>
           
           {!showCustomDateInput ? (
             <>
@@ -80,16 +82,16 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
                     style={styles.navButton}
                     onPress={() => setTempDate(addDays(tempDate, -1))}
                   >
-                    <Text style={styles.navButtonText}>-</Text>
+                    <Text style={[styles.navButtonText, { color: colors.primary }]}>-</Text>
                   </TouchableOpacity>
-                  <Text style={styles.currentDateText}>
+                  <Text style={[styles.currentDateText, { color: colors.text.primary }]}>
                     {formatDateOnly(tempDate)}
                   </Text>
                   <TouchableOpacity 
                     style={styles.navButton}
                     onPress={() => setTempDate(addDays(tempDate, 1))}
                   >
-                    <Text style={styles.navButtonText}>+</Text>
+                    <Text style={[styles.navButtonText, { color: colors.primary }]}>+</Text>
                   </TouchableOpacity>
                 </View>
                 

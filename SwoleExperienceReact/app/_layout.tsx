@@ -2,12 +2,15 @@ import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, Text } from 'react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { COLORS } from '../lib/constants/ui';
+import { ThemeProvider } from '../contexts/ThemeContext';
+import { useThemeColors } from '../hooks/useThemeColors';
 
-export default function RootLayout() {
+function AppContent() {
+  const colors = useThemeColors();
+  
   return (
-    <ErrorBoundary>
-      <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
+    <>
+      <StatusBar style={colors.background === '#000000' ? 'light' : 'dark'} />
       <Tabs 
         screenOptions={{
           headerShown: false,
@@ -17,35 +20,52 @@ export default function RootLayout() {
             left: 0,
             right: 0,
             elevation: 0,
-            backgroundColor: COLORS.surface,
-            borderTopColor: COLORS.border,
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
             height: 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
         }}
       >
         <Tabs.Screen 
+          name="index" 
+          options={{ 
+            href: null, // Hide from tab bar
+            title: 'Home'
+          }} 
+        />
+        <Tabs.Screen 
           name="weight" 
           options={{ 
             title: 'Weight',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>▲</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>▲</Text>
           }} 
         />
         <Tabs.Screen 
           name="workouts" 
           options={{ 
             title: 'Workouts',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>■</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>■</Text>
           }} 
         />
         <Tabs.Screen 
           name="settings" 
           options={{ 
             title: 'Settings',
-            tabBarIcon: () => <Text style={{ fontSize: 20 }}>○</Text>
+            tabBarIcon: () => <Text style={{ fontSize: 20, color: colors.text.primary }}>○</Text>
           }} 
         />
       </Tabs>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

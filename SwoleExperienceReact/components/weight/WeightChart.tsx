@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-nati
 import { VictoryChart, VictoryTheme, VictoryAxis, VictoryGroup, VictoryLine, VictoryScatter, VictoryArea } from 'victory';
 import { Weight } from '../../lib/models/Weight';
 import { Average } from '../../lib/models/Average';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WeightChartProps {
   weights: Weight[];
@@ -19,6 +20,7 @@ interface ChartOptions {
 
 
 export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) => {
+  const colors = useThemeColors();
   const [containerWidth, setContainerWidth] = useState<number>(Dimensions.get('window').width);
   const [options, setOptions] = React.useState<ChartOptions>({
     showMinMax: true,
@@ -32,23 +34,23 @@ export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) =
     const getChevronColor = () => {
       if (label.includes('3 Day')) return 'rgba(75, 192, 192, 1)';
       if (label.includes('7 Day')) return 'rgba(153, 102, 255, 1)';
-      return '#666666';
+      return colors.text.secondary;
     };
 
     return (
-      <View style={styles.statCard}>
+      <View style={[styles.statCard, { backgroundColor: colors.background }]}>
         {!isTrendOnly && value !== undefined && (
-          <Text style={styles.statValue}>{value.toFixed(1)}</Text>
+          <Text style={[styles.statValue, { color: colors.text.primary }]}>{value.toFixed(1)}</Text>
         )}
         {change !== undefined && (
           <View style={styles.trendContainer}>
             <Text style={[styles.changeIcon, { color: getChevronColor() }]}>
               {change > 0 ? '▲' : '▼'}
             </Text>
-            <Text style={styles.changeValue}> {Math.abs(change).toFixed(1)}</Text>
+            <Text style={[styles.changeValue, { color: colors.text.secondary }]}> {Math.abs(change).toFixed(1)}</Text>
           </View>
         )}
-        <Text style={styles.statLabel}>{label}</Text>
+        <Text style={[styles.statLabel, { color: colors.text.secondary }]}>{label}</Text>
       </View>
     );
   };
@@ -56,8 +58,8 @@ export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) =
 
   if (weights.length < 2) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.noDataText}>
+      <View style={[styles.container, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.noDataText, { color: colors.text.secondary }]}>
           {weights.length === 0 
             ? 'No weights have been logged' 
             : 'Keep adding weights to see your trends!'
@@ -72,13 +74,13 @@ export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) =
   
   return (
     <View
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.surface }]}
       onLayout={event => {
         const { width } = event.nativeEvent.layout;
         setContainerWidth(width);
       }}
     >
-      <Text style={styles.title}>Weight Trends</Text>
+      <Text style={[styles.title, { color: colors.text.primary }]}>Weight Trends</Text>
       
       <View style={styles.statsContainer}>
         {renderStatCard(stats.currentWeight, 'Current')}
@@ -88,35 +90,35 @@ export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) =
 
       <View style={styles.optionsContainer}>
         <TouchableOpacity
-          style={[styles.optionToggle, options.showAverage && styles.optionEnabled]}
+          style={[styles.optionToggle, { backgroundColor: colors.background, borderColor: colors.border }, options.showAverage && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
           onPress={() => setOptions(prev => ({ ...prev, showAverage: !prev.showAverage }))}
         >
           <View style={[styles.legendDot, { backgroundColor: 'rgba(0, 122, 255, 1)' }]} />
-          <Text style={styles.optionText}>Average</Text>
+          <Text style={[styles.optionText, { color: colors.text.primary }]}>Average</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionToggle, options.showMinMax && styles.optionEnabled]}
+          style={[styles.optionToggle, { backgroundColor: colors.background, borderColor: colors.border }, options.showMinMax && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
           onPress={() => setOptions(prev => ({ ...prev, showMinMax: !prev.showMinMax }))}
         >
           <View style={[styles.legendDot, { backgroundColor: 'rgba(128, 128, 128, 0.5)', borderWidth: 1, borderColor: 'rgba(128, 128, 128, 0.8)' }]} />
-          <Text style={styles.optionText}>Min/Max</Text>
+          <Text style={[styles.optionText, { color: colors.text.primary }]}>Min/Max</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionToggle, options.showThreeDayAverage && styles.optionEnabled]}
+          style={[styles.optionToggle, { backgroundColor: colors.background, borderColor: colors.border }, options.showThreeDayAverage && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
           onPress={() => setOptions(prev => ({ ...prev, showThreeDayAverage: !prev.showThreeDayAverage }))}
         >
           <View style={[styles.legendDot, { backgroundColor: 'rgba(75, 192, 192, 1)' }]} />
-          <Text style={styles.optionText}>3-Day Avg</Text>
+          <Text style={[styles.optionText, { color: colors.text.primary }]}>3-Day Avg</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionToggle, options.showSevenDayAverage && styles.optionEnabled]}
+          style={[styles.optionToggle, { backgroundColor: colors.background, borderColor: colors.border }, options.showSevenDayAverage && { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
           onPress={() => setOptions(prev => ({ ...prev, showSevenDayAverage: !prev.showSevenDayAverage }))}
         >
           <View style={[styles.legendDot, { backgroundColor: 'rgba(153, 102, 255, 1)' }]} />
-          <Text style={styles.optionText}>7-Day Avg</Text>
+          <Text style={[styles.optionText, { color: colors.text.primary }]}>7-Day Avg</Text>
         </TouchableOpacity>
       </View>
 
@@ -145,16 +147,16 @@ export const WeightChart: React.FC<WeightChartProps> = ({ weights, averages }) =
               return String(date);
             }}
             style={{
-              axis: { stroke: '#e0e0e0' },
-              tickLabels: { fontSize: 10, padding: 5, angle: -45 },
+              axis: { stroke: colors.border },
+              tickLabels: { fontSize: 10, padding: 5, angle: -45, fill: colors.text.secondary },
             }}
           />
           <VictoryAxis
             dependentAxis
             style={{
-              axis: { stroke: '#e0e0e0' },
-              grid: { stroke: '#f0f0f0' },
-              tickLabels: { fontSize: 10, padding: 2, angle: -45, textAnchor: 'end' },
+              axis: { stroke: colors.border },
+              grid: { stroke: colors.border + '40' },
+              tickLabels: { fontSize: 10, padding: 2, angle: -45, textAnchor: 'end', fill: colors.text.secondary },
             }}
           />
           {options.showMinMax && dailyStats.length > 0 && (
@@ -280,23 +282,16 @@ const styles = StyleSheet.create({
   optionToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
     flex: 1,
     marginHorizontal: 2,
     justifyContent: 'center',
   },
-  optionEnabled: {
-    backgroundColor: '#e8f0ff',
-    borderColor: '#007AFF',
-  },
   optionText: {
     fontSize: 11,
-    color: '#333',
   },
   legendDot: {
     width: 6,
@@ -346,7 +341,6 @@ const styles = StyleSheet.create({
   container: {
     margin: 16,
     padding: 16,
-    backgroundColor: '#fff',
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -359,7 +353,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 16,
     textAlign: 'center',
-    color: '#333',
   },
   chartWrapper: {
     width: '100%',

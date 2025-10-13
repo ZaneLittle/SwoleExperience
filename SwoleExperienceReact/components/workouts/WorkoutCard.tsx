@@ -14,6 +14,7 @@ import { WorkoutCardMetrics } from './WorkoutCardMetrics';
 import { WorkoutCardNotes } from './WorkoutCardNotes';
 import { WorkoutCardSupersets } from './WorkoutCardSupersets';
 import { COLORS, SPACING, SHADOWS, BORDER_RADIUS } from '../../lib/constants/ui';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -30,6 +31,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(({
   isAlternativesEnabled = false,
   isProgressionHelperEnabled = false,
 }) => {
+  const colors = useThemeColors();
   const [currentAlternativeIndex, setCurrentAlternativeIndex] = useState(0);
 
   // Memoized calculations for better performance
@@ -73,7 +75,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(({
   };
 
   const renderMainCard = () => (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <TouchableOpacity
         style={styles.infoSection}
         onLongPress={handleLongPress}
@@ -163,7 +165,6 @@ const styles = StyleSheet.create({
     paddingRight: SPACING.sm,
   },
   card: {
-    backgroundColor: COLORS.surface,
     marginHorizontal: SPACING.xs,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.md,

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface DateTimeButtonsProps {
   date: Date;
@@ -17,6 +18,7 @@ export const DateTimeButtons: React.FC<DateTimeButtonsProps> = ({
   onDatePress,
   onTimePress,
 }) => {
+  const colors = useThemeColors();
   const formatDateOnly = (date: Date) => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -34,18 +36,18 @@ export const DateTimeButtons: React.FC<DateTimeButtonsProps> = ({
     <View style={styles.dateTimeContainer}>
       <View style={styles.dateTimeButtons}>
         <TouchableOpacity 
-          style={styles.dateButton} 
+          style={[styles.dateButton, { backgroundColor: colors.background, borderColor: colors.border }]} 
           onPress={onDatePress}
           activeOpacity={0.7}
         >
-          <Text style={styles.dateText}>{formatDateOnly(date)}</Text>
+          <Text style={[styles.dateText, { color: colors.text.primary }]}>{formatDateOnly(date)}</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={styles.timeButton} 
+          style={[styles.timeButton, { backgroundColor: colors.background, borderColor: colors.border }]} 
           onPress={onTimePress}
           activeOpacity={0.7}
         >
-          <Text style={styles.timeText}>{formatTime(date)}</Text>
+          <Text style={[styles.timeText, { color: colors.text.primary }]}>{formatTime(date)}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -68,10 +70,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   dateButton: {
-    backgroundColor: '#fff',
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ddd',
     paddingVertical: 4,
     paddingHorizontal: 4,
     width: 85,
@@ -79,10 +79,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timeButton: {
-    backgroundColor: '#fff',
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ddd',
     paddingVertical: 4,
     paddingHorizontal: 4,
     width: 65,
@@ -91,13 +89,11 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 13,
-    color: '#333',
     textAlign: 'center',
     lineHeight: 16,
   },
   timeText: {
     fontSize: 13,
-    color: '#333',
     textAlign: 'center',
     lineHeight: 16,
   },

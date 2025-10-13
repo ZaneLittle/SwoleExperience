@@ -7,11 +7,13 @@ import { Weight } from '../lib/models/Weight';
 import { Average } from '../lib/models/Average';
 import { weightService } from '../lib/services/WeightService';
 import { averageService } from '../lib/services/AverageService';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 export default function WeightScreen() {
   const [weights, setWeights] = useState<Weight[]>([]);
   const [averages, setAverages] = useState<Average[]>([]);
   const [loading, setLoading] = useState(true);
+  const colors = useThemeColors();
 
   const loadData = async () => {
     try {
@@ -43,14 +45,14 @@ export default function WeightScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
       <WeightEntryForm onWeightAdded={handleWeightAdded} />
       
       <WeightChart weights={weights} averages={averages} />
@@ -66,7 +68,6 @@ export default function WeightScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   content: {
     paddingBottom: Platform.OS === 'ios' ? 100 : 90,
@@ -75,7 +76,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 50,
-    color: '#666',
   },
 });
 

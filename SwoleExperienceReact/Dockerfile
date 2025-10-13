@@ -18,6 +18,7 @@ COPY package*.json ./
 COPY app.json ./
 COPY app/ ./app/
 COPY components/ ./components/
+COPY contexts/ ./contexts/
 COPY lib/ ./lib/
 COPY hooks/ ./hooks/
 COPY index.js ./

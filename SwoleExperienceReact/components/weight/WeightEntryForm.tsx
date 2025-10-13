@@ -16,6 +16,7 @@ import { TimePickerModal } from '../TimePickerModal';
 import { DateTimeButtons } from '../DateTimeButtons';
 import { handleError, ErrorCodes } from '../../lib/utils/errorHandler';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../lib/constants/ui';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface WeightEntryFormProps {
   onWeightAdded: () => void;
@@ -26,6 +27,7 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
   const [date, setDate] = useState(new Date());
   const [showDateModal, setShowDateModal] = useState(false);
   const [showTimeModal, setShowTimeModal] = useState(false);
+  const colors = useThemeColors();
 
   const handleSubmit = async () => {
     const weightValue = parseFloat(weight);
@@ -241,7 +243,7 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <View style={styles.formRow}>
         <DateTimeButtons 
           date={date}
@@ -252,15 +254,20 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
         <View style={styles.weightContainer}>
           <View style={styles.inputRow}>
             <TextInput
-              style={styles.weightInput}
+              style={[styles.weightInput, { 
+                backgroundColor: colors.background, 
+                color: colors.text.primary,
+                borderColor: colors.border 
+              }]}
               value={weight}
               onChangeText={setWeight}
               placeholder="Enter weight"
+              placeholderTextColor={colors.text.tertiary}
               keyboardType="numeric"
               returnKeyType="done"
               onSubmitEditing={handleSubmit}
             />
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <TouchableOpacity style={[styles.submitButton, { backgroundColor: colors.primary }]} onPress={handleSubmit}>
               <Text style={styles.submitButtonText}>✓</Text>
             </TouchableOpacity>
           </View>
@@ -287,7 +294,6 @@ export const WeightEntryForm: React.FC<WeightEntryFormProps> = ({ onWeightAdded 
 const styles = StyleSheet.create({
   container: {
     padding: SPACING.sm,
-    backgroundColor: COLORS.background,
     borderRadius: BORDER_RADIUS.md,
     margin: SPACING.sm,
   },
@@ -318,16 +324,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: TYPOGRAPHY.sizes.md,
     paddingHorizontal: SPACING.sm,
-    backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
     height: 40,
     minWidth: 90,
     flexShrink: 1,
   },
   submitButton: {
-    backgroundColor: COLORS.primary,
     borderRadius: 20,
     width: 40,
     height: 40,
