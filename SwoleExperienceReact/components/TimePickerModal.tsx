@@ -54,66 +54,66 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
           
           <View style={styles.timePickerContainer}>
             <View style={styles.timeDisplay}>
-              <Text style={styles.timeDisplayText}>
+              <Text style={[styles.timeDisplayText, { color: colors.text.primary }]}>
                 {formatTime(tempTime)}
               </Text>
             </View>
             
             <View style={styles.timeControls}>
               <View style={styles.timeControlGroup}>
-                <Text style={styles.timeControlLabel}>Hour</Text>
+                <Text style={[styles.timeControlLabel, { color: colors.text.secondary }]}>Hour</Text>
                 <View style={styles.timeControlButtons}>
                   <TouchableOpacity 
-                    style={styles.timeControlButton}
+                    style={[styles.timeControlButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                     onPress={() => {
                       const newTime = new Date(tempTime);
                       newTime.setHours(tempTime.getHours() - 1);
                       setTempTime(newTime);
                     }}
                   >
-                    <Text style={styles.timeControlButtonText}>-</Text>
+                    <Text style={[styles.timeControlButtonText, { color: colors.text.primary }]}>-</Text>
                   </TouchableOpacity>
-                  <Text style={styles.timeControlValue}>
+                  <Text style={[styles.timeControlValue, { color: colors.text.primary }]}>
                     {tempTime.getHours().toString().padStart(2, '0')}
                   </Text>
                   <TouchableOpacity 
-                    style={styles.timeControlButton}
+                    style={[styles.timeControlButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                     onPress={() => {
                       const newTime = new Date(tempTime);
                       newTime.setHours(tempTime.getHours() + 1);
                       setTempTime(newTime);
                     }}
                   >
-                    <Text style={styles.timeControlButtonText}>+</Text>
+                    <Text style={[styles.timeControlButtonText, { color: colors.text.primary }]}>+</Text>
                   </TouchableOpacity>
                 </View>
               </View>
               
               <View style={styles.timeControlGroup}>
-                <Text style={styles.timeControlLabel}>Minute</Text>
+                <Text style={[styles.timeControlLabel, { color: colors.text.secondary }]}>Minute</Text>
                 <View style={styles.timeControlButtons}>
                   <TouchableOpacity 
-                    style={styles.timeControlButton}
+                    style={[styles.timeControlButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                     onPress={() => {
                       const newTime = new Date(tempTime);
                       newTime.setMinutes(tempTime.getMinutes() - 15);
                       setTempTime(newTime);
                     }}
                   >
-                    <Text style={styles.timeControlButtonText}>-</Text>
+                    <Text style={[styles.timeControlButtonText, { color: colors.text.primary }]}>-</Text>
                   </TouchableOpacity>
-                  <Text style={styles.timeControlValue}>
+                  <Text style={[styles.timeControlValue, { color: colors.text.primary }]}>
                     {tempTime.getMinutes().toString().padStart(2, '0')}
                   </Text>
                   <TouchableOpacity 
-                    style={styles.timeControlButton}
+                    style={[styles.timeControlButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                     onPress={() => {
                       const newTime = new Date(tempTime);
                       newTime.setMinutes(tempTime.getMinutes() + 15);
                       setTempTime(newTime);
                     }}
                   >
-                    <Text style={styles.timeControlButtonText}>+</Text>
+                    <Text style={[styles.timeControlButtonText, { color: colors.text.primary }]}>+</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -121,47 +121,47 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
             
             <View style={styles.quickTimeButtons}>
               <TouchableOpacity 
-                style={styles.quickTimeButton} 
+                style={[styles.quickTimeButton, { backgroundColor: colors.background }]} 
                 onPress={() => setTempTime(setTime(tempTime, 8, 0))}
               >
-                <Text style={styles.quickTimeButtonText}>8:00 AM</Text>
+                <Text style={[styles.quickTimeButtonText, { color: colors.primary }]}>8:00 AM</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.quickTimeButton} 
+                style={[styles.quickTimeButton, { backgroundColor: colors.background }]} 
                 onPress={() => setTempTime(setTime(tempTime, 14, 0))}
               >
-                <Text style={styles.quickTimeButtonText}>2:00 PM</Text>
+                <Text style={[styles.quickTimeButtonText, { color: colors.primary }]}>2:00 PM</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.quickTimeButton} 
+                style={[styles.quickTimeButton, { backgroundColor: colors.background }]} 
                 onPress={() => setTempTime(setTime(tempTime, 18, 0))}
               >
-                <Text style={styles.quickTimeButtonText}>6:00 PM</Text>
+                <Text style={[styles.quickTimeButtonText, { color: colors.primary }]}>6:00 PM</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                style={styles.quickTimeButton} 
+                style={[styles.quickTimeButton, { backgroundColor: colors.background }]} 
                 onPress={() => setTempTime(new Date())}
               >
-                <Text style={styles.quickTimeButtonText}>Now</Text>
+                <Text style={[styles.quickTimeButtonText, { color: colors.primary }]}>Now</Text>
               </TouchableOpacity>
             </View>
           </View>
           
           <View style={styles.modalButtons}>
             <TouchableOpacity 
-              style={[styles.modalButton, styles.cancelButton]} 
+              style={[styles.modalButton, { backgroundColor: colors.background }]} 
               onPress={onClose}
             >
-              <Text style={[styles.modalButtonText, styles.cancelButtonText]}>Cancel</Text>
+              <Text style={[styles.modalButtonText, { color: colors.text.primary }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={styles.modalButton} 
+              style={[styles.modalButton, { backgroundColor: colors.primary }]} 
               onPress={handleTimeSelect}
             >
-              <Text style={styles.modalButtonText}>Select Time</Text>
+              <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>Select Time</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -197,22 +197,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   modalButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 6,
     padding: 12,
     alignItems: 'center',
     flex: 1,
   },
   modalButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  cancelButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  cancelButtonText: {
-    color: '#333',
   },
   // Time picker specific styles
   timePickerContainer: {
@@ -225,7 +217,6 @@ const styles = StyleSheet.create({
   timeDisplayText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
   },
   timeControls: {
     flexDirection: 'row',
@@ -237,7 +228,6 @@ const styles = StyleSheet.create({
   },
   timeControlLabel: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 8,
   },
   timeControlButtons: {
@@ -246,22 +236,20 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   timeControlButton: {
-    backgroundColor: '#f0f0f0',
     borderRadius: 20,
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
   },
   timeControlButtonText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
   },
   timeControlValue: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
     minWidth: 50,
     textAlign: 'center',
   },
@@ -271,14 +259,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   quickTimeButton: {
-    backgroundColor: '#e8f4fd',
     borderRadius: 6,
     padding: 10,
     flex: 1,
     minWidth: 70,
   },
   quickTimeButtonText: {
-    color: '#007AFF',
     fontSize: 12,
     fontWeight: '500',
     textAlign: 'center',
