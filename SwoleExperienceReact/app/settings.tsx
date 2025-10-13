@@ -33,52 +33,29 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Units</Text>
-              <Text style={styles.settingDescription}>
-                Weight units (lbs/kg)
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
 
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Notifications</Text>
-              <Text style={styles.settingDescription}>
-                Workout reminders and alerts
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-        </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data</Text>
+          <Text style={styles.sectionTitle}>Support</Text>
           
-          <View style={styles.settingItem}>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => {
+              // Open GitHub repository in external browser
+              const url = 'https://github.com/ZaneLittle/SwoleExperience/';
+              if (typeof window !== 'undefined' && window.open) {
+                window.open(url, '_blank');
+              }
+            }}
+          >
             <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Export Data</Text>
+              <Text style={styles.settingTitle}>Visit GitHub Repository</Text>
               <Text style={styles.settingDescription}>
-                Export your workout and weight data
+                View source code and leave feedback
               </Text>
             </View>
             <Text style={styles.chevron}>›</Text>
-          </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingContent}>
-              <Text style={styles.settingTitle}>Backup & Restore</Text>
-              <Text style={styles.settingDescription}>
-                Backup your data to the cloud
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
