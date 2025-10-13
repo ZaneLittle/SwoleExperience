@@ -2,12 +2,15 @@ import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, Text } from 'react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { COLORS } from '../lib/constants/ui';
+import { ThemeProvider } from '../contexts/ThemeContext';
+import { useThemeColors } from '../hooks/useThemeColors';
 
-export default function RootLayout() {
+function AppContent() {
+  const colors = useThemeColors();
+  
   return (
-    <ErrorBoundary>
-      <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
+    <>
+      <StatusBar style={colors.background === '#000000' ? 'light' : 'dark'} />
       <Tabs 
         screenOptions={{
           headerShown: false,
@@ -17,8 +20,8 @@ export default function RootLayout() {
             left: 0,
             right: 0,
             elevation: 0,
-            backgroundColor: COLORS.surface,
-            borderTopColor: COLORS.border,
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
             height: 60,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10,
           },
@@ -46,6 +49,16 @@ export default function RootLayout() {
           }} 
         />
       </Tabs>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
