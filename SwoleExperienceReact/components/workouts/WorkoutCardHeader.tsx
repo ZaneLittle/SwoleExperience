@@ -24,7 +24,7 @@ export const WorkoutCardHeader: React.FC<WorkoutCardHeaderProps> = ({
 }) => {
   return (
     <View style={styles.nameRow}>
-      {hasPrevious && <Text style={styles.chevron}>‹</Text>}
+      {hasPrevious && <View style={styles.chevronLeft} />}
       
       <View style={styles.titleContainer}>
         <Text style={styles.workoutName}>{workout.name}</Text>
@@ -50,7 +50,7 @@ export const WorkoutCardHeader: React.FC<WorkoutCardHeaderProps> = ({
         </View>
       </View>
       
-      {hasNext && <Text style={styles.chevron}>›</Text>}
+      {hasNext && <View style={styles.chevronRight} />}
     </View>
   );
 };
@@ -84,11 +84,25 @@ const styles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
   },
-  chevron: {
-    fontSize: TYPOGRAPHY.sizes.lg,
-    color: COLORS.primary,
-    width: 18,
-    textAlign: 'center',
+  chevronLeft: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 8,
+    borderBottomWidth: 8,
+    borderRightWidth: 12,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderRightColor: COLORS.primary,
+  },
+  chevronRight: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 8,
+    borderBottomWidth: 8,
+    borderLeftWidth: 12,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: COLORS.primary,
   },
   editButtonText: {
     color: COLORS.primary,

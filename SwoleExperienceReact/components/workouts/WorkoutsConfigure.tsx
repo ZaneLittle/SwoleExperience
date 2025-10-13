@@ -148,7 +148,7 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
         onPress={() => setSelectedDay(Math.max(1, selectedDay - 1))}
         disabled={selectedDay <= 1}
       >
-        <Text style={styles.dayButtonText}>‹</Text>
+        <Text style={styles.dayButtonText}>PREV</Text>
       </TouchableOpacity>
       
       <View style={styles.dayInfo}>
@@ -167,7 +167,7 @@ export default function WorkoutsConfigure({ onBack }: WorkoutsConfigureProps) {
         style={styles.dayButton}
         onPress={handleNextDay}
       >
-        <Text style={styles.dayButtonText}>›</Text>
+        <Text style={styles.dayButtonText}>NEXT</Text>
       </TouchableOpacity>
     </View>
   );
