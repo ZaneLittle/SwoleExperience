@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Platform } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../lib/constants/ui';
 
@@ -24,10 +24,27 @@ export default function RootLayout() {
           },
         }}
       >
-        <Tabs.Screen name="index" options={{ title: 'Home' }} />
-        <Tabs.Screen name="weight" options={{ title: 'Weight' }} />
-        <Tabs.Screen name="workouts" options={{ title: 'Workouts' }} />
-        <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+        <Tabs.Screen 
+          name="weight" 
+          options={{ 
+            title: 'Weight',
+            tabBarIcon: () => <Text style={{ fontSize: 20 }}>▲</Text>
+          }} 
+        />
+        <Tabs.Screen 
+          name="workouts" 
+          options={{ 
+            title: 'Workouts',
+            tabBarIcon: () => <Text style={{ fontSize: 20 }}>■</Text>
+          }} 
+        />
+        <Tabs.Screen 
+          name="settings" 
+          options={{ 
+            title: 'Settings',
+            tabBarIcon: () => <Text style={{ fontSize: 20 }}>○</Text>
+          }} 
+        />
       </Tabs>
     </ErrorBoundary>
   );

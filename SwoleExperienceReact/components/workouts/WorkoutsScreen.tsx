@@ -201,7 +201,7 @@ export const WorkoutsScreen: React.FC = () => {
               style={styles.navButton}
               onPress={() => handleDayNavigation(-1)}
             >
-              <Text style={styles.navButtonText}>‹</Text>
+              <View style={styles.navButtonLeft} />
             </TouchableOpacity>
             
             <Text style={styles.dayText}>{dayText}</Text>
@@ -210,7 +210,7 @@ export const WorkoutsScreen: React.FC = () => {
               style={styles.navButton}
               onPress={() => handleDayNavigation(1)}
             >
-              <Text style={styles.navButtonText}>›</Text>
+              <View style={styles.navButtonRight} />
             </TouchableOpacity>
           </View>
           <View style={styles.spacer} />
@@ -320,10 +320,25 @@ const styles = StyleSheet.create({
   navButton: {
     padding: 8,
   },
-  navButtonText: {
-    fontSize: 24,
-    color: '#007AFF',
-    fontWeight: 'bold',
+  navButtonLeft: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderBottomWidth: 10,
+    borderRightWidth: 15,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderRightColor: '#007AFF',
+  },
+  navButtonRight: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderBottomWidth: 10,
+    borderLeftWidth: 15,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: '#007AFF',
   },
   dayText: {
     fontSize: 18,

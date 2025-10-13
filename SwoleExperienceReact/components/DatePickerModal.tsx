@@ -80,7 +80,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
                     style={styles.navButton}
                     onPress={() => setTempDate(addDays(tempDate, -1))}
                   >
-                    <Text style={styles.navButtonText}>‹</Text>
+                    <Text style={styles.navButtonText}>-</Text>
                   </TouchableOpacity>
                   <Text style={styles.currentDateText}>
                     {formatDateOnly(tempDate)}
@@ -89,7 +89,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
                     style={styles.navButton}
                     onPress={() => setTempDate(addDays(tempDate, 1))}
                   >
-                    <Text style={styles.navButtonText}>›</Text>
+                    <Text style={styles.navButtonText}>+</Text>
                   </TouchableOpacity>
                 </View>
                 

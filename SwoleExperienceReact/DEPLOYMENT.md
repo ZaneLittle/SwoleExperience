@@ -25,41 +25,27 @@ rm -rf /mnt/SSD/SwoleExperience/node_modules
 sync
 ```
 
-### Step 3: Build Docker Container in TrueNAS
+### Step 3: Build Docker Container in TrueNAS and deploy
 1. In TrueNAS, open the shell and navigate to your project:
-   ```bash
-   cd /mnt/your-pool/SwoleExperience/SwoleExperienceReact
-   ```
+```bash
+cd /mnt/your-pool/SwoleExperience/SwoleExperienceReact
+```
 
 2. Build the docker container:
-   ```bash
-   sudo docker build -t swole-experience-react:latest .
-   ```
+```bash
+sudo docker build -t swole-experience-react:latest .
+```
 
-## Setup the TrueNAS App - first time setup
+3. Restart the app container
 
-### Step 1: Access TrueNAS Web Interface
-1. Go to TrueNAS web interface
-2. Navigate to **Apps** → **Available Applications**
-3. Click **Custom App**
 
-### Step 2: Configure Application Settings
-- **Repository**: `swole-experience-react`
-- **Tag**: `latest`
-- **Pull Policy**: `Never`
-- **Port Bind Mode**: `Publish port on the host for external access`
-- **Container Port**: `42069`
-- **Host Port**: `42069`
-- **Protocol**: `TCP`
 
-### Step 3: Deploy
-1. Click **Save**
-2. Click **Deploy**
-3. Wait for deployment to complete
-4. Access your app at: `http://your-truenas-ip:42069`
+## Troubleshooting 
+1. logs are stored separately in and can be viewed with:
+```bash
+# View logs from the container directly
+sudo docker-compose logs -f swole-experience-react
 
-## Redeploying the TrueNAS App
-1. Go to TrueNAS web interface
-2. Navigate to Apps -> installed Applications
-3. Find the Swole Experience Apps and click Edit and Update
-4. Redeploy the application
+# Or access logs inside the running container
+sudo docker exec -it swole-experience-react cat /var/log/nginx/access.log
+```

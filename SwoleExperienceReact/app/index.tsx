@@ -4,8 +4,8 @@ import { Text, View, StyleSheet } from 'react-native';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>SwoleExperience</Text>
-      <Text style={styles.subtitle}>React Native + Web</Text>
+      <Text style={styles.title}>Swole Experience</Text>
+      <Text style={styles.subtitle}>A simple weight tracker and workout planner</Text>
       <View style={styles.links}>
         <Link href="/weight">Go to Weight Tracker</Link>
         <Link href="/workouts" style={styles.link}>Go to Workouts</Link>
