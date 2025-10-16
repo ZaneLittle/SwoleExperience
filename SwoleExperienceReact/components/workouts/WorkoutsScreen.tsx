@@ -258,7 +258,7 @@ export const WorkoutsScreen: React.FC = () => {
 
   const renderHeader = () => (
     <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-      {(workoutHistory.length > 0 || workouts.length > 0) ? (
+      {(workoutHistory.length > 0 || workouts.length > 0 || dayOffset !== 0) ? (
         <>
           <View style={styles.spacer} />
           <View style={styles.dayNavigation}>
