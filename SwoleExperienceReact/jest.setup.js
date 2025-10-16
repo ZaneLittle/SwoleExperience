@@ -11,31 +11,10 @@ jest.mock('react-native-uuid', () => ({
   v4: jest.fn(() => 'mocked-uuid-123'),
 }));
 
-// Mock React Native modules
-jest.mock('react-native', () => ({
-  Alert: {
-    alert: jest.fn(),
-    prompt: jest.fn(),
-  },
-  Dimensions: {
-    get: jest.fn(() => ({ width: 375, height: 812 })),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-  },
-  Platform: {
-    OS: 'ios',
-    select: jest.fn((obj) => obj.ios),
-  },
-  StyleSheet: {
-    create: jest.fn((styles) => styles),
-  },
-  View: 'View',
-  Text: 'Text',
-  TextInput: 'TextInput',
-  TouchableOpacity: 'TouchableOpacity',
-  FlatList: 'FlatList',
-  Modal: 'Modal',
-  ScrollView: 'ScrollView',
+// Mock specific React Native modules that cause issues
+jest.mock('react-native/Libraries/Alert/Alert', () => ({
+  alert: jest.fn(),
+  prompt: jest.fn(),
 }));
 
 // Mock Victory components (only when needed for component tests)
@@ -54,6 +33,16 @@ global.window = {
   confirm: jest.fn(),
 };
 
+// Mock localStorage for web platform
+global.localStorage = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
+};
+
 // Silence specific console errors during tests
 const originalError = console.error;
 beforeAll(() => {
@@ -64,7 +53,9 @@ beforeAll(() => {
        args[0].includes('Error getting weights:') ||
        args[0].includes('Error getting averages:') ||
        args[0].includes('Error adding weight:') ||
-       args[0].includes('Error calculating averages:'))
+       args[0].includes('Error calculating averages:') ||
+       args[0].includes('Error getting current day:') ||
+       args[0].includes('Error setting current day:'))
     ) {
       return;
     }
