@@ -72,7 +72,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
     return !!workout.supersetParentId;
   };
 
-  const renderHistoryHeader = () => (
+  const renderHistoryHeader = (showHeader: boolean = true) => (
     <View style={styles.historyHeader}>
       <Text style={styles.historyHeaderText}>Completed</Text>
     </View>
@@ -97,12 +97,12 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
     </TouchableOpacity>
   );
 
-  const renderWorkoutCards = (workoutList: (WorkoutDay | WorkoutHistory)[], isHistory: boolean = false) => {
+  const renderWorkoutCards = (workoutList: (WorkoutDay | WorkoutHistory)[], isHistory: boolean = false, showCompletedHeader: boolean = false) => {
     if (workoutList.length === 0) return null;
 
     const cards: React.ReactElement[] = [];
     
-    if (isHistory) {
+    if (isHistory || showCompletedHeader) {
       cards.push(<View key="history-header">{renderHistoryHeader()}</View>);
     }
 
@@ -170,8 +170,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
       {!isHistory && renderWorkoutCards(workouts, false)}
-      {renderWorkoutCards(history, true)}
-      {isHistory && renderWorkoutCards(workouts, false)}
+      {history.length > 0 && renderWorkoutCards(history, isHistory, !isHistory)}
     </ScrollView>
   );
 }

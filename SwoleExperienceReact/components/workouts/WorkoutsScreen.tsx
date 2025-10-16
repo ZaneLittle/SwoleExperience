@@ -40,9 +40,14 @@ export const WorkoutsScreen: React.FC = () => {
     try {
       setIsLoading(true);
       const targetDay = day !== undefined ? day : currentDay;
+
+      const today = new Date();
+      const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const historyDate = dayOffset === 0 ? todayString : getDateString();
+      
       const [workoutsData, historyData, uniqueDays] = await Promise.all([
         workoutService.getWorkouts(targetDay),
-        workoutHistoryService.getWorkoutHistory(getDateString()),
+        workoutHistoryService.getWorkoutHistory(historyDate),
         workoutService.getUniqueDays(),
       ]);
       
@@ -60,7 +65,10 @@ export const WorkoutsScreen: React.FC = () => {
   const getDateString = (): string => {
     const date = new Date();
     date.setDate(date.getDate() + dayOffset);
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const updateDayText = () => {
@@ -91,19 +99,25 @@ export const WorkoutsScreen: React.FC = () => {
       loadWorkouts();
     } else if (newOffset < 0) {
       // Past dates - load history
-      loadWorkoutHistory();
+      loadWorkoutHistory(newOffset);
     } else {
       // Future dates - load scheduled workouts for that day
       loadFutureWorkouts(newOffset);
     }
   };
 
-  const loadWorkoutHistory = async () => {
+  const loadWorkoutHistory = async (offset?: number) => {
     try {
       setIsLoading(true);
-      const historyData = await workoutHistoryService.getWorkoutHistory(getDateString());
+      // Use the provided offset or the current dayOffset
+      const currentOffset = offset !== undefined ? offset : dayOffset;
+      const historyDate = getDateStringForOffset(currentOffset);
+      
+      const historyData = await workoutHistoryService.getWorkoutHistory(historyDate);
+      
+      // Clear current workouts first, then set history
+      setWorkouts([]);
       setWorkoutHistory(historyData);
-      setWorkouts([]); // Clear workouts for history view
     } catch (error) {
       console.error('Error loading workout history:', error);
     } finally {
@@ -111,11 +125,26 @@ export const WorkoutsScreen: React.FC = () => {
     }
   };
 
+  const getDateStringForOffset = (offset: number): string => {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const loadFutureWorkouts = async (offset: number) => {
     try {
       setIsLoading(true);
-      // For future dates, calculate which day of the week it should be
-      const futureDay = ((currentDay - 1 + offset) % totalDays) + 1;
+      // For future dates, calculate the next workout day
+      let futureDay = currentDay + offset;
+      
+      // Handle wrapping around to day 1 if we exceed totalDays
+      if (futureDay > totalDays) {
+        futureDay = futureDay - totalDays;
+      }
+      
       const futureWorkouts = await workoutService.getWorkouts(futureDay);
       setWorkouts(futureWorkouts);
       setWorkoutHistory([]); // Clear history for future dates
@@ -136,9 +165,11 @@ export const WorkoutsScreen: React.FC = () => {
 
       setIsCompletingDay(true);
 
-      // Convert all workouts to history
+      // Convert all workouts to history with the current date
+      const completionDate = new Date();
+      
       for (const workout of workouts) {
-        const workoutHistory = WorkoutHistoryService.workoutDayToHistory(workout);
+        const workoutHistory = WorkoutHistoryService.workoutDayToHistory(workout, completionDate);
         await workoutHistoryService.createWorkoutHistory(workoutHistory);
       }
 
@@ -148,26 +179,12 @@ export const WorkoutsScreen: React.FC = () => {
       // Save the new current day to storage first
       await workoutService.setCurrentDay(nextDay);
       
-      // Update state in a single batch
+      // Update state - this will trigger the useEffect to load workouts
       setCurrentDay(nextDay);
       setDayOffset(0);
       
-      // Clear current workouts immediately
-      setWorkouts([]);
-      
-      // Load workouts for the new day
-      const [workoutsData, historyData, uniqueDays] = await Promise.all([
-        workoutService.getWorkouts(nextDay),
-        workoutHistoryService.getWorkoutHistory(getDateString()),
-        workoutService.getUniqueDays(),
-      ]);
-      
-      setWorkouts(workoutsData);
-      setWorkoutHistory(historyData);
-      setTotalDays(uniqueDays);
-      
       setIsCompletingDay(false);
-        Alert.alert('Success', `Workout day completed! Moved to day ${nextDay}.`);
+      Alert.alert('Success', `Workout day completed! Moved to day ${nextDay}.`);
     } catch (error) {
       console.error('Error completing day:', error);
       setIsCompletingDay(false);

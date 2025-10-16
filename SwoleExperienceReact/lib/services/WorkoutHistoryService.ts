@@ -87,12 +87,15 @@ export class WorkoutHistoryService {
   // Convert WorkoutDay to WorkoutHistory
   static workoutDayToHistory(workoutDay: WorkoutDay, date?: Date): WorkoutHistory {
     const dateToLog = date || new Date();
-    const truncatedDate = new Date(dateToLog.getFullYear(), dateToLog.getMonth(), dateToLog.getDate());
+    const year = dateToLog.getFullYear();
+    const month = String(dateToLog.getMonth() + 1).padStart(2, '0');
+    const day = String(dateToLog.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
     
     return {
       id: uuid.v4() as string,
       workoutId: workoutDay.id,
-      date: truncatedDate.toISOString().split('T')[0], // YYYY-MM-DD format
+      date: dateString, // YYYY-MM-DD format
       name: workoutDay.name,
       weight: workoutDay.weight,
       sets: workoutDay.sets,
