@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import uuid from 'react-native-uuid';
 import { WorkoutDay, WorkoutDayData, WorkoutDayConverter, WorkoutDayValidator } from '../models/WorkoutDay';
 import { WorkoutValidator } from '../models/Workout';
 
 const WORKOUT_STORAGE_KEY = 'workouts';
+const CURRENT_DAY_STORAGE_KEY = 'current_workout_day';
 
 class WorkoutService {
   private static instance: WorkoutService;
@@ -132,6 +134,60 @@ class WorkoutService {
 
   static supersetExists(workoutDay: WorkoutDay, workouts: WorkoutDay[]): boolean {
     return WorkoutDayValidator.supersetExists(workoutDay, workouts);
+  }
+
+  // Current workout day persistence methods
+  async getCurrentDay(): Promise<number> {
+    try {
+      let currentDayJson = await AsyncStorage.getItem(CURRENT_DAY_STORAGE_KEY);
+      
+      // If AsyncStorage fails on web, try localStorage as fallback (hydration-safe)
+      if (!currentDayJson && Platform.OS === 'web') {
+        try {
+          currentDayJson = localStorage.getItem(CURRENT_DAY_STORAGE_KEY);
+        } catch (localError) {
+          // localStorage fallback failed, continue with AsyncStorage result
+        }
+      }
+      
+      if (!currentDayJson) {
+        return 1; // Default to day 1
+      }
+      
+      const currentDay = JSON.parse(currentDayJson);
+      return typeof currentDay === 'number' ? currentDay : 1;
+    } catch (error) {
+      console.error('Error getting current day:', error);
+      return 1; // Default to day 1 on error
+    }
+  }
+
+  async setCurrentDay(day: number): Promise<boolean> {
+    try {
+      // Use the same robust pattern as workouts/weights: read existing data first
+      const existingDay = await this.getCurrentDay();
+      
+      // Only update if the day is actually different
+      if (existingDay === day) {
+        return true;
+      }
+      
+      // Use a more explicit storage approach for web (hydration-safe)
+      if (Platform.OS === 'web') {
+        // Web platform - use localStorage directly as backup
+        try {
+          localStorage.setItem(CURRENT_DAY_STORAGE_KEY, JSON.stringify(day));
+        } catch (localError) {
+          // localStorage backup failed, continue with AsyncStorage
+        }
+      }
+      
+      await AsyncStorage.setItem(CURRENT_DAY_STORAGE_KEY, JSON.stringify(day));
+      return true;
+    } catch (error) {
+      console.error('Error setting current day:', error);
+      return false;
+    }
   }
 }
 

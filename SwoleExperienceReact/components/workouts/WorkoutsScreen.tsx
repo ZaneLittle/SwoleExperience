@@ -29,17 +29,19 @@ export const WorkoutsScreen: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<WorkoutDay | undefined>();
   const [totalDays, setTotalDays] = useState(0);
+  const [isCompletingDay, setIsCompletingDay] = useState(false);
 
   // Feature toggles (you can make these configurable later)
   const [isSupersetsEnabled] = useState(true);
   const [isAlternativesEnabled] = useState(true);
   const [isProgressionHelperEnabled] = useState(true);
 
-  const loadWorkouts = useCallback(async () => {
+  const loadWorkouts = useCallback(async (day?: number) => {
     try {
       setIsLoading(true);
+      const targetDay = day !== undefined ? day : currentDay;
       const [workoutsData, historyData, uniqueDays] = await Promise.all([
-        workoutService.getWorkouts(currentDay),
+        workoutService.getWorkouts(targetDay),
         workoutHistoryService.getWorkoutHistory(getDateString()),
         workoutService.getUniqueDays(),
       ]);
@@ -126,10 +128,13 @@ export const WorkoutsScreen: React.FC = () => {
 
   const handleCompleteDay = async () => {
     try {
+      
       if (workouts.length === 0) {
         Alert.alert('No Workouts', 'No workouts to complete for today');
         return;
       }
+
+      setIsCompletingDay(true);
 
       // Convert all workouts to history
       for (const workout of workouts) {
@@ -139,13 +144,33 @@ export const WorkoutsScreen: React.FC = () => {
 
       // Move to next day
       const nextDay = currentDay < totalDays ? currentDay + 1 : 1;
+      
+      // Save the new current day to storage first
+      await workoutService.setCurrentDay(nextDay);
+      
+      // Update state in a single batch
       setCurrentDay(nextDay);
       setDayOffset(0);
       
-      Alert.alert('Success', 'Workout day completed!');
-      loadWorkouts();
+      // Clear current workouts immediately
+      setWorkouts([]);
+      
+      // Load workouts for the new day
+      const [workoutsData, historyData, uniqueDays] = await Promise.all([
+        workoutService.getWorkouts(nextDay),
+        workoutHistoryService.getWorkoutHistory(getDateString()),
+        workoutService.getUniqueDays(),
+      ]);
+      
+      setWorkouts(workoutsData);
+      setWorkoutHistory(historyData);
+      setTotalDays(uniqueDays);
+      
+      setIsCompletingDay(false);
+        Alert.alert('Success', `Workout day completed! Moved to day ${nextDay}.`);
     } catch (error) {
       console.error('Error completing day:', error);
+      setIsCompletingDay(false);
       Alert.alert('Error', 'Failed to complete workout day');
     }
   };
@@ -179,15 +204,53 @@ export const WorkoutsScreen: React.FC = () => {
     loadWorkouts();
   };
 
-  const handleGoToToday = () => {
+  const handleGoToToday = async () => {
     setDayOffset(0);
-    setCurrentDay(1);
-    loadWorkouts();
+    // Load the current saved day from storage
+    const savedCurrentDay = await workoutService.getCurrentDay();
+    setCurrentDay(savedCurrentDay);
+    loadWorkouts(savedCurrentDay);
   };
 
+  // Load current day from storage and initialize workouts on component mount
   useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        const savedCurrentDay = await workoutService.getCurrentDay();
+        setCurrentDay(savedCurrentDay);
+        
+        // Load workouts for the saved current day
+        await loadWorkouts(savedCurrentDay);
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        Alert.alert('Error', 'Failed to load app data');
+      }
+    };
+    
+    initializeApp();
+  }, []);
+
+  // Load workouts when currentDay changes (but not on initial mount)
+  useEffect(() => {
+    // Only reload if currentDay has been updated from storage (not initial load)
+    const hasInitialized = workouts.length > 0 || totalDays > 0;
+    if (!hasInitialized) {
+      return; // Still initializing
+    }
+    
     loadWorkouts();
-  }, [loadWorkouts]);
+  }, [currentDay, loadWorkouts]);
+
+  // Force re-render when completing a day
+  useEffect(() => {
+    if (isCompletingDay) {
+      // Force a re-render by updating a dummy state
+      const timer = setTimeout(() => {
+        // This will trigger a re-render
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isCompletingDay]);
 
   useEffect(() => {
     updateDayText();
@@ -227,8 +290,16 @@ export const WorkoutsScreen: React.FC = () => {
     if (workouts.length === 0 || dayOffset !== 0) return null;
     
     return (
-      <TouchableOpacity style={styles.completeButton} onPress={handleCompleteDay}>
-        <Text style={styles.completeButtonText}>Complete Day</Text>
+      <TouchableOpacity 
+        style={[styles.completeButton, isCompletingDay && styles.completeButtonDisabled]} 
+        onPress={handleCompleteDay}
+        disabled={isCompletingDay}
+      >
+        {isCompletingDay ? (
+          <Text style={styles.completeButtonText}>Completing...</Text>
+        ) : (
+          <Text style={styles.completeButtonText}>Complete Day</Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -270,6 +341,7 @@ export const WorkoutsScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderHeader()}
+      
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -360,6 +432,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     borderRadius: 8,
     alignItems: 'center',
+  },
+  completeButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
   },
   completeButtonText: {
     color: '#fff',

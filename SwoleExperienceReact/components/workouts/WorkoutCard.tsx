@@ -130,9 +130,9 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = React.memo(({
   );
 
   const renderCardList = () => {
-    const cards = [renderMainCard()];
+    const cards = [<View key="main">{renderMainCard()}</View>];
     alternatives.forEach((alternative, index) => {
-      cards.push(renderAlternativeCard(alternative, index));
+      cards.push(<View key={`alt-${alternative.id}-${index}`}>{renderAlternativeCard(alternative, index)}</View>);
     });
     return cards;
   };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Switch, Platform } from 'react-native';
 import WorkoutsConfigure from '../components/workouts/WorkoutsConfigure';
 import { useTheme, ThemeMode } from '../contexts/ThemeContext';
 import { useThemeColors } from '../hooks/useThemeColors';
@@ -98,7 +98,7 @@ export default function SettingsScreen() {
             onPress={() => {
               // Open GitHub repository in external browser
               const url = 'https://github.com/ZaneLittle/SwoleExperience/';
-              if (typeof window !== 'undefined' && window.open) {
+              if (Platform.OS === 'web' && window.open) {
                 window.open(url, '_blank');
               }
             }}
