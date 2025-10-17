@@ -1,232 +1,85 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Alert,
   ActivityIndicator,
-  Modal,
+  Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WorkoutDay } from '../../lib/models/WorkoutDay';
-import { WorkoutHistory } from '../../lib/models/WorkoutHistory';
 import { workoutService } from '../../lib/services/WorkoutService';
-import { workoutHistoryService, WorkoutHistoryService } from '../../lib/services/WorkoutHistoryService';
 import { WorkoutList } from './WorkoutList';
-import { WorkoutCreateUpdateForm } from './WorkoutCreateUpdateForm';
+import { WorkoutsHeader } from './WorkoutsHeader';
+import { WorkoutFormModal } from './WorkoutFormModal';
+import { CompleteWorkoutButton } from './CompleteWorkoutButton';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useWorkoutData } from '../../hooks/useWorkoutData';
+import { useWorkoutCompletion } from '../../hooks/useWorkoutCompletion';
+import { useWorkoutForm } from '../../hooks/useWorkoutForm';
+import { useDayText } from '../../hooks/useDayText';
 
 export const WorkoutsScreen: React.FC = () => {
-  const insets = useSafeAreaInsets();
   const colors = useThemeColors();
-  const [workouts, setWorkouts] = useState<WorkoutDay[]>([]);
-  const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentDay, setCurrentDay] = useState(1);
-  const [dayOffset, setDayOffset] = useState(0);
-  const [dayText, setDayText] = useState('Today');
-  const [showForm, setShowForm] = useState(false);
-  const [editingWorkout, setEditingWorkout] = useState<WorkoutDay | undefined>();
-  const [totalDays, setTotalDays] = useState(0);
-  const [isCompletingDay, setIsCompletingDay] = useState(false);
-
+  
   // Feature toggles (you can make these configurable later)
   const [isSupersetsEnabled] = useState(true);
   const [isAlternativesEnabled] = useState(true);
   const [isProgressionHelperEnabled] = useState(true);
 
-  const loadWorkouts = useCallback(async (day?: number) => {
-    try {
-      setIsLoading(true);
-      const targetDay = day !== undefined ? day : currentDay;
+  // Custom hooks
+  const {
+    workouts,
+    workoutHistory,
+    isLoading,
+    currentDay,
+    dayOffset,
+    totalDays,
+    setCurrentDay,
+    setDayOffset,
+    loadDataForOffset,
+    loadInitialData,
+    handleDayNavigation,
+  } = useWorkoutData();
 
-      const today = new Date();
-      const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      const historyDate = dayOffset === 0 ? todayString : getDateString();
-      
-      const [workoutsData, historyData, uniqueDays] = await Promise.all([
-        workoutService.getWorkouts(targetDay),
-        workoutHistoryService.getWorkoutHistory(historyDate),
-        workoutService.getUniqueDays(),
-      ]);
-      
-      setWorkouts(workoutsData);
-      setWorkoutHistory(historyData);
-      setTotalDays(uniqueDays);
-    } catch (error) {
-      console.error('Error loading workouts:', error);
-      Alert.alert('Error', 'Failed to load workouts');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentDay]);
+  const { isCompletingDay, completeWorkoutDay } = useWorkoutCompletion();
+  const {
+    showForm,
+    editingWorkout,
+    handleAddWorkout,
+    handleEditWorkout,
+    handleDeleteWorkout,
+    handleSaveWorkout,
+    handleCancelForm,
+  } = useWorkoutForm();
 
-  const getDateString = (): string => {
-    const date = new Date();
-    date.setDate(date.getDate() + dayOffset);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const dayText = useDayText(dayOffset);
 
-  const updateDayText = () => {
-    switch (dayOffset) {
-      case 0:
-        setDayText('Today');
-        break;
-      case -1:
-        setDayText('Yesterday');
-        break;
-      case 1:
-        setDayText('Tomorrow');
-        break;
-      default:
-        setDayText(dayOffset > 0 
-          ? `In ${dayOffset} Days` 
-          : `${Math.abs(dayOffset)} Days Ago`);
-        break;
-    }
-  };
-
-  const handleDayNavigation = (offset: number) => {
-    const newOffset = dayOffset + offset;
-    setDayOffset(newOffset);
-    
-    if (newOffset === 0) {
-      // When going back to today, load current day workouts
-      loadWorkouts();
-    } else if (newOffset < 0) {
-      // Past dates - load history
-      loadWorkoutHistory(newOffset);
-    } else {
-      // Future dates - load scheduled workouts for that day
-      loadFutureWorkouts(newOffset);
-    }
-  };
-
-  const loadWorkoutHistory = async (offset?: number) => {
-    try {
-      setIsLoading(true);
-      // Use the provided offset or the current dayOffset
-      const currentOffset = offset !== undefined ? offset : dayOffset;
-      const historyDate = getDateStringForOffset(currentOffset);
-      
-      const historyData = await workoutHistoryService.getWorkoutHistory(historyDate);
-      
-      // Clear current workouts first, then set history
-      setWorkouts([]);
-      setWorkoutHistory(historyData);
-    } catch (error) {
-      console.error('Error loading workout history:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getDateStringForOffset = (offset: number): string => {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const loadFutureWorkouts = async (offset: number) => {
-    try {
-      setIsLoading(true);
-      // For future dates, calculate the next workout day
-      let futureDay = currentDay + offset;
-      
-      // Handle wrapping around to day 1 if we exceed totalDays
-      if (futureDay > totalDays) {
-        futureDay = futureDay - totalDays;
-      }
-      
-      const futureWorkouts = await workoutService.getWorkouts(futureDay);
-      setWorkouts(futureWorkouts);
-      setWorkoutHistory([]); // Clear history for future dates
-    } catch (error) {
-      console.error('Error loading future workouts:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCompleteDay = async () => {
-    try {
-      
-      if (workouts.length === 0) {
-        Alert.alert('No Workouts', 'No workouts to complete for today');
-        return;
-      }
-
-      setIsCompletingDay(true);
-
-      // Convert all workouts to history with the current date
-      const completionDate = new Date();
-      
-      for (const workout of workouts) {
-        const workoutHistory = WorkoutHistoryService.workoutDayToHistory(workout, completionDate);
-        await workoutHistoryService.createWorkoutHistory(workoutHistory);
-      }
-
-      // Move to next day
-      const nextDay = currentDay < totalDays ? currentDay + 1 : 1;
-      
-      // Save the new current day to storage first
-      await workoutService.setCurrentDay(nextDay);
-      
-      // Update state - this will trigger the useEffect to load workouts
+  // Event handlers
+  const handleCompleteDay = () => {
+    completeWorkoutDay(workouts, currentDay, totalDays, (nextDay) => {
       setCurrentDay(nextDay);
       setDayOffset(0);
-      
-      setIsCompletingDay(false);
-      Alert.alert('Success', `Workout day completed! Moved to day ${nextDay}.`);
-    } catch (error) {
-      console.error('Error completing day:', error);
-      setIsCompletingDay(false);
-      Alert.alert('Error', 'Failed to complete workout day');
-    }
-  };
-
-  const handleAddWorkout = () => {
-    setEditingWorkout(undefined);
-    setShowForm(true);
-  };
-
-  const handleEditWorkout = (workout: WorkoutDay) => {
-    setEditingWorkout(workout);
-    setShowForm(true);
-  };
-
-  const handleDeleteWorkout = async (workout: WorkoutDay) => {
-    try {
-      const success = await workoutService.removeWorkout(workout.id);
-      if (success) {
-        loadWorkouts();
-      } else {
-        Alert.alert('Error', 'Failed to delete workout');
-      }
-    } catch (error) {
-      console.error('Error deleting workout:', error);
-      Alert.alert('Error', 'Failed to delete workout');
-    }
-  };
-
-  const handleSaveWorkout = (workout: WorkoutDay) => {
-    setShowForm(false);
-    loadWorkouts();
+      loadDataForOffset(0);
+    });
   };
 
   const handleGoToToday = async () => {
     setDayOffset(0);
-    // Load the current saved day from storage
     const savedCurrentDay = await workoutService.getCurrentDay();
     setCurrentDay(savedCurrentDay);
-    loadWorkouts(savedCurrentDay);
+    loadInitialData(savedCurrentDay);
+  };
+
+  const handleRefresh = () => {
+    loadDataForOffset(dayOffset);
+  };
+
+  const handleDelete = (workout: WorkoutDay) => {
+    handleDeleteWorkout(workout, handleRefresh);
+  };
+
+  const handleSave = (workout: WorkoutDay) => {
+    handleSaveWorkout(handleRefresh);
   };
 
   // Load current day from storage and initialize workouts on component mount
@@ -237,7 +90,7 @@ export const WorkoutsScreen: React.FC = () => {
         setCurrentDay(savedCurrentDay);
         
         // Load workouts for the saved current day
-        await loadWorkouts(savedCurrentDay);
+        await loadInitialData(savedCurrentDay);
       } catch (error) {
         console.error('Error initializing app:', error);
         Alert.alert('Error', 'Failed to load app data');
@@ -247,7 +100,7 @@ export const WorkoutsScreen: React.FC = () => {
     initializeApp();
   }, []);
 
-  // Load workouts when currentDay changes (but not on initial mount)
+  // Load data when currentDay or dayOffset changes (but not on initial mount)
   useEffect(() => {
     // Only reload if currentDay has been updated from storage (not initial load)
     const hasInitialized = workouts.length > 0 || totalDays > 0;
@@ -255,110 +108,20 @@ export const WorkoutsScreen: React.FC = () => {
       return; // Still initializing
     }
     
-    loadWorkouts();
-  }, [currentDay, loadWorkouts]);
+    // Load appropriate data based on dayOffset
+    loadDataForOffset(dayOffset);
+  }, [currentDay, dayOffset]);
 
-  // Force re-render when completing a day
-  useEffect(() => {
-    if (isCompletingDay) {
-      // Force a re-render by updating a dummy state
-      const timer = setTimeout(() => {
-        // This will trigger a re-render
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isCompletingDay]);
-
-  useEffect(() => {
-    updateDayText();
-  }, [dayOffset]);
-
-  const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-      {(workoutHistory.length > 0 || workouts.length > 0 || dayOffset !== 0) ? (
-        <>
-          <View style={styles.spacer} />
-          <View style={styles.dayNavigation}>
-            <TouchableOpacity 
-              style={styles.navButton}
-              onPress={() => handleDayNavigation(-1)}
-            >
-              <View style={[styles.navButtonLeft, { borderRightColor: colors.primary }]} />
-            </TouchableOpacity>
-            
-            <Text style={[styles.dayText, { color: colors.text.primary }]}>{dayText}</Text>
-            
-            <TouchableOpacity 
-              style={styles.navButton}
-              onPress={() => handleDayNavigation(1)}
-            >
-              <View style={[styles.navButtonRight, { borderLeftColor: colors.primary }]} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.spacer} />
-        </>
-      ) : (
-        <View style={styles.spacer} />
-      )}
-    </View>
-  );
-
-  const renderCompleteButton = () => {
-    if (workouts.length === 0 || dayOffset !== 0) return null;
-    
-    return (
-      <TouchableOpacity 
-        style={[styles.completeButton, isCompletingDay && styles.completeButtonDisabled]} 
-        onPress={handleCompleteDay}
-        disabled={isCompletingDay}
-      >
-        {isCompletingDay ? (
-          <Text style={styles.completeButtonText}>Completing...</Text>
-        ) : (
-          <Text style={styles.completeButtonText}>Complete Day</Text>
-        )}
-      </TouchableOpacity>
-    );
-  };
-
-  const renderFormModal = () => (
-    <Modal
-      visible={showForm}
-      animationType="slide"
-      presentationStyle="pageSheet"
-    >
-      <View style={[styles.modalContainer, { paddingTop: insets.top, backgroundColor: colors.background }]}>
-        <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
-            {editingWorkout ? 'Edit Workout' : 'Add Workout'}
-          </Text>
-          <TouchableOpacity 
-            style={styles.closeButton}
-            onPress={() => setShowForm(false)}
-          >
-            <Text style={[styles.closeButtonText, { color: colors.text.secondary }]}>✕</Text>
-          </TouchableOpacity>
-        </View>
-        
-        <WorkoutCreateUpdateForm
-          workout={editingWorkout}
-          day={currentDay}
-          defaultOrder={workouts.length + 1}
-          onSave={handleSaveWorkout}
-          onCancel={() => setShowForm(false)}
-          workoutsInDay={workouts}
-          isSupersetsEnabled={isSupersetsEnabled}
-          isAlternativesEnabled={isAlternativesEnabled}
-          isProgressionHelperEnabled={isProgressionHelperEnabled}
-        />
-      </View>
-    </Modal>
-  );
+  const hasContent = workoutHistory.length > 0 || workouts.length > 0 || dayOffset !== 0;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {renderHeader()}
-      
+      <WorkoutsHeader
+        dayText={dayText}
+        hasContent={hasContent}
+        onPreviousDay={() => handleDayNavigation(-1)}
+        onNextDay={() => handleDayNavigation(1)}
+      />
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -373,15 +136,31 @@ export const WorkoutsScreen: React.FC = () => {
           onAddWorkout={handleAddWorkout}
           onGoToToday={handleGoToToday}
           onUpdateWorkout={handleEditWorkout}
-          onDeleteWorkout={handleDeleteWorkout}
+          onDeleteWorkout={handleDelete}
           isSupersetsEnabled={isSupersetsEnabled}
           isAlternativesEnabled={isAlternativesEnabled}
           isProgressionHelperEnabled={isProgressionHelperEnabled}
         />
       )}
       
-      {renderCompleteButton()}
-      {renderFormModal()}
+      <CompleteWorkoutButton
+        visible={workouts.length > 0 && dayOffset === 0}
+        isCompleting={isCompletingDay}
+        onComplete={handleCompleteDay}
+      />
+      
+      <WorkoutFormModal
+        visible={showForm}
+        editingWorkout={editingWorkout}
+        currentDay={currentDay}
+        workoutsCount={workouts.length}
+        workoutsInDay={workouts}
+        onSave={handleSave}
+        onCancel={handleCancelForm}
+        isSupersetsEnabled={isSupersetsEnabled}
+        isAlternativesEnabled={isAlternativesEnabled}
+        isProgressionHelperEnabled={isProgressionHelperEnabled}
+      />
     </View>
   );
 };
@@ -389,49 +168,6 @@ export const WorkoutsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  dayNavigation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: 300,
-  },
-  navButton: {
-    padding: 8,
-  },
-  navButtonLeft: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 10,
-    borderBottomWidth: 10,
-    borderRightWidth: 15,
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-  },
-  navButtonRight: {
-    width: 0,
-    height: 0,
-    borderTopWidth: 10,
-    borderBottomWidth: 10,
-    borderLeftWidth: 15,
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-  },
-  dayText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  spacer: {
-    width: 36,
   },
   loadingContainer: {
     flex: 1,
@@ -441,43 +177,5 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-  },
-  completeButton: {
-    margin: 16,
-    marginBottom: 80, // Add space for bottom tab bar
-    paddingVertical: 16,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  completeButtonDisabled: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
-  },
-  completeButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  closeButtonText: {
-    fontSize: 18,
   },
 });
